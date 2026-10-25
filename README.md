@@ -171,7 +171,7 @@ mes;radiacion_media;temp_media
 
 > **Significado de Columnas:**
 > - `mes`: Número del mes del 1 al 12.
-> - `radiacion_media`: Radiación solar global diaria media en plano horizontal ($G_{dm}(0)$) en $\text{kWh/m}^2/\text{día}$ (o acumulada mensual si $> 25$).
+> - `radiacion_media`: Radiación solar global diaria media en plano horizontal ($G_{dm}(0)$) en $\text{kWh/m}^2/\text{día}$.
 > - `temp_media`: Temperatura media ambiental ($T_{amb}$) en grados Celsius ($^{\circ}\text{C}$).
 >
 > *(Nota de compatibilidad: Por flexibilidad, el analizador también reconoce delimitadores por coma `,` y denominaciones alternativas como `Mes,Gdm0_kWh_m2_dia,Temperatura_C` o `Tamb`, garantizando compatibilidad retroactiva total).*
