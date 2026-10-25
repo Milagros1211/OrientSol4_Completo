@@ -66,64 +66,134 @@ La versión para Android está optimizada con diseño responsivo adaptativo tant
 
 ---
 
-## Guía de Plantillas y Formatos para la Carga de Emplazamientos (CSV / JSON)
+## 📁 Guía Completa de Formatos de Subida y Flujo de Ingesta Digital (Pestaña 3: CSV / JSON / TXT)
 
-OrientSol 4.0 incluye un motor universal de ingesta digital capaz de procesar archivos de climatología tanto para **un único emplazamiento** como para un **lote de múltiples emplazamientos simultáneos (Batch)**. Los archivos subidos se validan matemáticamente, se cargan en el motor de cálculo y se registran automáticamente en la base de datos de **Supabase** (tabla `datos_mensuales`) o en la caché offline si no hay conexión a Internet.
+OrientSol 4.0 incorpora un motor universal de ingesta y validación climática en cliente diseñado para procesar archivos de radiación y temperatura tanto para **un único emplazamiento** como para **lotes masivos de múltiples emplazamientos simultáneos (Batch)**.
+
+Los archivos subidos se validan matemáticamente en milisegundos mediante WebAssembly/TypeScript, se almacenan de forma segura bajo una **arquitectura híbrida dual** (Caché Local para uso offline y sincronización opcional en la nube con **Supabase**, tabla `datos_mensuales`), y permiten ejecutar **simulaciones directas in situ** sin necesidad de recargar la aplicación ni cambiar de pantalla.
 
 ---
 
-> **Campos que se guardan en Supabase (como emplazamiento no oficial, `es_oficial = false`):** nombre del emplazamiento, latitud, longitud y, para cada uno de los 12 meses, la radiación y la temperatura media. Las plantillas contienen únicamente esos campos; otros campos opcionales (país, altitud, albedo, notas) no se almacenan en la base de datos.
+### 🔄 Flujo de Funcionamiento Actualizado en la Aplicación Web
+
+El funcionamiento de la pestaña **3. Subida Digital (CSV / JSON)** sigue un flujo de trabajo optimizado en 5 etapas continuas:
+
+```mermaid
+flowchart TD
+    A["Arrastrar archivo (.csv, .json, .txt) o botón 'Seleccionar Archivo'"] --> B["Validación sintáctica y física de rangos (12 meses)"]
+    B --> C["Almacenamiento inmediato en Caché Local ('[CACHÉ LOCAL]')"]
+    C --> D["Aparición de Tarjeta de Preparación (Staging Card)"]
+    D --> E{"¿Conexión activa a Supabase?"}
+    E -- Sí (Online) --> F["Botón 'Cargar a Base de Datos (Nube)' -> Registra en tabla 'datos_mensuales' ('[ORIENTSOL]')"]
+    E -- No (Offline) --> G["Botón 'Guardar en Caché Local' -> Encolado offline automático"]
+    F --> H["Activación de Selector In Situ y Píldoras Interactivas"]
+    G --> H
+    H --> I["Seleccionar estación y simular al instante en los 8 módulos inferiores"]
+```
+
+1. **Carga y Validación Automática:**
+   Arrastra tu archivo a la zona de caída (*Dropzone*) o pulsa el botón **«Seleccionar Archivo»** (admite extensiones `.csv`, `.json` y `.txt`). El analizador inteligente verifica de inmediato que las coordenadas sean válidas y que se disponga del vector completo de 12 meses de irradiancia y temperatura.
+2. **Almacenamiento Dual Inmediato (Caché Local + Nube):**
+   * **Caché Local Inmediata (`[CACHÉ LOCAL]`):** Nada más leer el archivo, los emplazamientos se guardan automáticamente en la memoria local del navegador (IndexedDB / localStorage). Ya quedan disponibles al 100% para realizar cálculos sin conexión y son localizables en los buscadores con la etiqueta distintiva `[CACHÉ LOCAL]`.
+   * **Banner de Estado de Permisos:** La interfaz muestra un indicador dinámico en tiempo real:
+     - 🟢 *Carga Online a Supabase: PERMITIDA* (cuando hay conectividad con la base de datos).
+     - 🟠 *Carga Online a Supabase: NO PERMITIDA (Modo Offline)* (funciona de forma autónoma local).
+3. **Tarjeta de Preparación (*Staging Card*) y Carga a Base de Datos:**
+   Aparece un panel que detalla el nombre del archivo, el número total de emplazamientos detectados y sus nombres. Al pulsar el botón principal **«Cargar a Base de Datos (Nube)»**, el sistema ejecuta el protocolo de inserción en Supabase (tabla `datos_mensuales` con `es_oficial = false`). Una vez sincronizado, la etiqueta de los emplazamientos pasa automáticamente a ser **`[ORIENTSOL]`**.
+4. **Simulación y Cálculo Directo In Situ (Sin salir de la Pestaña 3):**
+   * **Buscador y Selector Integrado:** En la misma pantalla de subida se despliega una barra de búsqueda con autocompletado y menú desplegable para consultar y activar cualquier estación registrada en la nube o en caché local.
+   * **Píldoras Interactivas (Lotes Multi-Estación):** Si el archivo contiene varios emplazamientos (p. ej. un lote con *Jaén*, *Madrid*, *Sevilla* o *Arequipa* y *Lima*), aparecen botones en forma de píldora interactiva para cada ciudad con su respectiva etiqueta de estado. Al hacer clic sobre cualquiera de ellos, sus 12 meses de irradiancia $G_{dm}(0)$ y temperatura $T_{amb}$ se cargan en el acto.
+   * **Cálculo Instantáneo:** Justo debajo se actualizan la tabla mensual, los gráficos interactivos y los paneles de los **8 módulos de estudio solar** (Inclinación Anual Óptima, Mensual, Estacional, Seguimiento Polar, Azimutal, Horizontal, 2 Ejes y Comparativa Global).
+5. **Tarjeta de Éxito y Redirección al Catálogo Oficial:**
+   Tras completar el guardado, se muestra una tarjeta de confirmación con el botón **«Ir a Pestaña 1 (Catálogo Oficial) y Ver en Desplegable»**, permitiendo al usuario trasladarse cómodamente a la pestaña principal del catálogo histórico manteniendo la estación activa.
+
+---
+
+### 🛡️ Reglas de Validación, Integridad Física y Control Antiduplicados
+
+Para asegurar la máxima calidad de los datos climáticos ingresados, OrientSol 4.0 aplica un sistema de auditoría con cuatro niveles de verificación:
+
+| Regla / Filtro | Criterio de Aceptación | Comportamiento del Sistema |
+| :--- | :--- | :--- |
+| **Separadores y Decimales** | Delimitador `,` o `;` \| Decimal `.` o `,` | Detección y normalización automática universal. |
+| **Normalización de Radiación** | $G_{dm}(0) \le 15.0\text{ kWh/m}^2/\text{día}$ | Si se introducen valores superiores a $25$, OrientSol detecta que es radiación mensual acumulada ($\text{kWh/m}^2/\text{mes}$) y la divide entre los días del mes ($[31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]$) para calcular la media diaria diaria equivalente. |
+| **Rangos Físicos Admisibles** | Latitud: $[-90^\circ, +90^\circ]$<br>Longitud: $[-180^\circ, +180^\circ]$<br>Temperatura: $[-60^\circ\text{C}, +65^\circ\text{C}]$<br>Radiación: $[0.01, 15.0\text{ kWh/m}^2/\text{d}]$ | Rechazo preventivo si faltan meses, si los valores contienen caracteres alfabéticos o si se violan los límites físicos de la constante solar. |
+| **Antiduplicados 1: Coordenadas** | Tolerancia geográfica $< 0.005^\circ$ ($\approx 500\text{ m}$) | Alerta de duplicidad si ya existe una estación en el mismo punto geográfico. |
+| **Antiduplicados 2: Similitud de Nombre** | Distancia de Levenshtein $\ge 90\%$ | Bloqueo si el nombre es casi idéntico. **Excepción inteligente:** Si los nombres incluyen años explícitos distintos (p. ej. *Lima 2025* vs *Lima 2026*), el sistema los admite como series temporales anuales diferentes. |
+| **Antiduplicados 3: Perfil Numérico** | Correlación numérica $\ge 90\%$ | Identifica si los 12 meses de datos radiométricos ya han sido registrados previamente bajo otro nombre. |
+
+---
+
+### 📋 Estructura de Datos Almacenada en Supabase (Tabla `datos_mensuales`)
+
+Cuando se confirma la subida a la nube, OrientSol descompone el emplazamiento en **12 registros normalizados** (uno por cada mes) en la tabla `datos_mensuales` de PostgreSQL con los siguientes campos:
+
+| Campo en Base de Datos | Tipo | Descripción y Validación |
+| :--- | :--- | :--- |
+| `nombre_emplazamiento` | `VARCHAR(200)` | Nombre identificativo del emplazamiento (saneado contra XSS y SQLi). |
+| `latitud` | `NUMERIC` | Latitud en grados decimales (Sur negativo, Norte positivo). |
+| `longitud` | `NUMERIC` | Longitud en grados decimales (Oeste negativo, Este positivo). |
+| `mes` | `INTEGER` | Mes del año del 1 (enero) al 12 (diciembre). |
+| `radiacion_media` | `NUMERIC` | Radiación solar acumulada mensual en $\text{kWh/m}^2/\text{mes}$ ($G_{dm}(0) \times \text{días del mes}$). |
+| `temp_media` | `NUMERIC` | Temperatura media ambiental mensual en $^{\circ}\text{C}$. |
+| `es_oficial` | `BOOLEAN` | Asignado siempre en `false` para distinguir las aportaciones de usuario de las estaciones oficiales del TFM. |
+| `creado_en` | `TIMESTAMP` | Marca temporal automática de inserción y trazabilidad. |
+
+> ℹ️ **Nota sobre parámetros adicionales:** Propiedades como el país, altitud o albedo del suelo ($\rho$) son aprovechadas durante la sesión de cálculo en memoria y en la exportación de informes, pero la tabla central `datos_mensuales` almacena estrictamente las variables astronómicas y climáticas normalizadas anteriores.
 
 ---
 
 ### 1. Formatos para Cargar un ÚNICO Emplazamiento
 
-#### A. Formato CSV Individual (Vertical - Recomendado)
-Este formato consta de cabeceras de metadatos precedidas por `#` y 12 filas con los datos de cada mes del año:
+#### A. Formato CSV Individual (Vertical - Homogenizado y Oficial)
+Consta de cabeceras de metadatos precedidas por `#` o `//` y 12 filas con los datos de cada mes del año. Emplea la misma nomenclatura homogénea que la base de datos y el formato en lote (`mes;radiacion_media;temp_media`) con delimitador punto y coma `;`:
 
 ```csv
 # OrientSol 4.0 - Plantilla de Climatología Individual
 # Localidad: Jaén
 # Latitud: 37.7796
 # Longitud: -3.7849
-Mes,Gdm0_kWh_m2_dia,Temperatura_C
-1,2.45,9.2
-2,3.31,10.5
-3,4.68,13.8
-4,5.82,16.5
-5,6.95,20.8
-6,7.92,26.1
-7,8.10,29.4
-8,7.25,28.9
-9,5.54,24.5
-10,3.95,19.1
-11,2.75,13.2
-12,2.18,10.0
+# Radiación: en kWh/m²/día (ej: 2.45) o mensual en kWh/m²/mes (se convierte automáticamente)
+mes;radiacion_media;temp_media
+1;2.45;9.2
+2;3.31;10.5
+3;4.68;13.8
+4;5.82;16.5
+5;6.95;20.8
+6;7.92;26.1
+7;8.10;29.4
+8;7.25;28.9
+9;5.54;24.5
+10;3.95;19.1
+11;2.75;13.2
+12;2.18;10.0
 ```
 
 > **Significado de Columnas:**
-> - `Mes`: Número del mes del 1 al 12.
-> - `Gdm0_kWh_m2_dia`: Radiación solar global sobre superficie horizontal media diaria ($G_{dm}(0)$) en $\text{kWh/m}^2/\text{día}$. *(Si se introducen valores superiores a 25, OrientSol detecta automáticamente que es radiación acumulada mensual en $\text{kWh/m}^2/\text{mes}$ y la divide entre los días del mes para normalizarla).*
-> - `Temperatura_C`: Temperatura media ambiental ($T_{amb}$) en grados Celsius ($^{\circ}\text{C}$).
+> - `mes`: Número del mes del 1 al 12.
+> - `radiacion_media`: Radiación solar global diaria media en plano horizontal ($G_{dm}(0)$) en $\text{kWh/m}^2/\text{día}$ (o acumulada mensual si $> 25$).
+> - `temp_media`: Temperatura media ambiental ($T_{amb}$) en grados Celsius ($^{\circ}\text{C}$).
+>
+> *(Nota de compatibilidad: Por flexibilidad, el analizador también reconoce delimitadores por coma `,` y denominaciones alternativas como `Mes,Gdm0_kWh_m2_dia,Temperatura_C` o `Tamb`, garantizando compatibilidad retroactiva total).*
 
 ---
 
 #### B. Formato CSV Individual (Horizontal)
-Distribución en filas horizontales compactas:
+Distribución compacta en tres filas homogéneas precedidas por las cabeceras comentadas con `#`:
 
 ```csv
 # Localidad: Jaén
 # Latitud: 37.7796
 # Longitud: -3.7849
-Mes,1,2,3,4,5,6,7,8,9,10,11,12
-Gdm0,2.45,3.31,4.68,5.82,6.95,7.92,8.10,7.25,5.54,3.95,2.75,2.18
-Tamb,9.2,10.5,13.8,16.5,20.8,26.1,29.4,28.9,24.5,19.1,13.2,10.0
+mes;1;2;3;4;5;6;7;8;9;10;11;12
+radiacion_media;2.45;3.31;4.68;5.82;6.95;7.92;8.10;7.25;5.54;3.95;2.75;2.18
+temp_media;9.2;10.5;13.8;16.5;20.8;26.1;29.4;28.9;24.5;19.1;13.2;10.0
 ```
 
 ---
 
-#### C. Formato JSON Individual
-Estructura en objeto JSON estándar:
+#### C. Formato JSON Individual (Nativo OrientSol)
+Objeto JSON estándar con las propiedades obligatorias `locationName`, `latitude`, `longitude`, `monthlyGdm0` (array de 12 números) y `monthlyTemperature` (array de 12 números):
 
 ```json
 {
@@ -139,87 +209,81 @@ Estructura en objeto JSON estándar:
 
 ### 2. Formatos para Cargar MÚLTIPLES Emplazamientos (Lote / Batch)
 
-#### A. Formato CSV Multi-Emplazamiento (Lote Tabular)
-Permite subir decenas o cientos de emplazamientos en un solo archivo delimitado por punto y coma `;` o coma `,`:
+#### A. Formato CSV Multi-Emplazamiento (Lote Tabular Oficial)
+Permite subir decenas o cientos de emplazamientos en un único archivo estructurado mediante punto y coma `;` o coma `,`. Cada ciudad ocupa 12 filas (una por cada mes):
 
 ```csv
 # OrientSol 4.0 - Plantilla de Lote Multi-Emplazamiento (Batch)
 # Formato: emplazamiento;latitud;longitud;mes;radiacion_media;temp_media
-# Radiación: en kWh/m²/día (ej: 5.80) o mensual en kWh/m²/mes (se convierte automáticamente)
-# Coordenadas: Latitud Sur (-) y Longitud Oeste (-)
+# Radiación: en kWh/m²/día (ej: 2.45) o mensual en kWh/m²/mes (se convierte automáticamente)
 emplazamiento;latitud;longitud;mes;radiacion_media;temp_media
-Arequipa;-16.40;-71.54;1;6.35;15.2
-Arequipa;-16.40;-71.54;2;5.95;15.1
-Arequipa;-16.40;-71.54;3;6.10;15.0
-Arequipa;-16.40;-71.54;4;6.42;14.6
-Arequipa;-16.40;-71.54;5;6.28;13.8
-Arequipa;-16.40;-71.54;6;6.05;13.1
-Arequipa;-16.40;-71.54;7;6.18;12.9
-Arequipa;-16.40;-71.54;8;6.65;13.4
-Arequipa;-16.40;-71.54;9;7.10;14.2
-Arequipa;-16.40;-71.54;10;7.35;14.8
-Arequipa;-16.40;-71.54;11;7.20;15.0
-Arequipa;-16.40;-71.54;12;6.70;15.3
-Lima;-12.05;-77.04;1;5.82;22.4
-Lima;-12.05;-77.04;2;6.12;23.1
-Lima;-12.05;-77.04;3;5.65;22.6
-Lima;-12.05;-77.04;4;4.78;20.8
-Lima;-12.05;-77.04;5;3.62;18.7
-Lima;-12.05;-77.04;6;2.85;17.2
-Lima;-12.05;-77.04;7;2.60;16.5
-Lima;-12.05;-77.04;8;2.72;16.3
-Lima;-12.05;-77.04;9;3.15;16.8
-Lima;-12.05;-77.04;10;3.95;18.0
-Lima;-12.05;-77.04;11;4.68;19.4
-Lima;-12.05;-77.04;12;5.25;21.1
+Jaén;37.77;-3.78;1;2.45;9.2
+Jaén;37.77;-3.78;2;3.31;10.5
+Jaén;37.77;-3.78;3;4.68;13.8
+Jaén;37.77;-3.78;4;5.82;16.5
+Jaén;37.77;-3.78;5;6.95;20.8
+Jaén;37.77;-3.78;6;7.92;26.1
+Jaén;37.77;-3.78;7;8.10;29.4
+Jaén;37.77;-3.78;8;7.25;28.9
+Jaén;37.77;-3.78;9;5.54;24.5
+Jaén;37.77;-3.78;10;3.95;19.1
+Jaén;37.77;-3.78;11;2.75;13.2
+Jaén;37.77;-3.78;12;2.18;10.0
+Madrid;40.41;-3.70;1;2.14;6.1
+Madrid;40.41;-3.70;2;3.15;7.9
+Madrid;40.41;-3.70;3;4.48;11.2
+Madrid;40.41;-3.70;4;5.51;13.5
+Madrid;40.41;-3.70;5;6.62;17.8
+Madrid;40.41;-3.70;6;7.54;23.3
+Madrid;40.41;-3.70;7;7.78;27.8
+Madrid;40.41;-3.70;8;6.84;26.7
+Madrid;40.41;-3.70;9;5.25;22.0
+Madrid;40.41;-3.70;10;3.52;15.9
+Madrid;40.41;-3.70;11;2.36;10.1
+Madrid;40.41;-3.70;12;1.84;6.9
 ```
+
+> 💡 **Nota de coordenadas:** El formato tabular es compatible con coordenadas de cualquier parte del mundo (coordenadas negativas para hemisferio sur y hemisferio occidental, por ejemplo: `Arequipa;-16.40;-71.54;...` o `Lima;-12.05;-77.04;...`).
 
 ---
 
 #### B. Formato JSON Multi-Emplazamiento (Array de Objetos)
-Un arreglo (`[]`) que contiene la lista de emplazamientos con sus 12 valores mensuales correspondientes:
+Un array (`[]`) en el que cada elemento es un objeto JSON de emplazamiento con sus vectores de 12 meses:
 
 ```json
 [
   {
-    "locationName": "Santiago de Chile",
-    "latitude": -33.4489,
-    "longitude": -70.6693,
-    "monthlyGdm0": [7.85, 7.12, 5.84, 4.15, 2.78, 2.15, 2.42, 3.25, 4.65, 6.10, 7.35, 8.02],
-    "monthlyTemperature": [21.2, 20.4, 18.3, 14.8, 11.5, 9.2, 8.7, 10.1, 12.4, 15.1, 17.8, 20.1]
+    "locationName": "Jaén",
+    "latitude": 37.7796,
+    "longitude": -3.7849,
+    "monthlyGdm0": [2.45, 3.31, 4.68, 5.82, 6.95, 7.92, 8.10, 7.25, 5.54, 3.95, 2.75, 2.18],
+    "monthlyTemperature": [9.2, 10.5, 13.8, 16.5, 20.8, 26.1, 29.4, 28.9, 24.5, 19.1, 13.2, 10.0]
   },
   {
-    "locationName": "Buenos Aires",
-    "latitude": -34.6037,
-    "longitude": -58.3816,
-    "monthlyGdm0": [6.75, 5.92, 4.85, 3.55, 2.62, 2.10, 2.28, 2.95, 3.98, 5.12, 6.25, 6.85],
-    "monthlyTemperature": [25.1, 23.9, 21.8, 17.9, 14.5, 11.7, 11.0, 12.8, 15.2, 18.2, 21.1, 23.6]
-  },
-  {
-    "locationName": "Bogotá",
-    "latitude": 4.7110,
-    "longitude": -74.0721,
-    "monthlyGdm0": [4.65, 4.52, 4.35, 4.10, 4.05, 4.20, 4.38, 4.45, 4.50, 4.18, 4.12, 4.40],
-    "monthlyTemperature": [13.5, 13.8, 14.0, 14.2, 14.3, 14.0, 13.7, 13.7, 13.6, 13.6, 13.7, 13.4]
-  },
-  {
-    "locationName": "Brasilia",
-    "latitude": -15.7975,
-    "longitude": -47.8919,
-    "monthlyGdm0": [4.85, 5.10, 4.95, 5.25, 5.48, 5.52, 5.75, 6.15, 5.82, 5.15, 4.65, 4.72],
-    "monthlyTemperature": [21.9, 22.0, 22.0, 21.7, 20.4, 19.3, 19.3, 21.1, 23.0, 23.1, 22.1, 21.9]
+    "locationName": "Madrid",
+    "latitude": 40.4168,
+    "longitude": -3.7038,
+    "monthlyGdm0": [2.14, 3.15, 4.48, 5.51, 6.62, 7.54, 7.78, 6.84, 5.25, 3.52, 2.36, 1.84],
+    "monthlyTemperature": [6.1, 7.9, 11.2, 13.5, 17.8, 23.3, 27.8, 26.7, 22.0, 15.9, 10.1, 6.9]
   }
 ]
 ```
 
 ---
 
-### 3. Descarga Directa de Plantillas desde la Aplicación Web
-Para facilitar la creación de tus archivos, la plataforma cuenta con botones de descarga directa en la pestaña **3. Subida Digital (CSV / JSON)**:
-1. `Descargar Plantilla CSV`: Genera la plantilla individual `.csv`.
-2. `Plantilla CSV (Lote Multi)`: Genera la plantilla de lote con múltiples ciudades `.csv`.
-3. `Descargar Plantilla JSON`: Genera la plantilla individual `.json`.
-4. `Plantilla JSON (Lote Multi)`: Genera el array con múltiples ciudades `.json`.
+#### C. Compatibilidad con Archivos Exportados de PVGIS (API / Web)
+OrientSol 4.0 reconoce e ingiere directamente archivos JSON mensuales descargados desde la plataforma oficial **PVGIS 5.3** de la Comisión Europea (JRC). El analizador detecta el bloque `outputs.monthly`, extrae automáticamente la radiación media horizontal `H(h)_m` o `H(h)`, la temperatura ambiente `T2m` y las coordenadas `inputs.location`, transformándolo al instante en un perfil válido listo para simular.
+
+---
+
+### 3. Descarga Directa de Plantillas Oficiales desde la Aplicación Web
+
+En la propia pestaña **3. Subida Digital (CSV / JSON)** de la plataforma dispones de 4 botones de generación y descarga inmediata para no tener que crear los archivos manualmente:
+
+1. **`Descargar Plantilla CSV`:** Descarga el archivo `plantilla_climatica_individual_orientsol.csv` con la estructura vertical de 12 meses.
+2. **`Plantilla CSV (Lote Multi)`:** Descarga el archivo `plantilla_climatica_lote_multi_orientsol.csv` con la estructura tabular multi-ciudad.
+3. **`Descargar Plantilla JSON`:** Descarga el archivo `plantilla_climatica_individual_orientsol.json` para un único emplazamiento.
+4. **`Plantilla JSON (Lote Multi)`:** Descarga el archivo `plantilla_climatica_lote_multi_orientsol.json` con la lista de objetos de ejemplo.
 
 ---
 
@@ -242,11 +306,15 @@ OrientSol 4.0 está diseñado para funcionar de manera **100% autónoma y offlin
 2. **Desbloqueo de SmartScreen:** Al ejecutarlo por primera vez, Windows SmartScreen puede mostrar la ventana azul *"Windows protegió su PC"* (al tratarse de una aplicación académica de código abierto sin firma corporativa de pago). Haz clic en el enlace **"Más información"** y luego en el botón **"Ejecutar de todas formas"**.
 3. **Arranque del simulador:** La aplicación abrirá su ventana principal al instante. En segundo plano, se inicializa automáticamente el hilo seguro de WebAssembly con Pyodide.
 4. **Flujo de uso en la aplicación:**
-   * **Paso 1 (Emplazamiento):** En la cabecera, selecciona una localidad española del catálogo de 114 estaciones, introduce coordenadas libres (Latitud/Longitud) o sube tu propio archivo de radiación en la pestaña *"Subida Digital (CSV / JSON)"*.
-   * **Paso 2 (Módulo de Estudio):** Selecciona en la barra superior el análisis deseado: *Inclinación Fija Anual*, *Inclinación Estacional*, *Seguimiento Solar (1 o 2 ejes)*, *Pérdidas CTE DB-HE4* o *Modelo Energético de Osterwald*.
-   * **Paso 3 (Ajuste de Parámetros):** Modifica el albedo ($\rho$), los ángulos de inclinación ($\beta$) y orientación ($\alpha$), o los coeficientes térmicos del panel.
-   * **Paso 4 (Cálculo):** Pulsa el botón **"Calcular"**. Los resultados numéricos, tablas de radiación mensual y diagramas polares vectoriales en SVG se procesarán en milisegundos.
-   * **Paso 5 (Exportación):** Utiliza los botones de descarga para exportar el informe técnico completo en **PDF**, las series de radiación en **CSV**, o la hoja de cálculo sanitizada en **Excel (.xlsx)**.
+   * **Paso 1 (Emplazamiento y Climatología):** En el panel superior, selecciona cualquiera de las 4 modalidades disponibles:
+     1. *Catálogo Histórico & Supabase:* Búsqueda asistida en las 114 estaciones oficiales o datasets en la nube (`[ORIENTSOL]`).
+     2. *Entrada Manual:* Introducción directa de coordenadas y perfil de 12 meses de radiación y temperatura.
+     3. *Subida Digital (CSV / JSON / TXT):* Carga de archivos individuales o por lote multi-ciudad con previsualización, guardado dual (caché local y base de datos) y selección directa in situ.
+     4. *Consulta Satelital:* Extracción georreferenciada global desde PVGIS 5.3 (SARAH2), NASA POWER o Open-Meteo.
+   * **Paso 2 (Módulo de Estudio Solar):** Selecciona el análisis deseado entre los 8 módulos científicos disponibles: *Inclinación Fija Anual*, *Inclinación Mensual*, *Inclinación Estacional*, *Seguimiento Polar*, *Seguimiento Azimutal*, *Seguimiento Horizontal*, *Seguimiento en 2 Ejes* o *Estudio Comparativo Global*.
+   * **Paso 3 (Ajuste de Parámetros de Diseño):** Modifica el albedo del suelo ($\rho$), la potencia pico ($P_n$), el Performance Ratio ($PR$), la temperatura de célula ($TONC/NOCT$), o los ángulos de inclinación ($\beta$) y orientación ($\alpha$).
+   * **Paso 4 (Cálculo Inmediato):** Pulsa **«Calcular»** (o haz clic en cualquiera de las píldoras de estaciones en lotes). El motor en WebAssembly/Python procesa las integrales solares, ganancias energéticas y pérdidas térmicas en milisegundos.
+   * **Paso 5 (Exportación Profesional):** Descarga el informe técnico formal en **PDF**, las series horarias y mensuales en **CSV**, o la auditoría completa en **Excel (.xlsx)**.
 
 ---
 
