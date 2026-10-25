@@ -4,7 +4,11 @@ import {
   type SolarBridgeSimulationResult,
 } from '@/services/bridge/solarCalculationBridge';
 import { solarSyncState } from '@/services/bridge/solarSyncState';
-import { generateSampleCSV, generateSampleJSON } from '@/services/hybrid/climateFileParser';
+import {
+  generateSampleCSV,
+  generateSampleCSVHorizontal,
+  generateSampleJSON,
+} from '@/services/hybrid/climateFileParser';
 import type { ClimateDataRecord } from '@/types/climate';
 import {
   climateDatabaseService,
@@ -391,9 +395,10 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
             <span>${t.hybridLoader.selectFileBtn}</span>
             <input type="file" id="climate-file-input" accept=".csv,.json,.txt" style="display: none;" />
           </label>
-          <button id="btn-download-csv-template" class="btn btn-secondary">${t.hybridLoader.sampleCsvBtn}</button>
+          <button id="btn-download-csv-template" class="btn btn-secondary">${isEn ? 'Sample CSV (Vertical)' : 'Plantilla CSV (Vertical)'}</button>
+          <button id="btn-download-csv-horizontal-template" class="btn btn-secondary">${isEn ? 'Sample CSV (Horizontal)' : 'Plantilla CSV (Horizontal)'}</button>
           <button id="btn-download-csv-multi-template" class="btn btn-secondary">${isEn ? 'Sample Batch CSV (Multi)' : 'Plantilla CSV (Lote Multi)'}</button>
-          <button id="btn-download-json-template" class="btn btn-secondary">${t.hybridLoader.sampleJsonBtn}</button>
+          <button id="btn-download-json-template" class="btn btn-secondary">${isEn ? 'Sample JSON (Single)' : 'Plantilla JSON (Individual)'}</button>
           <button id="btn-download-json-multi-template" class="btn btn-secondary">${isEn ? 'Sample Batch JSON (Multi)' : 'Plantilla JSON (Lote Multi)'}</button>
         </div>
       </div>
@@ -635,6 +640,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
   const dropzone = container.querySelector('#file-dropzone') as HTMLElement;
   const fileInput = container.querySelector('#climate-file-input') as HTMLInputElement;
   const downloadCsvBtn = container.querySelector('#btn-download-csv-template') as HTMLButtonElement;
+  const downloadCsvHorizontalBtn = container.querySelector('#btn-download-csv-horizontal-template') as HTMLButtonElement;
   const downloadCsvMultiBtn = container.querySelector('#btn-download-csv-multi-template') as HTMLButtonElement;
   const downloadJsonBtn = container.querySelector('#btn-download-json-template') as HTMLButtonElement;
   const downloadJsonMultiBtn = container.querySelector('#btn-download-json-multi-template') as HTMLButtonElement;
@@ -2229,7 +2235,18 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'plantilla_climatica_individual_orientsol.csv';
+    a.download = 'plantilla_climatica_individual_vertical.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  downloadCsvHorizontalBtn?.addEventListener('click', () => {
+    const csv = generateSampleCSVHorizontal();
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'plantilla_climatica_individual_horizontal.csv';
     a.click();
     URL.revokeObjectURL(url);
   });
@@ -2240,7 +2257,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'plantilla_lote_multi_emplazamientos.csv';
+    a.download = 'plantilla_climatica_lote_multi_orientsol.csv';
     a.click();
     URL.revokeObjectURL(url);
   });
@@ -2262,7 +2279,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'plantilla_lote_multi_emplazamientos.json';
+    a.download = 'plantilla_climatica_lote_multi_orientsol.json';
     a.click();
     URL.revokeObjectURL(url);
   });

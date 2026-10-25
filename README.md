@@ -278,12 +278,16 @@ OrientSol 4.0 reconoce e ingiere directamente archivos JSON mensuales descargado
 
 ### 3. Descarga Directa de Plantillas Oficiales desde la Aplicación Web
 
-En la propia pestaña **3. Subida Digital (CSV / JSON)** de la plataforma dispones de 4 botones de generación y descarga inmediata para no tener que crear los archivos manualmente:
+En la pestaña **3. Subida Digital (CSV / JSON)** de la plataforma dispones de **5 botones de generación y descarga inmediata** para obtener los archivos preconfigurados con un solo clic:
 
-1. **`Descargar Plantilla CSV`:** Descarga el archivo `plantilla_climatica_individual_orientsol.csv` con la estructura vertical de 12 meses.
-2. **`Plantilla CSV (Lote Multi)`:** Descarga el archivo `plantilla_climatica_lote_multi_orientsol.csv` con la estructura tabular multi-ciudad.
-3. **`Descargar Plantilla JSON`:** Descarga el archivo `plantilla_climatica_individual_orientsol.json` para un único emplazamiento.
-4. **`Plantilla JSON (Lote Multi)`:** Descarga el archivo `plantilla_climatica_lote_multi_orientsol.json` con la lista de objetos de ejemplo.
+1. **`Plantilla CSV (Vertical)`:** Descarga [`plantilla_climatica_individual_vertical.csv`](plantillas/plantilla_climatica_individual_vertical.csv) con la estructura vertical de 12 meses (`mes;radiacion_media;temp_media`).
+2. **`Plantilla CSV (Horizontal)`:** Descarga [`plantilla_climatica_individual_horizontal.csv`](plantillas/plantilla_climatica_individual_horizontal.csv) con la estructura horizontal compacta en 3 filas.
+3. **`Plantilla CSV (Lote Multi)`:** Descarga [`plantilla_climatica_lote_multi_orientsol.csv`](plantillas/plantilla_climatica_lote_multi_orientsol.csv) con la estructura tabular multi-ciudad para lotes simultáneos.
+4. **`Plantilla JSON (Individual)`:** Descarga [`plantilla_climatica_individual_orientsol.json`](plantillas/plantilla_climatica_individual_orientsol.json) con el objeto JSON para una única estación.
+5. **`Plantilla JSON (Lote Multi)`:** Descarga [`plantilla_climatica_lote_multi_orientsol.json`](plantillas/plantilla_climatica_lote_multi_orientsol.json) con la matriz JSON de múltiples ciudades.
+
+> 📁 **Archivos adjuntos en el repositorio:**  
+> También puedes acceder directamente a la carpeta física de plantillas del proyecto en [`plantillas/`](plantillas/) o en [`orientsol-web/public/plantillas/`](orientsol-web/public/plantillas/).
 
 ---
 
