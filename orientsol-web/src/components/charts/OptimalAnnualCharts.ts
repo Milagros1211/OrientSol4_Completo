@@ -1,6 +1,7 @@
 import type { RadiationComponentType } from '@/components/climate/OptimalAnnualStudyPanel';
 import { themeManager } from '@/services/theme/themeManager';
 import { formatNum } from '@/utils/formatters';
+import { renderWrappedSvgTitle } from './chartSvgUtils';
 
 export interface InclinationEvolutionChartProps {
   radiationCurve: number[]; // 91 elements (angles 0° to 90°)
@@ -379,10 +380,16 @@ export function renderInclinationEvolutionSvg(props: InclinationEvolutionChartPr
         </filter>
       </defs>
 
-      <!-- Chart Title -->
-      <text x="${width / 2}" y="28" fill="${titleFill}" font-size="16" font-weight="700" text-anchor="middle">
-        ${chartTitle}
-      </text>
+      <!-- Chart Title with safe wrapping & baseline -->
+      ${renderWrappedSvgTitle({
+        text: chartTitle,
+        centerX: width / 2,
+        startY: 28,
+        fill: titleFill,
+        fontSize: 15,
+        fontWeight: 700,
+        maxCharsPerLine: 54,
+      })}
 
       <!-- Plot Background -->
       <rect x="${padding.left}" y="${padding.top}" width="${plotWidth}" height="${plotHeight}" fill="${plotBg}" rx="4" stroke="${axisLineStroke}" stroke-width="0.8" />
@@ -691,10 +698,16 @@ export function renderMonthlyOptimumAndGainsSvg(props: MonthlyOptimumChartProps)
 
   return `
     <svg viewBox="0 0 ${width} ${height}" class="opt-svg-chart" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
-      <!-- SUBPLOT 1: Monthly Radiations -->
-      <text x="${width / 2}" y="24" fill="${title1Fill}" font-size="15" font-weight="700" text-anchor="middle">
-        ${title1}
-      </text>
+      <!-- SUBPLOT 1: Monthly Radiations with safe wrapping & baseline -->
+      ${renderWrappedSvgTitle({
+        text: title1,
+        centerX: width / 2,
+        startY: 25,
+        fill: title1Fill,
+        fontSize: 14.5,
+        fontWeight: 700,
+        maxCharsPerLine: 56,
+      })}
 
       <!-- Subplot 1 Background -->
       <rect x="${padding.left}" y="${topY0}" width="${plotW}" height="${topH}" fill="${plotBg}" rx="4" stroke="${axisLineStroke}" stroke-width="0.8" />
@@ -773,10 +786,16 @@ export function renderMonthlyOptimumAndGainsSvg(props: MonthlyOptimumChartProps)
       `
       }
 
-      <!-- SUBPLOT 2: Gains Bar Chart (%) -->
-      <text x="${width / 2}" y="${bottomY0 - 14}" fill="${title2Fill}" font-size="14" font-weight="700" text-anchor="middle">
-        ${title2}
-      </text>
+      <!-- SUBPLOT 2: Gains Bar Chart (%) with safe wrapping & baseline -->
+      ${renderWrappedSvgTitle({
+        text: title2,
+        centerX: width / 2,
+        startY: bottomY0 - 15,
+        fill: title2Fill,
+        fontSize: 13.5,
+        fontWeight: 700,
+        maxCharsPerLine: 56,
+      })}
 
       <!-- Subplot 2 Background -->
       <rect x="${padding.left}" y="${bottomY0}" width="${plotW}" height="${bottomH}" fill="${plotBg}" rx="4" stroke="${axisLineStroke}" stroke-width="0.8" />

@@ -7916,11 +7916,22 @@ body.theme-dark .opt-chart-question {
 .opt-chart-matlab-brand {
   font-size: 0.8rem;
   letter-spacing: 0.08em;
+  padding: 0.2rem 0.55rem;
+  border-radius: 4px;
+}
+
+[data-theme="light"] .opt-chart-matlab-brand,
+body.theme-light .opt-chart-matlab-brand {
+  color: #0284c7;
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+}
+
+[data-theme="dark"] .opt-chart-matlab-brand,
+body.theme-dark .opt-chart-matlab-brand {
   color: #38bdf8;
   background: rgba(14, 165, 233, 0.12);
   border: 1px solid rgba(14, 165, 233, 0.3);
-  padding: 0.2rem 0.55rem;
-  border-radius: 4px;
 }
 
 .opt-chart-inline-toolbar {
@@ -8067,13 +8078,29 @@ body.theme-dark .btn-matlab-volver:hover {
   animation: fadeIn 0.2s ease-out;
 }
 
-.chart-save-feedback.feedback-success {
+[data-theme="light"] .chart-save-feedback.feedback-success,
+body.theme-light .chart-save-feedback.feedback-success {
+  background: #ecfdf5;
+  border: 1px solid #6ee7b7;
+  color: #065f46;
+}
+
+[data-theme="light"] .chart-save-feedback.feedback-error,
+body.theme-light .chart-save-feedback.feedback-error {
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  color: #991b1b;
+}
+
+[data-theme="dark"] .chart-save-feedback.feedback-success,
+body.theme-dark .chart-save-feedback.feedback-success {
   background: rgba(16, 185, 129, 0.15);
   border: 1px solid rgba(16, 185, 129, 0.4);
   color: #6ee7b7;
 }
 
-.chart-save-feedback.feedback-error {
+[data-theme="dark"] .chart-save-feedback.feedback-error,
+body.theme-dark .chart-save-feedback.feedback-error {
   background: rgba(239, 68, 68, 0.15);
   border: 1px solid rgba(239, 68, 68, 0.4);
   color: #fca5a5;
@@ -8138,18 +8165,51 @@ body.theme-dark .opt-svg-wrapper {
   display: flex;
   align-items: flex-start;
   gap: 0.5rem;
-  background: rgba(14, 165, 233, 0.08);
-  border: 1px solid rgba(14, 165, 233, 0.25);
   border-radius: 6px;
   padding: 0.65rem 0.85rem;
   font-size: 0.82rem;
-  color: #bae6fd;
   line-height: 1.45;
 }
 
 .opt-chart-note svg {
   flex-shrink: 0;
   margin-top: 0.15rem;
+}
+
+[data-theme="light"] .opt-chart-note,
+body.theme-light .opt-chart-note {
+  background: #f0f9ff;
+  border: 1.5px solid #7dd3fc;
+  color: #0369a1;
+  font-weight: 600;
+}
+
+[data-theme="light"] .opt-chart-note span,
+body.theme-light .opt-chart-note span {
+  color: #0369a1;
+  font-weight: 500;
+}
+
+[data-theme="light"] .opt-chart-note svg,
+body.theme-light .opt-chart-note svg {
+  color: #0284c7;
+}
+
+[data-theme="dark"] .opt-chart-note,
+body.theme-dark .opt-chart-note {
+  background: rgba(14, 165, 233, 0.12);
+  border: 1px solid rgba(14, 165, 233, 0.35);
+  color: #bae6fd;
+}
+
+[data-theme="dark"] .opt-chart-note span,
+body.theme-dark .opt-chart-note span {
+  color: #bae6fd;
+  font-weight: 400;
+}
+
+[data-theme="dark"] .opt-chart-note svg,
+body.theme-dark .opt-chart-note svg {
   color: #38bdf8;
 }
 
@@ -8228,6 +8288,43 @@ body.theme-dark .opt-svg-wrapper {
 
 .chip-v.highlight-gain {
   color: #10b981;
+}
+
+[data-theme="light"] .matlab-stat-box,
+body.theme-light .matlab-stat-box {
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] .stat-box-title,
+body.theme-light .stat-box-title {
+  color: #475569;
+}
+
+[data-theme="light"] .chip-k,
+body.theme-light .chip-k {
+  color: #64748b;
+}
+
+[data-theme="light"] .chip-v,
+body.theme-light .chip-v {
+  color: #0f172a;
+}
+
+[data-theme="light"] .chip-v.highlight-c0,
+body.theme-light .chip-v.highlight-c0 {
+  color: #0284c7;
+}
+
+[data-theme="light"] .chip-v.highlight-opt,
+body.theme-light .chip-v.highlight-opt {
+  color: #d97706;
+}
+
+[data-theme="light"] .chip-v.highlight-gain,
+body.theme-light .chip-v.highlight-gain {
+  color: #059669;
 }
 
 /* ==========================================================================

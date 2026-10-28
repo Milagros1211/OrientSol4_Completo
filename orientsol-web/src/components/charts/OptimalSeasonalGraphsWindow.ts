@@ -5,7 +5,7 @@ import {
   type TableRadiationComponent,
 } from '@/components/climate/OptimalAnnualStudyPanel';
 import { themeManager } from '@/services/theme/themeManager';
-import { renderWrappedSvgTitle } from './chartSvgUtils';
+import { renderWrappedSvgTitle, computeSvgTitleLayout } from './chartSvgUtils';
 import { showAlbedoWarningModal } from '@/components/modals/AlbedoWarningModal';
 
 export type SeasonalGraphComponentChoice = 'global' | 'beam' | 'diffuse' | 'albedo' | 'all';
@@ -182,11 +182,20 @@ export function renderOptimalSeasonalGraphsWindow(props: OptimalSeasonalGraphsPr
     // -------------------------------------------------------------
     // SVG 1: Top Plot (Line Chart of Radiation vs Months)
     // -------------------------------------------------------------
+    const topTitleLayout = computeSvgTitleLayout(topPlotTitle, {
+      basePadTop: 34,
+      basePlotH: 200,
+      maxCharsPerLine: 44,
+      fontSize: 12,
+      lineHeight: 15,
+      topMargin: 16,
+      gapBelowTitle: 10,
+    });
     const plotW = 540;
-    const plotH = 200;
-    const pad = { top: 32, right: 90, bottom: 35, left: 45 };
+    const plotH = topTitleLayout.plotH;
+    const pad = { top: topTitleLayout.padTop, right: 90, bottom: 35, left: 45 };
     const innerW = plotW - pad.left - pad.right;
-    const innerH = plotH - pad.top - pad.bottom;
+    const innerH = 200 - 34 - 35;
 
     const maxRadiationY = isAll ? 8 : Math.ceil(Math.max(...radSeas, ...rad0, 1.0) * 1.15);
     const yTop = (v: number) => pad.top + innerH - (Math.min(v, maxRadiationY) / maxRadiationY) * innerH;
@@ -287,12 +296,13 @@ export function renderOptimalSeasonalGraphsWindow(props: OptimalSeasonalGraphsPr
     const svgTopHtml = `
       <svg viewBox="0 0 ${plotW} ${plotH}" style="width: 100%; height: auto; background: ${plotBg}; border: 1px solid ${plotBorder}; border-radius: 4px;">
         ${renderWrappedSvgTitle({
-          text: topPlotTitle,
-          centerX: plotW / 2 - 20,
-          startY: 19,
+          lines: topTitleLayout.lines,
+          centerX: pad.left + innerW / 2,
+          firstY: topTitleLayout.firstY,
           fill: titleColor,
-          fontSize: 12,
-          maxCharsPerLine: 48,
+          fontSize: topTitleLayout.fontSize,
+          lineHeight: topTitleLayout.lineHeight,
+          fontWeight: 700,
         })}
         <text x="14" y="${plotH / 2}" fill="${labelColor}" font-size="10.5" font-weight="600" text-anchor="middle" transform="rotate(-90 14 ${plotH / 2})">${isEn ? 'Radiation' : 'Radiación'}</text>
         <text x="${pad.left + innerW / 2}" y="${plotH - 8}" fill="${labelColor}" font-size="10.5" font-weight="600" text-anchor="middle">${isEn ? 'Months' : 'Meses'}</text>
@@ -315,11 +325,20 @@ export function renderOptimalSeasonalGraphsWindow(props: OptimalSeasonalGraphsPr
     // -------------------------------------------------------------
     // SVG 2: Bottom Plot (Bar Chart of Gains %) - Full Negative & Dual-Bar Support
     // -------------------------------------------------------------
+    const bottomTitleLayout = computeSvgTitleLayout(bottomPlotTitle, {
+      basePadTop: 34,
+      basePlotH: 205,
+      maxCharsPerLine: 42,
+      fontSize: 11.5,
+      lineHeight: 14.5,
+      topMargin: 16,
+      gapBelowTitle: 10,
+    });
     const bottomPlotW = 540;
-    const bottomPlotH = 200;
-    const bPad = { top: 32, right: 90, bottom: 35, left: 45 };
+    const bottomPlotH = bottomTitleLayout.plotH;
+    const bPad = { top: bottomTitleLayout.padTop, right: 90, bottom: 35, left: 45 };
     const bInnerW = bottomPlotW - bPad.left - bPad.right;
-    const bInnerH = bottomPlotH - bPad.top - bPad.bottom;
+    const bInnerH = 205 - 34 - 35;
 
     // Calculate realistic dynamic Y limits to ensure negative diffuse or tracking gains render properly!
     const allGainsPool = isAll
@@ -477,12 +496,13 @@ export function renderOptimalSeasonalGraphsWindow(props: OptimalSeasonalGraphsPr
     const svgBottomHtml = `
       <svg viewBox="0 0 ${bottomPlotW} ${bottomPlotH}" style="width: 100%; height: auto; background: ${plotBg}; border: 1px solid ${plotBorder}; border-radius: 4px;">
         ${renderWrappedSvgTitle({
-          text: bottomPlotTitle,
-          centerX: bottomPlotW / 2 - 20,
-          startY: 19,
+          lines: bottomTitleLayout.lines,
+          centerX: bPad.left + bInnerW / 2,
+          firstY: bottomTitleLayout.firstY,
           fill: titleColor,
-          fontSize: 11.5,
-          maxCharsPerLine: 46,
+          fontSize: bottomTitleLayout.fontSize,
+          lineHeight: bottomTitleLayout.lineHeight,
+          fontWeight: 700,
         })}
         <text x="14" y="${bottomPlotH / 2}" fill="${labelColor}" font-size="10.5" font-weight="600" text-anchor="middle" transform="rotate(-90 14 ${bottomPlotH / 2})">${isEn ? 'Gains (%)' : 'Ganancias (%)'}</text>
         <text x="${bPad.left + bInnerW / 2}" y="${bottomPlotH - 8}" fill="${labelColor}" font-size="10.5" font-weight="600" text-anchor="middle">${isEn ? 'Months' : 'Meses'}</text>

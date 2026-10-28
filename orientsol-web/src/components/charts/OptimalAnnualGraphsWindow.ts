@@ -5,7 +5,7 @@ import {
   type TableRadiationComponent,
 } from '@/components/climate/OptimalAnnualStudyPanel';
 import { themeManager } from '@/services/theme/themeManager';
-import { renderWrappedSvgTitle } from './chartSvgUtils';
+import { renderWrappedSvgTitle, computeSvgTitleLayout } from './chartSvgUtils';
 import { showAlbedoWarningModal } from '@/components/modals/AlbedoWarningModal';
 import { formatNum } from '@/utils/formatters';
 
@@ -123,11 +123,20 @@ export function renderOptimalAnnualGraphsWindow(props: OptimalAnnualGraphsProps)
     // -------------------------------------------------------------
     // SVG 1: Top Plot (Line Chart of Radiation vs Months)
     // -------------------------------------------------------------
+    const topTitleLayout = computeSvgTitleLayout(topPlotTitle, {
+      basePadTop: 34,
+      basePlotH: 200,
+      maxCharsPerLine: 44,
+      fontSize: 12,
+      lineHeight: 15,
+      topMargin: 16,
+      gapBelowTitle: 10,
+    });
     const plotW = 540;
-    const plotH = 200;
-    const pad = { top: 32, right: 90, bottom: 35, left: 45 };
+    const plotH = topTitleLayout.plotH;
+    const pad = { top: topTitleLayout.padTop, right: 90, bottom: 35, left: 45 };
     const innerW = plotW - pad.left - pad.right;
-    const innerH = plotH - pad.top - pad.bottom;
+    const innerH = 200 - 34 - 35; // Fixed 131px plotting area height
 
     // Y scale
     const maxRadiationY = isAll
@@ -244,12 +253,13 @@ export function renderOptimalAnnualGraphsWindow(props: OptimalAnnualGraphsProps)
       <svg viewBox="0 0 ${plotW} ${plotH}" class="matlab-plot-svg" id="svg-matlab-rad-top">
         <!-- Title with dynamic text wrapping -->
         ${renderWrappedSvgTitle({
-          text: topPlotTitle,
+          lines: topTitleLayout.lines,
           centerX: pad.left + innerW / 2,
-          startY: 18,
+          firstY: topTitleLayout.firstY,
           fill: titleColor,
-          fontSize: 12,
-          maxCharsPerLine: 48,
+          fontSize: topTitleLayout.fontSize,
+          lineHeight: topTitleLayout.lineHeight,
+          fontWeight: 700,
         })}
 
         <!-- Plot Area Box -->
@@ -282,11 +292,20 @@ export function renderOptimalAnnualGraphsWindow(props: OptimalAnnualGraphsProps)
     // -------------------------------------------------------------
     // SVG 2: Bottom Plot (Bar Chart of Gains %)
     // -------------------------------------------------------------
+    const bottomTitleLayout = computeSvgTitleLayout(bottomPlotTitle, {
+      basePadTop: 34,
+      basePlotH: 205,
+      maxCharsPerLine: 42,
+      fontSize: 11.5,
+      lineHeight: 14.5,
+      topMargin: 16,
+      gapBelowTitle: 10,
+    });
     const bPlotW = 540;
-    const bPlotH = 205;
-    const bPad = { top: 34, right: 90, bottom: 35, left: 45 };
+    const bPlotH = bottomTitleLayout.plotH;
+    const bPad = { top: bottomTitleLayout.padTop, right: 90, bottom: 35, left: 45 };
     const bInnerW = bPlotW - bPad.left - bPad.right;
-    const bInnerH = bPlotH - bPad.top - bPad.bottom;
+    const bInnerH = 205 - 34 - 35; // Fixed 136px plotting area height
 
     // Y scale: min to max %
     let minG = isAll ? -50 : Math.min(...gainsPct, -10);
@@ -417,12 +436,13 @@ export function renderOptimalAnnualGraphsWindow(props: OptimalAnnualGraphsProps)
       <svg viewBox="0 0 ${bPlotW} ${bPlotH}" class="matlab-plot-svg" id="svg-matlab-gain-bottom">
         <!-- Title with dynamic text wrapping -->
         ${renderWrappedSvgTitle({
-          text: bottomPlotTitle,
+          lines: bottomTitleLayout.lines,
           centerX: bPad.left + bInnerW / 2,
-          startY: 18,
+          firstY: bottomTitleLayout.firstY,
           fill: titleColor,
-          fontSize: 11.5,
-          maxCharsPerLine: 46,
+          fontSize: bottomTitleLayout.fontSize,
+          lineHeight: bottomTitleLayout.lineHeight,
+          fontWeight: 700,
         })}
 
         <!-- Plot Area Box -->
