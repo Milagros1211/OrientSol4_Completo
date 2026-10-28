@@ -131,7 +131,7 @@ def run_tests():
         alpha_step_deg=15,
         alpha_range_deg=(-90, 90)
     )
-    print("\n[OK] 5. Mapa de Pérdidas de Captación (Matriz 2D Inclinación x Acimut):")
+    print("\n[OK] 5. Mapa de Pérdidas de Captación (Matriz 2D Inclinación x Azimut):")
     print(f"   • Eje Inclinaciones (Beta):   {loss_map['betas_deg']} (total: {len(loss_map['betas_deg'])})")
     print(f"   • Eje Orientaciones (Alpha):  {loss_map['alphas_deg']} (total: {len(loss_map['alphas_deg'])})")
     print(f"   • Punto Óptimo del Mapa:      Beta = {loss_map['optimal_point']['beta_deg']}°, Alpha = {loss_map['optimal_point']['alpha_deg']}° ({loss_map['optimal_point']['max_daily_radiation_kwh']} kWh/m²/d)")

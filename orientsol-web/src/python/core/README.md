@@ -13,7 +13,7 @@ Este módulo implementa los cálculos astronómicos y de geometría solar para c
 | `declination.py` | `matriz_declinacion.m` | Cálculo de la declinación solar mensual ($\delta$) mediante la fórmula de Spencer / Cooper: $\delta = 23.45^\circ \cdot \sin\left(\frac{360}{365}(284 + n)\right)$. |
 | `sunset_angles.py` | `AngulosSalida.m` | Ángulo horario de salida y puesta de sol ($\omega_s$): $\cos(\omega_s) = -\tan(\phi)\tan(\delta)$, con gestión de sol de medianoche y noche polar. |
 | `hour_angles.py` | `Angulos.m`, `Angulos2.m` | Discretización del arco diurno en intervalos horarios y semihorarios ($\omega \in [-\omega_s, \omega_s]$). |
-| `solar_position.py` | `Altura_Solar.m`, `Azimut_Solar.m` | Elevación solar ($\sin\alpha_s = \sin\phi\sin\delta + \cos\phi\cos\delta\cos\omega$) y acimut solar ($\psi_s$) en grados sexagesimales. |
+| `solar_position.py` | `Altura_Solar.m`, `Azimut_Solar.m` | Elevación solar ($\sin\alpha_s = \sin\phi\sin\delta + \cos\phi\cos\delta\cos\omega$) y azimut solar ($\psi_s$) en grados sexagesimales. |
 
 ---
 

@@ -7,6 +7,7 @@ import {
 import { themeManager } from '@/services/theme/themeManager';
 import { renderWrappedSvgTitle, computeSvgTitleLayout } from './chartSvgUtils';
 import { showAlbedoWarningModal } from '@/components/modals/AlbedoWarningModal';
+import { formatNum } from '@/utils/formatters';
 
 export type SeasonalGraphComponentChoice = 'global' | 'beam' | 'diffuse' | 'albedo' | 'all';
 
@@ -607,39 +608,39 @@ export function renderOptimalSeasonalGraphsWindow(props: OptimalSeasonalGraphsPr
 
             <div class="matlab-stat-boxes-container">
               <div class="matlab-stat-frame frame-opt">
-                <div class="stat-frame-title title-opt">${isEn ? 'Seasonal optimal tilt' : 'Inclinación óptima estacional'}</div>
+                <div class="stat-frame-title title-opt">${isEn ? 'Seasonal optimal tilt (kWh/m²/day)' : 'Inclinación ópt. estacional (kWh/m²/día)'}</div>
                 <div class="stat-frame-row">
                   <span>${isEn ? 'Maximum' : 'Máximo'}</span>
-                  <strong>${maxVal(radSeas).toFixed(2)}</strong>
+                  <strong>${formatNum(maxVal(radSeas), 2)} kWh/m²/d</strong>
                 </div>
                 <div class="stat-frame-row">
                   <span>${isEn ? 'Minimum' : 'Mínimo'}</span>
-                  <strong>${minVal(radSeas).toFixed(2)}</strong>
+                  <strong>${formatNum(minVal(radSeas), 2)} kWh/m²/d</strong>
                 </div>
                 <div class="stat-frame-row">
                   <span>${isEn ? 'Mean' : 'Media'}</span>
-                  <strong>${meanVal(radSeas).toFixed(2)}</strong>
+                  <strong>${formatNum(meanVal(radSeas), 2)} kWh/m²/d</strong>
                 </div>
               </div>
 
               <div class="matlab-stat-frame frame-horiz">
-                <div class="stat-frame-title title-horiz">${isEn ? 'Horizontal surface (0°)' : 'Superficie horizontal (0°)'}</div>
+                <div class="stat-frame-title title-horiz">${isEn ? 'Horizontal surface (0°) (kWh/m²/day)' : 'Superficie horizontal (0°) (kWh/m²/día)'}</div>
                 <div class="stat-frame-row">
                   <span>${isEn ? 'Maximum' : 'Máximo'}</span>
-                  <strong>${maxVal(rad0).toFixed(2)}</strong>
+                  <strong>${formatNum(maxVal(rad0), 2)} kWh/m²/d</strong>
                 </div>
                 <div class="stat-frame-row">
                   <span>${isEn ? 'Minimum' : 'Mínimo'}</span>
-                  <strong>${minVal(rad0).toFixed(2)}</strong>
+                  <strong>${formatNum(minVal(rad0), 2)} kWh/m²/d</strong>
                 </div>
                 <div class="stat-frame-row">
                   <span>${isEn ? 'Mean' : 'Media'}</span>
-                  <strong>${meanVal(rad0).toFixed(2)}</strong>
+                  <strong>${formatNum(meanVal(rad0), 2)} kWh/m²/d</strong>
                 </div>
               </div>
 
               <div class="matlab-stat-frame frame-gain">
-                <div class="stat-frame-title title-gain">${isEn ? 'Gain vs 0° (%)' : 'Ganancia vs 0° (%)'}</div>
+                <div class="stat-frame-title title-gain">${isEn ? 'Gain vs horizontal plane (0°) (%)' : 'Ganancia vs plano horizontal (0°) (%)'}</div>
                 <div class="stat-frame-row">
                   <span>${isEn ? 'Maximum' : 'Máximo'}</span>
                   <strong>${isAlbedo ? '-' : `${maxVal(gainsVs0).toFixed(2)} %`}</strong>

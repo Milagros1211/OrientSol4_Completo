@@ -480,28 +480,28 @@ export function renderOptimalAnnualGraphsWindow(props: OptimalAnnualGraphsProps)
     // -------------------------------------------------------------
     const statBoxOptHtml = `
       <div class="matlab-stat-frame">
-        <div class="stat-frame-title title-opt">${isEn ? 'Annual optimal tilt' : 'Inclinación ópt. anual'}</div>
-        <div class="stat-frame-row"><span>${isEn ? 'min' : 'mínimo'}</span> <strong>${formatNum(minVal(radOpt), 2)}</strong></div>
-        <div class="stat-frame-row"><span>${isEn ? 'mean' : 'media'}</span> <strong>${formatNum(meanVal(radOpt), 2)}</strong></div>
-        <div class="stat-frame-row"><span>${isEn ? 'max' : 'máximo'}</span> <strong>${formatNum(maxVal(radOpt), 2)}</strong></div>
+        <div class="stat-frame-title title-opt">${isEn ? 'Annual optimal tilt (kWh/m²/day)' : 'Inclinación ópt. anual (kWh/m²/día)'}</div>
+        <div class="stat-frame-row"><span>${isEn ? 'min' : 'mínimo'}</span> <strong>${formatNum(minVal(radOpt), 2)} kWh/m²/d</strong></div>
+        <div class="stat-frame-row"><span>${isEn ? 'mean' : 'media'}</span> <strong>${formatNum(meanVal(radOpt), 2)} kWh/m²/d</strong></div>
+        <div class="stat-frame-row"><span>${isEn ? 'max' : 'máximo'}</span> <strong>${formatNum(maxVal(radOpt), 2)} kWh/m²/d</strong></div>
       </div>
     `;
 
     const statBoxHorizHtml = `
       <div class="matlab-stat-frame">
-        <div class="stat-frame-title title-horiz">${isEn ? 'On horizontal plane' : 'Sobre plano horizontal'}</div>
-        <div class="stat-frame-row"><span>${isEn ? 'min' : 'mínimo'}</span> <strong>${formatNum(minVal(rad0), 2)}</strong></div>
-        <div class="stat-frame-row"><span>${isEn ? 'mean' : 'media'}</span> <strong>${formatNum(meanVal(rad0), 2)}</strong></div>
-        <div class="stat-frame-row"><span>${isEn ? 'max' : 'máximo'}</span> <strong>${formatNum(maxVal(rad0), 2)}</strong></div>
+        <div class="stat-frame-title title-horiz">${isEn ? 'On horizontal plane (0°) (kWh/m²/day)' : 'Sobre plano horizontal (0°) (kWh/m²/día)'}</div>
+        <div class="stat-frame-row"><span>${isEn ? 'min' : 'mínimo'}</span> <strong>${formatNum(minVal(rad0), 2)} kWh/m²/d</strong></div>
+        <div class="stat-frame-row"><span>${isEn ? 'mean' : 'media'}</span> <strong>${formatNum(meanVal(rad0), 2)} kWh/m²/d</strong></div>
+        <div class="stat-frame-row"><span>${isEn ? 'max' : 'máximo'}</span> <strong>${formatNum(maxVal(rad0), 2)} kWh/m²/d</strong></div>
       </div>
     `;
 
     const statBoxGainHtml = `
       <div class="matlab-stat-frame" style="margin-top: 1.5rem;">
-        <div class="stat-frame-title title-gain">${isEn ? 'Rel. horizontal plane' : 'Res. plano horizontal'}</div>
-        <div class="stat-frame-row"><span>${isEn ? 'min' : 'mínimo'}</span> <strong>${isAlbedo ? '-' : formatNum(minVal(gainsPct), 2)}</strong></div>
-        <div class="stat-frame-row"><span>${isEn ? 'mean' : 'media'}</span> <strong>${isAlbedo ? '-' : formatNum(meanVal(gainsPct), 2)}</strong></div>
-        <div class="stat-frame-row"><span>${isEn ? 'max' : 'máximo'}</span> <strong>${isAlbedo ? '-' : formatNum(maxVal(gainsPct), 2)}</strong></div>
+        <div class="stat-frame-title title-gain">${isEn ? 'Gain vs horizontal plane (0°) (%)' : 'Ganancia vs plano horizontal (0°) (%)'}</div>
+        <div class="stat-frame-row"><span>${isEn ? 'min' : 'mínimo'}</span> <strong>${isAlbedo ? '-' : `${formatNum(minVal(gainsPct), 2)} %`}</strong></div>
+        <div class="stat-frame-row"><span>${isEn ? 'mean' : 'media'}</span> <strong>${isAlbedo ? '-' : `${formatNum(meanVal(gainsPct), 2)} %`}</strong></div>
+        <div class="stat-frame-row"><span>${isEn ? 'max' : 'máximo'}</span> <strong>${isAlbedo ? '-' : `${formatNum(maxVal(gainsPct), 2)} %`}</strong></div>
       </div>
     `;
 

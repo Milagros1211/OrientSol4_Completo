@@ -26,7 +26,7 @@ orientsol-web/
 │   ├── python/           # Motor científico matemático en Python vectorizado (Pyodide)
 │   │   ├── core/         # Geometría solar astronómica
 │   │   ├── radiation/    # Descomposición Liu-Jordan y transposición a plano inclinado
-│   │   ├── tracking/     # Seguidores 2 ejes, polar, acimutal y horizontal
+│   │   ├── tracking/     # Seguidores 2 ejes, polar, azimutal y horizontal
 │   │   ├── optimization/ # Inclinación óptima anual, estacional, mensual y mapas CTE
 │   │   └── energy/       # Modelos energéticos (Simplificado y Osterwald)
 │   ├── services/         # Servicios de integración externa (PVGIS, NASA POWER, ERA5, Supabase)

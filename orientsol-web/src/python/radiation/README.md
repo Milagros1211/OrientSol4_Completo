@@ -1,6 +1,6 @@
 # Módulo de Radiación Solar (`radiation/`)
 
-Este módulo implementa la descomposición de la radiación solar y su transposición sobre planos inclinados con cualquier ángulo de inclinación ($\beta$) y acimut ($\alpha$).
+Este módulo implementa la descomposición de la radiación solar y su transposición sobre planos inclinados con cualquier ángulo de inclinación ($\beta$) y azimut ($\alpha$).
 
 ---
 

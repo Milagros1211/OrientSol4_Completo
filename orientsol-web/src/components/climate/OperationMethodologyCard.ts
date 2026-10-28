@@ -275,7 +275,7 @@ function getOperationData(op: SolarOperationType, isEn: boolean, latitude: numbe
           : 'Seguidor Solar en 1 Eje Azimutal (Eje Vertical con Inclinación Fija)',
         summary: isEn
           ? `Rotates around a vertical axis to match the solar azimuth γ_s, maintaining a constant fixed panel slope β.`
-          : `Gira alrededor de un eje vertical perpendicular al terreno siguiendo el acimut del sol γ_s, manteniendo el panel a una inclinación fija β.`,
+          : `Gira alrededor de un eje vertical perpendicular al terreno siguiendo el azimut del sol γ_s, manteniendo el panel a una inclinación fija β.`,
         inputDescription: isEn
           ? `<div style="display: flex; flex-direction: column; gap: 0.35rem;">
               <div><strong>Solar Radiation:</strong> Global horizontal vector ${renderTex('G_{dm}(0) \\in \\mathbb{R}^{12}')} [kWh/m²·day].</div>
@@ -298,7 +298,7 @@ function getOperationData(op: SolarOperationType, isEn: boolean, latitude: numbe
             formula: '\\cos\\theta_{\\text{incidencia}}(t) = \\sin\\alpha_s(t) \\cos\\beta_{\\text{panel}} + \\cos\\alpha_s(t) \\sin\\beta_{\\text{panel}}',
             note: isEn
               ? 'Ensures maximum projected area perpendicular to solar azimuth throughout daylight hours.'
-              : 'Garantiza máxima superficie proyectada perpendicularmente al acimut solar a lo largo de todo el día.'
+              : 'Garantiza máxima superficie proyectada perpendicularmente al azimut solar a lo largo de todo el día.'
           }
         ],
         outputSummary: isEn
@@ -365,7 +365,7 @@ function getOperationData(op: SolarOperationType, isEn: boolean, latitude: numbe
           : 'Seguidor Solar a Dos Ejes (Incidencia Normal Continua)',
         summary: isEn
           ? `Follows the sun continuously in both azimuth and elevation, ensuring rays strike perpendicular to the surface at every moment.`
-          : `Sigue al sol de forma continua y simultánea en acimut y elevación, garantizando incidencia perpendicular exacta (θ = 0°) en todo momento.`,
+          : `Sigue al sol de forma continua y simultánea en azimut y elevación, garantizando incidencia perpendicular exacta (θ = 0°) en todo momento.`,
         inputDescription: isEn
           ? `<div style="display: flex; flex-direction: column; gap: 0.35rem;">
               <div><strong>Direct Beam & Diffuse:</strong> Separate vectors ${renderTex('B_{dm}(0)_m')} and ${renderTex('D_{dm}(0)_m')} at latitude ${renderTex(`\\phi_{\\text{lat}} = ${latStr}`)}.</div>
@@ -374,7 +374,7 @@ function getOperationData(op: SolarOperationType, isEn: boolean, latitude: numbe
             </div>`
           : `<div style="display: flex; flex-direction: column; gap: 0.35rem;">
               <div><strong>Componentes Directa y Difusa:</strong> Vectores ${renderTex('B_{dm}(0)_m')} y ${renderTex('D_{dm}(0)_m')} a latitud ${renderTex(`\\phi_{\\text{lat}} = ${latStr}`)}.</div>
-              <div><strong>Grados de Libertad:</strong> 2 ejes motorizados continuos (acimut ${renderTex('\\gamma')} y elevación cenital ${renderTex('\\beta')}).</div>
+              <div><strong>Grados de Libertad:</strong> 2 ejes motorizados continuos (azimut ${renderTex('\\gamma')} y elevación cenital ${renderTex('\\beta')}).</div>
               <div><strong>Condición Geométrica:</strong> Ángulo de incidencia perpendicular permanente ${renderTex('\\theta_{\\text{incidencia}} = 0^\\circ')}.</div>
             </div>`,
         mathProcessTitle: isEn ? 'Mathematical Algorithm & Formulations:' : 'Procedimiento y Algoritmo Matemático:',

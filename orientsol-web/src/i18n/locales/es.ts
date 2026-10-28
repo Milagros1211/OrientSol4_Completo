@@ -157,7 +157,7 @@ export const es: Translations = {
     simplifiedModel: 'Modelo Simplificado:',
     // Capture Loss Maps
     lossMapTitle: 'Mapa de Pérdidas de Captación (CTE DB-HE4)',
-    lossMapSubtitle: 'Matriz bidimensional de radiación y pérdidas porcentuales en función de la inclinación (β: 0° a 90°) y orientación acimutal (α: -90° Este a +90° Oeste).',
+    lossMapSubtitle: 'Matriz bidimensional de radiación y pérdidas porcentuales en función de la inclinación (β: 0° a 90°) y orientación azimutal (α: -90° Este a +90° Oeste).',
     lossMapOptimal: 'Óptimo: β = {beta}°, α = {alpha}° ({rad} kWh/m²/d)',
     cteGeneral: 'General (≤10%):',
     cteSuperposition: 'Superposición (≤20%):',
@@ -165,7 +165,7 @@ export const es: Translations = {
     cteNonCompliant: 'No conforme (>40%)',
     ofMap: 'del mapa',
     tiltHeader: 'β \\ α',
-    azimuthHeader: 'Orientación Acimutal (α)',
+    azimuthHeader: 'Orientación Azimutal (α)',
     // 8 Surfaces Comparison
     surfacesTableTitle: 'Comparativa Global de Todas las Superficies (8 Configuraciones)',
     surfacesTableSubtitle: 'Fijas, 1 Eje (Horizontal, Azimutal, Polar) y 2 Ejes',

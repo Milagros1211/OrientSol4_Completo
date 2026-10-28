@@ -130,7 +130,7 @@ export function exportToCSV(
   lines.push('----------------------------------------------------------------------');
   lines.push(isEn ? 'CTE DB-HE4 CAPTURE LOSS MATRIX SUMMARY' : 'RESUMEN DEL MAPA DE PÉRDIDAS CTE DB-HE4');
   lines.push('----------------------------------------------------------------------');
-  lines.push(`${isEn ? 'Absolute Optimal Point' : 'Punto Óptimo Absoluto'};${isEn ? 'Tilt Beta' : 'Inclinación Beta'} = ${formatNum(res.captureLossMap.optimalPoint.betaDeg, 1)}° | ${isEn ? 'Azimuth Alpha' : 'Acimut Alpha'} = ${formatNum(res.captureLossMap.optimalPoint.alphaDeg, 1)}°`);
+  lines.push(`${isEn ? 'Absolute Optimal Point' : 'Punto Óptimo Absoluto'};${isEn ? 'Tilt Beta' : 'Inclinación Beta'} = ${formatNum(res.captureLossMap.optimalPoint.betaDeg, 1)}° | ${isEn ? 'Azimuth Alpha' : 'Azimut Alpha'} = ${formatNum(res.captureLossMap.optimalPoint.alphaDeg, 1)}°`);
   lines.push(`${isEn ? 'Optimal Radiation' : 'Radiación Óptima'};${formatNum(res.captureLossMap.optimalPoint.maxDailyRadiationKwh, 3)} ${isEn ? 'kWh/m²/day' : 'kWh/m²/día'} (${formatInt(Math.round(res.captureLossMap.optimalPoint.maxAnnualRadiationKwhM2))} ${isEn ? 'kWh/m²·yr' : 'kWh/m²·año'})`);
   lines.push(`${isEn ? 'CTE General Limit (<=10% loss)' : 'Límite General CTE (Pérdida <= 10%)'};${formatPercent(res.captureLossMap.cteZones.generalPctCompliant, 1)} ${isEn ? 'of map' : 'del mapa'}`);
   lines.push(`${isEn ? 'CTE Superposition Limit (<=20% loss)' : 'Superposición CTE (Pérdida <= 20%)'};${formatPercent(res.captureLossMap.cteZones.superpositionPctCompliant, 1)} ${isEn ? 'of map' : 'del mapa'}`);

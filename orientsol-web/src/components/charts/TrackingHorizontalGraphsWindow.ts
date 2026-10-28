@@ -501,39 +501,39 @@ export function renderTrackingHorizontalGraphsWindow(props: TrackingHorizontalGr
 
             <div class="matlab-stat-boxes-container">
               <div class="matlab-stat-frame frame-opt">
-                <div class="stat-frame-title title-opt">${isEn ? 'Horizontal tracking' : 'Seguimiento horizontal'}</div>
+                <div class="stat-frame-title title-opt">${isEn ? 'Horizontal tracking (kWh/m²/day)' : 'Seguimiento horizontal (kWh/m²/día)'}</div>
                 <div class="stat-frame-row">
                   <span>${isEn ? 'Maximum' : 'Máximo'}</span>
-                  <strong>${formatNum(maxVal(radHorTrack), 2)}</strong>
+                  <strong>${formatNum(maxVal(radHorTrack), 2)} kWh/m²/d</strong>
                 </div>
                 <div class="stat-frame-row">
                   <span>${isEn ? 'Minimum' : 'Mínimo'}</span>
-                  <strong>${formatNum(minVal(radHorTrack), 2)}</strong>
+                  <strong>${formatNum(minVal(radHorTrack), 2)} kWh/m²/d</strong>
                 </div>
                 <div class="stat-frame-row">
                   <span>${isEn ? 'Mean' : 'Media'}</span>
-                  <strong>${formatNum(meanVal(radHorTrack), 2)}</strong>
+                  <strong>${formatNum(meanVal(radHorTrack), 2)} kWh/m²/d</strong>
                 </div>
               </div>
 
               <div class="matlab-stat-frame frame-horiz">
-                <div class="stat-frame-title title-horiz">${isEn ? 'Horizontal surface (0°)' : 'Superficie horizontal (0°)'}</div>
+                <div class="stat-frame-title title-horiz">${isEn ? 'Horizontal surface (0°) (kWh/m²/day)' : 'Superficie horizontal (0°) (kWh/m²/día)'}</div>
                 <div class="stat-frame-row">
                   <span>${isEn ? 'Maximum' : 'Máximo'}</span>
-                  <strong>${formatNum(maxVal(rad0), 2)}</strong>
+                  <strong>${formatNum(maxVal(rad0), 2)} kWh/m²/d</strong>
                 </div>
                 <div class="stat-frame-row">
                   <span>${isEn ? 'Minimum' : 'Mínimo'}</span>
-                  <strong>${formatNum(minVal(rad0), 2)}</strong>
+                  <strong>${formatNum(minVal(rad0), 2)} kWh/m²/d</strong>
                 </div>
                 <div class="stat-frame-row">
                   <span>${isEn ? 'Mean' : 'Media'}</span>
-                  <strong>${formatNum(meanVal(rad0), 2)}</strong>
+                  <strong>${formatNum(meanVal(rad0), 2)} kWh/m²/d</strong>
                 </div>
               </div>
 
               <div class="matlab-stat-frame frame-gain">
-                <div class="stat-frame-title title-gain">${isEn ? 'Gain vs 0° (%)' : 'Ganancia vs 0° (%)'}</div>
+                <div class="stat-frame-title title-gain">${isEn ? 'Gain vs horizontal plane (0°) (%)' : 'Ganancia vs plano horizontal (0°) (%)'}</div>
                 <div class="stat-frame-row">
                   <span>${isEn ? 'Maximum' : 'Máximo'}</span>
                   <strong>${isAlbedo ? '-' : `${formatNum(maxVal(gainsVs0), 2)} %`}</strong>

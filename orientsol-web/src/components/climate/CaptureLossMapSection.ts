@@ -453,7 +453,7 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
           <div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
               <label for="loss-slider-alpha" style="font-size: 0.8rem; font-weight: 700; color: var(--text-main);">
-                ${isEn ? 'Azimuth angle α (-90° to +90°):' : 'Orientación / Acimut α (-90° a +90°):'}
+                ${isEn ? 'Azimuth angle α (-90° to +90°):' : 'Orientación / Azimut α (-90° a +90°):'}
               </label>
               <div style="display: flex; align-items: center; gap: 0.35rem;">
                 <input type="number" id="loss-input-alpha" min="-90" max="90" step="1" value="${evaluatedAlpha}"
@@ -747,7 +747,7 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
       ctx!.font = 'bold 11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
       ctx!.textAlign = 'center';
       ctx!.fillText(
-        isEn ? 'Azimuth / Orientation α (degrees)' : 'Orientación / Acimut α (grados respecto al Sur)',
+        isEn ? 'Azimuth / Orientation α (degrees)' : 'Orientación / Azimut α (grados respecto al Sur)',
         padLeft + plotW / 2,
         padTop + plotH + 28
       );
@@ -1049,7 +1049,7 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
               }
               ${
                 Math.abs(evaluatedAlpha) > 10
-                  ? ` El desvío acimutal de ${evaluatedAlpha > 0 ? '+' : ''}${evaluatedAlpha}° penaliza la captación en el mediodía solar, favoreciendo las ${evaluatedAlpha < 0 ? 'mañanas' : 'tardes'}.`
+                  ? ` El desvío azimutal de ${evaluatedAlpha > 0 ? '+' : ''}${evaluatedAlpha}° penaliza la captación en el mediodía solar, favoreciendo las ${evaluatedAlpha < 0 ? 'mañanas' : 'tardes'}.`
                   : ''
               }
             </div>

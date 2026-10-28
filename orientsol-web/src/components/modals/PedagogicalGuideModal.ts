@@ -357,7 +357,7 @@ export function openPedagogicalGuideModal(
                     ${renderTex('\\sin\\alpha_s = \\sin\\phi\\sin\\delta + \\cos\\phi\\cos\\delta\\cos\\omega', true)}
                     ${renderTex('\\cos\\psi_s = \\frac{\\sin\\alpha_s\\sin\\phi - \\sin\\delta}{\\cos\\alpha_s\\cos\\phi}', true)}
                   </div>
-                  <p style="margin: 0.4rem 0 0 0; line-height: 1.5;"><strong>Ley Universal de Simetría Solar:</strong> El mediodía solar (12:00 h, ${renderTex('\\omega = 0^\\circ')}) actúa como un espejo astronómico exacto. A horas equidistantes del mediodía (${renderTex('12 - \\Delta t')} vs. ${renderTex('12 + \\Delta t')}), la altura solar ${renderTex('\\alpha_s')} y la inclinación del seguidor a 2 ejes ${renderTex('\\beta = 90^\\circ - \\alpha_s')} son rigurosamente idénticas, y el acimut ${renderTex('\\psi_s')} tiene la misma apertura angular con signo reflejado (- Este por la mañana vs. + Oeste por la tarde).</p>`,
+                  <p style="margin: 0.4rem 0 0 0; line-height: 1.5;"><strong>Ley Universal de Simetría Solar:</strong> El mediodía solar (12:00 h, ${renderTex('\\omega = 0^\\circ')}) actúa como un espejo astronómico exacto. A horas equidistantes del mediodía (${renderTex('12 - \\Delta t')} vs. ${renderTex('12 + \\Delta t')}), la altura solar ${renderTex('\\alpha_s')} y la inclinación del seguidor a 2 ejes ${renderTex('\\beta = 90^\\circ - \\alpha_s')} son rigurosamente idénticas, y el azimut ${renderTex('\\psi_s')} tiene la misma apertura angular con signo reflejado (- Este por la mañana vs. + Oeste por la tarde).</p>`,
             },
             {
               heading: isEn
