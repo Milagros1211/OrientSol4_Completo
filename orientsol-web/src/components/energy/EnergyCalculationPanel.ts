@@ -57,7 +57,7 @@ export function showOsterwaldInfoModal(isEn: boolean): void {
   backdrop.setAttribute('data-theme', themeManager.getTheme());
 
   backdrop.innerHTML = `
-    <div class="matlab-dialog-box" role="dialog" aria-modal="true" style="max-width: 860px; width: 95vw; background: ${isDark ? '#0f172a' : '#ffffff'}; border: 1.5px solid ${isDark ? '#334155' : '#64748b'}; box-shadow: 0 16px 40px rgba(0,0,0,0.35); border-radius: 6px; overflow: hidden; display: flex; flex-direction: column;">
+    <div class="matlab-dialog-box" role="dialog" aria-modal="true" style="max-width: 880px; width: 95vw; background: ${isDark ? '#0f172a' : '#ffffff'}; border: 1.5px solid ${isDark ? '#334155' : '#64748b'}; box-shadow: 0 16px 40px rgba(0,0,0,0.35); border-radius: 6px; overflow: hidden; display: flex; flex-direction: column;">
       <div class="matlab-dialog-titlebar" style="background: ${isDark ? 'linear-gradient(90deg, #1e293b 0%, #0f172a 100%)' : 'linear-gradient(90deg, #f1f5f9 0%, #e2e8f0 100%)'}; border-bottom: 1px solid ${isDark ? '#334155' : '#cbd5e1'}; padding: 9px 14px; display: flex; justify-content: space-between; align-items: center;">
         <div style="display: flex; align-items: center; gap: 8px;">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none">
@@ -71,13 +71,38 @@ export function showOsterwaldInfoModal(isEn: boolean): void {
         <button type="button" class="matlab-close-btn" aria-label="${isEn ? 'Close' : 'Cerrar'}" style="border: none; background: transparent; font-size: 20px; color: ${isDark ? '#94a3b8' : '#64748b'}; cursor: pointer; padding: 0 4px; line-height: 1;">&times;</button>
       </div>
 
-      <div class="matlab-dialog-body" style="padding: 16px; background: ${isDark ? '#0b1120' : '#ffffff'}; max-height: calc(90vh - 80px); overflow-y: auto;">
+      <div class="matlab-dialog-body" style="display: flex !important; flex-direction: column !important; align-items: stretch !important; padding: 16px; background: ${isDark ? '#0b1120' : '#ffffff'}; max-height: calc(90vh - 80px); overflow-y: auto; overflow-x: hidden !important; width: 100%; box-sizing: border-box;">
         <style>
           .osterwald-modal-grid {
             display: grid;
-            grid-template-columns: minmax(0, 1.08fr) minmax(0, 1.22fr);
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
             gap: 14px;
             align-items: stretch;
+            width: 100%;
+            box-sizing: border-box;
+          }
+          .math-block-card {
+            overflow: hidden !important;
+            width: 100%;
+            box-sizing: border-box;
+          }
+          .math-block-card .katex-display {
+            margin: 0.2rem 0 !important;
+            max-width: 100% !important;
+            text-align: center !important;
+            overflow: hidden !important;
+          }
+          .math-block-card .katex {
+            font-size: clamp(0.70rem, 0.9vw + 0.30rem, 0.86rem) !important;
+            line-height: 1.25 !important;
+          }
+          .osterwald-eq-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            overflow: hidden !important;
+            padding: 2px 0;
           }
           @media (max-width: 780px) {
             .osterwald-modal-grid {
@@ -88,7 +113,7 @@ export function showOsterwaldInfoModal(isEn: boolean): void {
         
         <div class="osterwald-modal-grid">
           <!-- Columna Izquierda: Formulación y Ecuaciones en Bloques -->
-          <div style="border: 1.5px solid #3b82f6; border-radius: 6px; padding: 14px; background: ${isDark ? '#111827' : '#ffffff'}; display: flex; flex-direction: column;">
+          <div style="border: 1.5px solid #3b82f6; border-radius: 6px; padding: 14px; background: ${isDark ? '#111827' : '#ffffff'}; display: flex; flex-direction: column; overflow: hidden;">
             <div style="color: #ea580c; font-weight: 700; font-size: 14.5px; margin-bottom: 12px; font-family: 'Segoe UI', Tahoma, sans-serif; display: flex; align-items: center; gap: 6px;">
               <span style="display: inline-block; width: 4px; height: 16px; background: #ea580c; border-radius: 2px;"></span>
               ${isEn ? 'Osterwald Method Equations:' : 'Método de Osterwald (Fórmulas):'}
@@ -99,7 +124,7 @@ export function showOsterwaldInfoModal(isEn: boolean): void {
               <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: ${isDark ? '#fb923c' : '#c2410c'}; margin-bottom: 4px;">
                 ${isEn ? '1. Instantaneous Maximum Power (W)' : '1. Potencia máxima instantánea del módulo (W)'}
               </div>
-              <div style="overflow-x: auto; text-align: center; padding: 2px 0;">
+              <div class="osterwald-eq-wrapper">
                 ${renderTex('P_M = P_{M,\\text{STC}} \\cdot \\frac{G}{G_{\\text{STC}}} \\cdot \\left[ 1 - \\gamma \\cdot (T_c - 25^\\circ\\text{C}) \\right]', true)}
               </div>
             </div>
@@ -109,7 +134,7 @@ export function showOsterwaldInfoModal(isEn: boolean): void {
               <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: ${isDark ? '#fb923c' : '#c2410c'}; margin-bottom: 4px;">
                 ${isEn ? '2. Cell Operating Temperature (°C)' : '2. Temperatura de operación de la célula (°C)'}
               </div>
-              <div style="overflow-x: auto; text-align: center; padding: 2px 0;">
+              <div class="osterwald-eq-wrapper">
                 ${renderTex('T_c = T_{\\text{amb}} + \\left( \\frac{\\text{TONC} - 20^\\circ\\text{C}}{800\\,\\text{W/m}^2} \\right) \\cdot G', true)}
               </div>
             </div>
@@ -119,7 +144,7 @@ export function showOsterwaldInfoModal(isEn: boolean): void {
               <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: ${isDark ? '#fb923c' : '#c2410c'}; margin-bottom: 4px;">
                 ${isEn ? '3. Accumulated Total Energy' : '3. Energía producida acumulada en el intervalo'}
               </div>
-              <div style="overflow-x: auto; text-align: center; padding: 2px 0;">
+              <div class="osterwald-eq-wrapper">
                 ${renderTex('E = \\int_{t_1}^{t_2} P_M(t)\\,dt', true)}
               </div>
             </div>
@@ -178,7 +203,7 @@ export function showOsterwaldInfoModal(isEn: boolean): void {
         </div>
 
         <!-- Action footer with Cerrar button -->
-        <div style="margin-top: 14px; display: flex; justify-content: flex-end;">
+        <div style="margin-top: 14px; display: flex; justify-content: flex-end; width: 100%;">
           <button type="button" class="matlab-btn-default btn-ayuda-ok" style="min-width: 95px; padding: 7px 18px; font-size: 13.5px; background: #2563eb; color: #ffffff; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.15); transition: background 0.15s ease;">
             ${isEn ? 'Close' : 'Cerrar'}
           </button>
