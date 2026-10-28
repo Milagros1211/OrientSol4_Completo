@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>OrientSol v4.0 | Solar & PV Simulation Engine (WebAssembly)</title>
+    <meta name="description" content="Simulación de radiación solar, cálculo de inclinación óptima anual, estacional y mensual, sistemas de seguimiento (1 y 2 ejes), mapas de pérdidas CTE DB-HE4 y producción fotovoltaica en el navegador mediante Pyodide y WebAssembly." />
+    
+    <!-- Security Headers (OWASP & W3C Standard Security Configuration) -->
+    <!-- 1. Content Security Policy (Tailored for Pyodide WebAssembly, Worker Threads, and Supabase/External APIs) -->
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob: https://cdn.jsdelivr.net;
+      worker-src 'self' blob:;
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+      font-src 'self' https://fonts.gstatic.com data:;
+      img-src 'self' data: blob: https:;
+      connect-src 'self' https://*.supabase.co wss://*.supabase.co https://re.jrc.ec.europa.eu https://power.larc.nasa.gov https://archive-api.open-meteo.com https://cdn.jsdelivr.net;
+      upgrade-insecure-requests;
+      frame-ancestors 'none';
+      object-src 'none';
+      base-uri 'self';
+    " />
+
+    <!-- 2. Prevent MIME-Type Sniffing (X-Content-Type-Options) -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+
+    <!-- 3. Prevent Clickjacking & Framing Attacks (X-Frame-Options equivalent via Client Guard) -->
+    <script>
+      // Anti-Clickjacking: Ensure app cannot be framed or embedded inside malicious iframes
+      if (window.top !== window.self) {
+        window.top.location = window.self.location;
+      }
+      // Automatic client-side HTTP -> HTTPS redirection
+      if (window.location.protocol === 'http:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+        window.location.href = window.location.href.replace(/^http:/, 'https:');
+      }
+    </script>
+    
+    <!-- PWA & Mobile Meta Tags -->
+    <meta name="theme-color" content="#0b0f19" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="OrientSol" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="apple-touch-icon" href="./favicon.svg" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script type="module" crossorigin src="./assets/index-Bgj8_sO0.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/rolldown-runtime-pP25SEvz.js">
+    <link rel="stylesheet" crossorigin href="./assets/index-Du8vHblR.css">
+  </head>
+  <body>
+    <div id="app"></div>
+  </body>
+</html>
