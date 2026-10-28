@@ -1,3 +1,5 @@
+import katex from 'katex';
+import { themeManager } from '@/services/theme/themeManager';
 import { i18n } from '@/i18n';
 import type { SolarBridgeSimulationResult } from '@/services/bridge/solarCalculationBridge';
 import { solarSyncState } from '@/services/bridge/solarSyncState';
@@ -27,94 +29,157 @@ const MONTH_NAMES_EN = [
 
 const DAYS_IN_MONTH = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
+function renderTex(expr: string, displayMode: boolean = false): string {
+  try {
+    return katex.renderToString(expr, {
+      displayMode,
+      throwOnError: false,
+      output: 'htmlAndMathml',
+    });
+  } catch {
+    return `<code>${expr}</code>`;
+  }
+}
+
 /**
  * Shows Osterwald Formula and Nomenclature help dialog
- * matching EXACTLY Figura 5.2.80 (Ayuda_Energia.m) in OrientSol 4.0
+ * Formats equations into clean, professional mathematical block cards
+ * matching Figura 5.2.80 (Ayuda_Energia.m) in OrientSol 4.0
  */
 export function showOsterwaldInfoModal(isEn: boolean): void {
   const existing = document.getElementById('matlab-ayuda-energia-modal');
   if (existing) existing.remove();
 
+  const isDark = themeManager.isDark();
   const backdrop = document.createElement('div');
   backdrop.id = 'matlab-ayuda-energia-modal';
   backdrop.className = 'matlab-modal-backdrop';
+  backdrop.setAttribute('data-theme', themeManager.getTheme());
 
   backdrop.innerHTML = `
-    <div class="matlab-dialog-box" role="dialog" aria-modal="true" style="max-width: 680px; background: #ffffff; border: 1.5px solid #64748b; box-shadow: 0 12px 36px rgba(0,0,0,0.3); border-radius: 4px; overflow: hidden;">
-      <div class="matlab-dialog-titlebar" style="background: linear-gradient(90deg, #f1f5f9 0%, #e2e8f0 100%); border-bottom: 1px solid #cbd5e1; padding: 7px 12px; display: flex; justify-content: space-between; align-items: center;">
+    <div class="matlab-dialog-box" role="dialog" aria-modal="true" style="max-width: 860px; width: 95vw; background: ${isDark ? '#0f172a' : '#ffffff'}; border: 1.5px solid ${isDark ? '#334155' : '#64748b'}; box-shadow: 0 16px 40px rgba(0,0,0,0.35); border-radius: 6px; overflow: hidden; display: flex; flex-direction: column;">
+      <div class="matlab-dialog-titlebar" style="background: ${isDark ? 'linear-gradient(90deg, #1e293b 0%, #0f172a 100%)' : 'linear-gradient(90deg, #f1f5f9 0%, #e2e8f0 100%)'}; border-bottom: 1px solid ${isDark ? '#334155' : '#cbd5e1'}; padding: 9px 14px; display: flex; justify-content: space-between; align-items: center;">
         <div style="display: flex; align-items: center; gap: 8px;">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none">
             <path d="M12 2L2 7l10 5 10-5-10-5z" fill="#ea580c"/>
             <path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="#ea580c" stroke-width="2"/>
           </svg>
-          <span style="font-size: 13.5px; font-weight: 600; color: #1e293b; font-family: 'Segoe UI', Tahoma, sans-serif;">
+          <span style="font-size: 14px; font-weight: 600; color: ${isDark ? '#f8fafc' : '#1e293b'}; font-family: 'Segoe UI', Tahoma, sans-serif;">
             ${isEn ? 'Information and nomenclature of the Osterwald method' : 'Información y nomenclatura del método de Osterwald'}
           </span>
         </div>
-        <div style="display: flex; gap: 4px;">
-          <button type="button" class="matlab-close-btn" aria-label="Cerrar" style="border: none; background: transparent; font-size: 18px; color: #64748b; cursor: pointer; padding: 0 4px; line-height: 1;">&times;</button>
-        </div>
+        <button type="button" class="matlab-close-btn" aria-label="${isEn ? 'Close' : 'Cerrar'}" style="border: none; background: transparent; font-size: 20px; color: ${isDark ? '#94a3b8' : '#64748b'}; cursor: pointer; padding: 0 4px; line-height: 1;">&times;</button>
       </div>
-      <div class="matlab-dialog-body" style="padding: 16px; background: #ffffff;">
-        <!-- Top Section: Método de Osterwald -->
-        <div style="border: 1.5px solid #3b82f6; border-radius: 3px; padding: 14px 18px; background: #ffffff; margin-bottom: 14px;">
-          <div style="color: #ea580c; font-weight: bold; font-size: 15px; margin-bottom: 12px; font-family: 'Segoe UI', Tahoma, sans-serif;">
-            ${isEn ? 'Osterwald method:' : 'Método de Osterwald:'}
-          </div>
-          <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
-            <!-- Formula box with orange border -->
-            <div style="border: 1.5px solid #f97316; padding: 9px 16px; background: #ffffff; font-family: 'Times New Roman', Times, serif; font-size: 17px; color: #0f172a; display: inline-flex; align-items: center;">
-              <span>P<sub>M</sub> = P<sub>M,STC</sub> &middot; </span>
-              <span style="display: inline-flex; flex-direction: column; align-items: center; margin: 0 5px; vertical-align: middle;">
-                <span style="border-bottom: 1px solid #000; padding: 0 4px; line-height: 1.1;">G</span>
-                <span style="line-height: 1.1;">G<sub>STC</sub></span>
-              </span>
-              <span>[1 - &gamma; &middot; (T<sub>c</sub> - 25)]</span>
+
+      <div class="matlab-dialog-body" style="padding: 16px; background: ${isDark ? '#0b1120' : '#ffffff'}; max-height: calc(90vh - 80px); overflow-y: auto;">
+        <style>
+          .osterwald-modal-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.08fr) minmax(0, 1.22fr);
+            gap: 14px;
+            align-items: stretch;
+          }
+          @media (max-width: 780px) {
+            .osterwald-modal-grid {
+              grid-template-columns: 1fr !important;
+            }
+          }
+        </style>
+        
+        <div class="osterwald-modal-grid">
+          <!-- Columna Izquierda: Formulación y Ecuaciones en Bloques -->
+          <div style="border: 1.5px solid #3b82f6; border-radius: 6px; padding: 14px; background: ${isDark ? '#111827' : '#ffffff'}; display: flex; flex-direction: column;">
+            <div style="color: #ea580c; font-weight: 700; font-size: 14.5px; margin-bottom: 12px; font-family: 'Segoe UI', Tahoma, sans-serif; display: flex; align-items: center; gap: 6px;">
+              <span style="display: inline-block; width: 4px; height: 16px; background: #ea580c; border-radius: 2px;"></span>
+              ${isEn ? 'Osterwald Method Equations:' : 'Método de Osterwald (Fórmulas):'}
             </div>
-            <!-- Right side: donde Tc = Tamb + ... -->
-            <div style="font-family: 'Times New Roman', Times, serif; font-size: 16px; color: #0f172a; display: inline-flex; align-items: center;">
-              <span>${isEn ? 'where' : 'donde'}&nbsp;&nbsp;T<sub>c</sub> = T<sub>amb</sub> &middot; </span>
-              <span style="display: inline-flex; flex-direction: column; align-items: center; margin: 0 5px; vertical-align: middle;">
-                <span style="border-bottom: 1px solid #000; padding: 0 4px; line-height: 1.1;">TONC - 20 &deg;C</span>
-                <span style="line-height: 1.1;">800 Wm<sup>-2</sup></span>
-              </span>
-              <span>&middot; G</span>
+
+            <!-- Bloque 1: Potencia Máxima Instantánea -->
+            <div class="math-block-card" style="background: ${isDark ? '#1e293b' : '#f8fafc'}; border: 1.5px solid ${isDark ? '#334155' : '#fed7aa'}; border-left: 4px solid #ea580c; border-radius: 6px; padding: 10px 12px; margin-bottom: 11px;">
+              <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: ${isDark ? '#fb923c' : '#c2410c'}; margin-bottom: 4px;">
+                ${isEn ? '1. Instantaneous Maximum Power (W)' : '1. Potencia máxima instantánea del módulo (W)'}
+              </div>
+              <div style="overflow-x: auto; text-align: center; padding: 2px 0;">
+                ${renderTex('P_M = P_{M,\\text{STC}} \\cdot \\frac{G}{G_{\\text{STC}}} \\cdot \\left[ 1 - \\gamma \\cdot (T_c - 25^\\circ\\text{C}) \\right]', true)}
+              </div>
+            </div>
+
+            <!-- Bloque 2: Temperatura de Operación de la Célula -->
+            <div class="math-block-card" style="background: ${isDark ? '#1e293b' : '#f8fafc'}; border: 1.5px solid ${isDark ? '#334155' : '#fed7aa'}; border-left: 4px solid #ea580c; border-radius: 6px; padding: 10px 12px; margin-bottom: 11px;">
+              <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: ${isDark ? '#fb923c' : '#c2410c'}; margin-bottom: 4px;">
+                ${isEn ? '2. Cell Operating Temperature (°C)' : '2. Temperatura de operación de la célula (°C)'}
+              </div>
+              <div style="overflow-x: auto; text-align: center; padding: 2px 0;">
+                ${renderTex('T_c = T_{\\text{amb}} + \\left( \\frac{\\text{TONC} - 20^\\circ\\text{C}}{800\\,\\text{W/m}^2} \\right) \\cdot G', true)}
+              </div>
+            </div>
+
+            <!-- Bloque 3: Energía Eléctrica Acumulada -->
+            <div class="math-block-card" style="background: ${isDark ? '#1e293b' : '#f8fafc'}; border: 1.5px solid ${isDark ? '#334155' : '#fed7aa'}; border-left: 4px solid #ea580c; border-radius: 6px; padding: 10px 12px;">
+              <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: ${isDark ? '#fb923c' : '#c2410c'}; margin-bottom: 4px;">
+                ${isEn ? '3. Accumulated Total Energy' : '3. Energía producida acumulada en el intervalo'}
+              </div>
+              <div style="overflow-x: auto; text-align: center; padding: 2px 0;">
+                ${renderTex('E = \\int_{t_1}^{t_2} P_M(t)\\,dt', true)}
+              </div>
             </div>
           </div>
-          <!-- Integrated Energy equation -->
-          <div style="margin-top: 14px; font-family: 'Times New Roman', Times, serif; font-size: 18px; color: #0f172a;">
-            E = &int;<sub>t<sub>1</sub></sub><sup>t<sub>2</sub></sup> p(t) dt
+
+          <!-- Columna Derecha: Nomenclatura Utilizada -->
+          <div style="border: 1.5px solid #3b82f6; border-radius: 6px; padding: 14px; background: ${isDark ? '#111827' : '#ffffff'}; display: flex; flex-direction: column;">
+            <div style="color: #2563eb; font-weight: 700; font-size: 14.5px; margin-bottom: 12px; font-family: 'Segoe UI', Tahoma, sans-serif; display: flex; align-items: center; gap: 6px;">
+              <span style="display: inline-block; width: 4px; height: 16px; background: #2563eb; border-radius: 2px;"></span>
+              ${isEn ? 'Nomenclature used:' : 'Nomenclatura utilizada:'}
+            </div>
+
+            <div class="osterwald-nomen-grid" style="display: grid; grid-template-columns: auto 1fr; gap: 7px 10px; align-items: baseline; font-size: 12.5px; line-height: 1.45; color: ${isDark ? '#cbd5e1' : '#1e293b'};">
+              <div style="font-weight: 600;">${renderTex('P_M')}</div>
+              <div>= ${isEn ? 'Maximum module power at maximum power point (W)' : 'Potencia máxima del módulo en el punto de máxima potencia (W)'}</div>
+
+              <div style="font-weight: 600;">${renderTex('P_{M,\\text{STC}}')}</div>
+              <div>= ${isEn ? 'Maximum cell power under standard test conditions (W)' : 'Potencia máxima de la célula en condiciones estándar (W)'}</div>
+
+              <div style="font-weight: 600;">${renderTex('G')}</div>
+              <div>= ${isEn ? 'Incident global irradiance (W/m²)' : 'Irradiancia global incidente (W/m²)'}</div>
+
+              <div style="font-weight: 600;">${renderTex('G_{\\text{STC}}')}</div>
+              <div>= ${isEn ? 'Standard test conditions irradiance (1000 W/m²)' : 'Irradiancia en condiciones estándar (1000 W/m²)'}</div>
+
+              <div style="font-weight: 600;">${renderTex('T_c')}</div>
+              <div>= ${isEn ? 'Cell temperature (°C)' : 'Temperatura de la célula (°C)'}</div>
+
+              <div style="font-weight: 600;">${renderTex('T_{\\text{amb}}')}</div>
+              <div>= ${isEn ? 'Ambient temperature (°C)' : 'Temperatura ambiente (°C)'}</div>
+
+              <div style="font-weight: 600;">${renderTex('\\gamma')}</div>
+              <div>
+                <span>= ${isEn ? 'Temperature coefficient of maximum cell power (°C⁻¹).' : 'Coeficiente de temperatura de la potencia máxima de la célula (°C⁻¹).'}</span>
+                <div style="font-size: 11.5px; color: ${isDark ? '#94a3b8' : '#64748b'}; margin-top: 2px;">
+                  ${isEn
+                    ? 'For monocrystalline silicon it can range between -0.005 to -0.003 °C⁻¹. Good results are obtained with 0.0035 °C⁻¹.'
+                    : 'En silicio monocristalino puede oscilar entre -0,005 a -0,003 °C⁻¹. Se obtienen buenos resultados con 0,0035 °C⁻¹.'}
+                </div>
+              </div>
+
+              <div style="font-weight: 600;">${renderTex('\\text{TONC}')}</div>
+              <div>
+                <span>= ${isEn ? 'Nominal operating cell temperature measured at 800 W/m² of irradiance and 20 °C ambient temperature.' : 'Temperatura de operación nominal de la célula medida a 800 W/m² de irradiancia global y a 20 °C de temperatura ambiente.'}</span>
+                <div style="font-size: 11.5px; color: ${isDark ? '#94a3b8' : '#64748b'}; margin-top: 2px;">
+                  ${isEn
+                    ? 'For monocrystalline silicon, 47 °C can be used.'
+                    : 'En silicio monocristalino puede usar 47 °C.'}
+                </div>
+              </div>
+
+              <div style="font-weight: 600;">${renderTex('E')}</div>
+              <div>= ${isEn ? 'Accumulated energy produced in time interval [t₁, t₂] (Wh or kWh)' : 'Energía eléctrica producida acumulada en el intervalo temporal [t₁, t₂] (Wh o kWh)'}</div>
+            </div>
           </div>
         </div>
 
-        <!-- Bottom Section: Nomenclatura utilizada -->
-        <div style="border: 1.5px solid #3b82f6; border-radius: 3px; padding: 14px 18px; background: #ffffff;">
-          <div style="color: #2563eb; font-weight: bold; font-size: 15px; margin-bottom: 10px; font-family: 'Segoe UI', Tahoma, sans-serif;">
-            ${isEn ? 'Nomenclature used:' : 'Nomenclatura utilizada:'}
-          </div>
-          <div style="font-family: 'Times New Roman', Times, serif; font-size: 14.5px; line-height: 1.8; color: #1e293b;">
-            <div>P<sub>M</sub> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= ${isEn ? 'Maximum module power at maximum power point (W)' : 'Potencia máxima del módulo en el punto de máxima potencia (W)'}</div>
-            <div>P<sub>M,STC</sub> &nbsp;= ${isEn ? 'Maximum cell power under standard test conditions (W)' : 'Potencia máxima de la célula en condiciones estándar (W)'}</div>
-            <div>G &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= ${isEn ? 'Incident global irradiance (W/m²)' : 'Irradiancia global incidente (<sup>W</sup>/<sub>m<sup>2</sup></sub>)'}</div>
-            <div>T<sub>c</sub> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= ${isEn ? 'Cell temperature (°C)' : 'Temperatura de la célula (°C)'}</div>
-            <div>&gamma; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= ${isEn ? 'Temperature coefficient of maximum cell power (°C⁻¹).' : 'Coeficiente de temperatura de la potencia máxima de la célula (°C⁻¹).'}</div>
-            <div style="padding-left: 60px; color: #334155;">
-              ${isEn
-                ? 'For monocrystalline silicon it can range between -0.005 to -0.003 °C⁻¹. Good results are obtained with 0.0035°C⁻¹'
-                : 'En silicio monocristalino puede oscilar entre -0,005 a -0,003 °C⁻¹. Se obtienen buenos resultdos con 0.0035°C⁻¹'}
-            </div>
-            <div>TONC &nbsp;&nbsp;&nbsp;&nbsp;= ${isEn ? 'Nominal operating cell temperature measured at 800 W/m² of' : 'Temperatura de operación nominal de la célula medida a 800 <sup>W</sup>/<sub>m<sup>2</sup></sub> de'}</div>
-            <div style="padding-left: 60px; color: #334155;">
-              ${isEn
-                ? 'global irradiance and 20 °C ambient temperature. For monocrystalline silicon 47 °C can be used.'
-                : 'irradiancia global y a 20 °C de temperatura ambiente. En silicio monocristalino puede usar 47 °C.'}
-            </div>
-          </div>
-        </div>
-
-        <!-- Action footer with Cerrar button on left matching Figura 5.2.80 -->
-        <div style="margin-top: 14px; display: flex; justify-content: flex-start;">
-          <button type="button" class="matlab-btn-default btn-ayuda-ok" style="min-width: 95px; padding: 6px 16px; font-size: 13.5px; background: #e2e8f0; color: #0f172a; border: 1px solid #94a3b8; border-radius: 3px; cursor: pointer; font-weight: 500;">
+        <!-- Action footer with Cerrar button -->
+        <div style="margin-top: 14px; display: flex; justify-content: flex-end;">
+          <button type="button" class="matlab-btn-default btn-ayuda-ok" style="min-width: 95px; padding: 7px 18px; font-size: 13.5px; background: #2563eb; color: #ffffff; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.15); transition: background 0.15s ease;">
             ${isEn ? 'Close' : 'Cerrar'}
           </button>
         </div>
