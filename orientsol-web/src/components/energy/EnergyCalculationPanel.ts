@@ -624,12 +624,7 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
               <span>${isEn ? 'Exit' : 'Salir'}</span>
             </button>
           </div>
-          <div class="footer-btn-right-group">
-            <button id="btn-energy-pdf" class="btn-study-foot btn-pdf" type="button" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #ffffff; border: 1px solid #38bdf8; border-radius: 4px; padding: 6px 14px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-              <span>${isEn ? 'PDF Report' : 'Informe PDF'}</span>
-            </button>
-          </div>
+          
         </div>
       </div>
     `;
@@ -720,20 +715,6 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
     const btnSalir = container.querySelector<HTMLButtonElement>('#btn-energy-salir');
     btnSalir?.addEventListener('click', () => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-
-    // 5. Informe PDF Button
-    const btnPdf = container.querySelector<HTMLButtonElement>('#btn-energy-pdf');
-    btnPdf?.addEventListener('click', () => {
-      import('@/components/export/pdfReportGenerator').then(({ showPdfGenerationNoticeModal, generateOrientSolPDFReport }) => {
-        showPdfGenerationNoticeModal(isEn, () => {
-          generateOrientSolPDFReport(res, isEn, studyType, {
-            peakPowerKw: statePeakKw,
-            tonc: stateTonc,
-            coefTemp: stateCoefTemp,
-          });
-        });
-      });
     });
   }
 

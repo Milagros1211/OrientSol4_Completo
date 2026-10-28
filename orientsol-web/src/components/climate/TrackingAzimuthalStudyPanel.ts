@@ -289,7 +289,7 @@ export function renderTrackingAzimuthalStudyPanel(props: TrackingStudyProps): HT
                 <line x1="16" y1="13" x2="8" y2="13"></line>
                 <line x1="16" y1="17" x2="8" y2="17"></line>
               </svg>
-              <span>${isEn ? 'Generate report' : 'Generar un informe'}</span>
+              <span>${isEn ? 'Generate PDF report' : 'Generar un informe PDF'}</span>
             </button>
           </div>
         </div>

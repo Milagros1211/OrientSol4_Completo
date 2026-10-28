@@ -109,7 +109,7 @@ export const en: Translations = {
     viewChartsBtn: 'View charts',
     energyCalcBtn: 'Energy calculation',
     exportExcelBtn: 'Export to Excel',
-    generateReportBtn: 'Generate report',
+    generateReportBtn: 'Generate PDF report',
     monthlyRadSubtitle: 'Monthly mean {comp} radiation (kWh/m²/day)',
     radGlobal: 'global',
     radBeam: 'direct / beam',
