@@ -1596,6 +1596,28 @@ body.theme-dark .verif-data-table th {
   font-weight: 600;
 }
 
+.verif-data-table .text-gain-pos {
+  color: #15803d !important;
+  font-weight: 700;
+}
+
+.verif-data-table .text-gain-neg {
+  color: #b91c1c !important;
+  font-weight: 700;
+}
+
+[data-theme="dark"] .verif-data-table .text-gain-pos,
+body.theme-dark .verif-data-table .text-gain-pos {
+  color: #34d399 !important;
+  font-weight: 700;
+}
+
+[data-theme="dark"] .verif-data-table .text-gain-neg,
+body.theme-dark .verif-data-table .text-gain-neg {
+  color: #f87171 !important;
+  font-weight: 700;
+}
+
 .badge-status-valid {
   display: inline-flex;
   align-items: center;

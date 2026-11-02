@@ -58,6 +58,14 @@ export function renderTrackingPolarGraphsWindow(props: TrackingPolarGraphsProps)
     const radSeas = res.seasonal.monthlyDailyKwh;
     const radAzim = res.tracking.azimuthalAxis.monthlyDailyKwh;
     const radHorTrack = res.tracking.horizontalAxis.monthlyDailyKwh;
+    const getDual = (k: string) => {
+      const dComps = res.tracking.dualAxis.components;
+      if (dComps && dComps[k as keyof typeof dComps]) {
+        return dComps[k as keyof typeof dComps];
+      }
+      return res.tracking.dualAxis.monthlyDailyKwh;
+    };
+    const radDual = getDual(compKey);
 
     const allData = {
       global: { rad0: getHoriz('global'), radPol: getPolar('global') },
@@ -75,6 +83,7 @@ export function renderTrackingPolarGraphsWindow(props: TrackingPolarGraphsProps)
     const gainsVsSeas = calcGains(radSeas);
     const gainsVsAzim = calcGains(radAzim);
     const gainsVsHorTrack = calcGains(radHorTrack);
+    const gainsVsDual = calcGains(radDual);
 
     const minVal = (arr: number[]) => (arr.length ? Math.min(...arr) : 0);
     const meanVal = (arr: number[]) => (arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0);
@@ -284,7 +293,7 @@ export function renderTrackingPolarGraphsWindow(props: TrackingPolarGraphsProps)
 
     const allGainsPool = isAll
       ? [...allGainsComps.global, ...allGainsComps.beam, ...allGainsComps.diffuse]
-      : [...gainsVs0, ...gainsVsAnn, ...gainsVsSeas, ...gainsVsAzim, ...gainsVsHorTrack];
+      : [...gainsVs0, ...gainsVsAnn, ...gainsVsSeas, ...gainsVsAzim, ...gainsVsHorTrack, ...gainsVsDual];
 
     const rawMinGain = Math.min(...allGainsPool, 0);
     const rawMaxGain = Math.max(...allGainsPool, 10);
@@ -364,17 +373,18 @@ export function renderTrackingPolarGraphsWindow(props: TrackingPolarGraphsProps)
         </g>
       `;
     } else {
-      // 5 bars per month matching MATLAB Grafica_EjePolar.m:
+      // 6 bars per month:
       // 1: vs 0°
       // 2: vs Inclinación óptima anual
       // 3: vs Inclinación óptima estacional
       // 4: vs Seg. eje azimutal
       // 5: vs Seg. eje horizontal
-      const barW = Math.max(2.5, monthSlotW * 0.16);
+      // 6: vs Seg. 2 ejes
+      const barW = Math.max(2.2, monthSlotW * 0.14);
       const gap = 1;
 
       for (let i = 0; i < 12; i++) {
-        const slotX = bPad.left + i * monthSlotW + (monthSlotW - (barW * 5 + gap * 4)) / 2;
+        const slotX = bPad.left + i * monthSlotW + (monthSlotW - (barW * 6 + gap * 5)) / 2;
 
         const series = [
           { val: gainsVs0[i], color: '#0284c7' },
@@ -382,6 +392,7 @@ export function renderTrackingPolarGraphsWindow(props: TrackingPolarGraphsProps)
           { val: gainsVsSeas[i], color: '#f59e0b' },
           { val: gainsVsAzim[i], color: '#8b5cf6' },
           { val: gainsVsHorTrack[i], color: '#ec4899' },
+          { val: gainsVsDual[i], color: '#14b8a6' },
         ];
 
         series.forEach((s, sIdx) => {
@@ -406,8 +417,8 @@ export function renderTrackingPolarGraphsWindow(props: TrackingPolarGraphsProps)
       }
 
       bottomLegendHtml = `
-        <g transform="translate(${bPad.left + bInnerW + 4}, ${bPad.top + 2})">
-          <rect x="0" y="0" width="88" height="98" fill="${legendBg}" stroke="${legendBorder}" rx="3" />
+        <g transform="translate(${bPad.left + bInnerW + 2}, ${bPad.top + 2})">
+          <rect x="0" y="0" width="92" height="112" fill="${legendBg}" stroke="${legendBorder}" rx="3" />
           <rect x="5" y="8" width="9" height="9" fill="${isAlbedo ? '#94a3b8' : '#0284c7'}" />
           <text x="18" y="16" fill="${isAlbedo ? '#f59e0b' : legendText}" font-size="7.5" font-weight="${isAlbedo ? '700' : '600'}">${isAlbedo ? 'vs 0° (Indet.)' : (isEn ? 'vs 0° (Horiz)' : 'vs 0° (Plano hor.)')}</text>
           <rect x="5" y="24" width="9" height="9" fill="#10b981" />
@@ -418,6 +429,8 @@ export function renderTrackingPolarGraphsWindow(props: TrackingPolarGraphsProps)
           <text x="18" y="64" fill="${legendText}" font-size="7.5" font-weight="600">${isEn ? 'vs Azim. trk' : 'vs Seg. azi'}</text>
           <rect x="5" y="72" width="9" height="9" fill="#ec4899" />
           <text x="18" y="80" fill="${legendText}" font-size="7.5" font-weight="600">${isEn ? 'vs Horiz. trk' : 'vs Seg. hor'}</text>
+          <rect x="5" y="88" width="9" height="9" fill="#14b8a6" />
+          <text x="18" y="96" fill="${legendText}" font-size="7.5" font-weight="600">${isEn ? 'vs 2-axis trk' : 'vs Seg. 2 ejes'}</text>
         </g>
       `;
     }

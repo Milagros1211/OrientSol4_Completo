@@ -179,7 +179,7 @@ ${isEn ? 'Data Source' : 'Fuente'}: ${res.source.toUpperCase()}
 ${isEn ? 'PV Peak Power' : 'Potencia Pico'}: ${formatNum(peakKw, 2)} kWp | PR: ${formatPercent(pr * 100, 0)}
 
 1. ${isEn ? 'OPTIMAL FIXED TILT' : 'INCLINACIÓN FIJA ÓPTIMA'}:
-   • ${isEn ? 'Annual Optimum' : 'Óptimo Anual'}: ${res.optimalAnnual.optimalTiltDeg}° (+${formatNum(res.optimalAnnual.gainOverHorizontalPct, 1)}% ${isEn ? 'vs Horiz' : 's/ Horizontal'})
+   • ${isEn ? 'Annual Optimum' : 'Óptimo Anual'}: ${res.optimalAnnual.optimalTiltDeg}° (${res.optimalAnnual.gainOverHorizontalPct >= 0 ? '+' : ''}${formatNum(res.optimalAnnual.gainOverHorizontalPct, 1)}% ${isEn ? 'vs Horiz' : 's/ Horizontal'})
    • ${isEn ? 'Daily Resource' : 'Recurso Medio Diario'}: ${formatNum(res.optimalAnnual.annualMeanDailyKwh, 2)} kWh/m²/día (${formatInt(res.optimalAnnual.annualTotalKwh)} kWh/m²·año)
 
 2. ${isEn ? 'ENERGY YIELD BALANCE' : 'BALANCE ENERGÉTICO'}:
@@ -190,7 +190,7 @@ ${isEn ? 'PV Peak Power' : 'Potencia Pico'}: ${formatNum(peakKw, 2)} kWp | PR: $
    • ${isEn ? 'Operating Cell Temp' : 'Temp. Célula Operativa'}: ${formatNum(res.temperatures.cellOperating.meanCellTempOptimalC, 1)} °C (Máx: ${formatNum(res.temperatures.cellOperating.maxCellTempOptimalC, 1)} °C)
 
 3. ${isEn ? 'SURFACES BENCHMARK RANKING' : 'RANKING DE RENDIMIENTO DE SUPERFICIES'}:
-${res.surfaceComparison.map((s, idx) => `   ${idx + 1}. ${getSurfaceDisplayName(s, isEn)}: ${formatNum(s.meanDailyKwhM2, 3)} kWh/m²/d (${formatInt(s.annualRadiationKwhM2)} kWh/m²) | +${formatNum(s.gainOverHorizontalPct, 1)}% | Prod: ${formatInt(s.energyProducedOsterwaldKwhYear)} kWh/${isEn ? 'yr' : 'año'}`).join('\n')}
+${res.surfaceComparison.map((s, idx) => `   ${idx + 1}. ${getSurfaceDisplayName(s, isEn)}: ${formatNum(s.meanDailyKwhM2, 3)} kWh/m²/d (${formatInt(s.annualRadiationKwhM2)} kWh/m²) | ${s.gainOverHorizontalPct >= 0 ? '+' : ''}${formatNum(s.gainOverHorizontalPct, 1)}% | Prod: ${formatInt(s.energyProducedOsterwaldKwhYear)} kWh/${isEn ? 'yr' : 'año'}`).join('\n')}
 
 ======================================================================
 OrientSol 4.0 Web • ${new Date().toLocaleDateString()}

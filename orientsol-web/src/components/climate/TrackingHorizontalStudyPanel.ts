@@ -74,6 +74,10 @@ export function renderTrackingHorizontalStudyPanel(props: TrackingStudyProps): H
     const radSeasonalOpt = res.seasonal.monthlyDailyKwh;
     const radPolar = res.tracking.polarAxis.monthlyDailyKwh;
     const radAzim = res.tracking.azimuthalAxis.monthlyDailyKwh;
+    const dualComps = res.tracking.dualAxis.components;
+    const radDual = dualComps
+      ? (dualComps[compActual as keyof typeof dualComps] || res.tracking.dualAxis.monthlyDailyKwh)
+      : res.tracking.dualAxis.monthlyDailyKwh;
 
     const calcGains = (target: number[]) =>
       radHorizTrack.map((h, i) => (target[i] > 0 ? ((h - target[i]) / target[i]) * 100 : 0));
@@ -83,6 +87,7 @@ export function renderTrackingHorizontalStudyPanel(props: TrackingStudyProps): H
     const gainsOverSeasonal = calcGains(radSeasonalOpt);
     const gainsOverPolar = calcGains(radPolar);
     const gainsOverAzim = calcGains(radAzim);
+    const gainsOverDual = calcGains(radDual);
 
     const meanHoriz = radHoriz.reduce((a, b) => a + b, 0) / 12;
     const meanHorizTrack = radHorizTrack.reduce((a, b) => a + b, 0) / 12;
@@ -91,6 +96,7 @@ export function renderTrackingHorizontalStudyPanel(props: TrackingStudyProps): H
     const meanGainSeasonal = ((meanHorizTrack - res.seasonal.annualMeanDailyKwh) / res.seasonal.annualMeanDailyKwh) * 100;
     const meanGainPolar = ((meanHorizTrack - res.tracking.polarAxis.annualMeanDailyKwh) / res.tracking.polarAxis.annualMeanDailyKwh) * 100;
     const meanGainAzim = ((meanHorizTrack - res.tracking.azimuthalAxis.annualMeanDailyKwh) / res.tracking.azimuthalAxis.annualMeanDailyKwh) * 100;
+    const meanGainDual = ((meanHorizTrack - res.tracking.dualAxis.annualMeanDailyKwh) / res.tracking.dualAxis.annualMeanDailyKwh) * 100;
 
     // SVG Diagram of Horizontal Axis Tracking (East-West rotating roll tracker)
     const horizDiagramSvg = `
@@ -187,7 +193,7 @@ export function renderTrackingHorizontalStudyPanel(props: TrackingStudyProps): H
                   <th rowspan="2" class="th-track-h0">${compSym} (0°)</th>
                   <th rowspan="2" class="th-track-opt">${compSym}</th>
                   <th rowspan="2" class="th-track-temp">${isEn ? 'Mean Temp' : 'Tª media'}</th>
-                  <th colspan="5" class="th-track-gains-super">${isEn ? 'Gains (%)' : 'Ganancias (%)'}</th>
+                  <th colspan="6" class="th-track-gains-super">${isEn ? 'Gains (%)' : 'Ganancias (%)'}</th>
                 </tr>
                 <tr class="tracking-sub-th-row">
                   <th class="th-gain-sub">${isEn ? 'Horiz.<br/>plane' : 'Plano<br/>horiz.'}</th>
@@ -195,6 +201,7 @@ export function renderTrackingHorizontalStudyPanel(props: TrackingStudyProps): H
                   <th class="th-gain-sub">${isEn ? 'Seasonal opt.<br/>tilt' : 'Inclin. ópt.<br/>estacional'}</th>
                   <th class="th-gain-sub">${isEn ? 'Polar<br/>1-axis' : '1 eje<br/>polar'}</th>
                   <th class="th-gain-sub">${isEn ? 'Azimuthal<br/>1-axis' : '1 eje<br/>azimutal'}</th>
+                  <th class="th-gain-sub">${isEn ? 'Two-axis' : '2 ejes'}</th>
                 </tr>
               </thead>
               <tbody>
@@ -212,6 +219,7 @@ export function renderTrackingHorizontalStudyPanel(props: TrackingStudyProps): H
                     <td class="td-num">${formatNum(gainsOverSeasonal[i], 2)}</td>
                     <td class="td-num">${formatNum(gainsOverPolar[i], 2)}</td>
                     <td class="td-num">${formatNum(gainsOverAzim[i], 2)}</td>
+                    <td class="td-num">${formatNum(gainsOverDual[i], 2)}</td>
                   </tr>
                 `).join('')}
               </tbody>
@@ -229,6 +237,7 @@ export function renderTrackingHorizontalStudyPanel(props: TrackingStudyProps): H
                   <td class="td-num"><strong>${formatNum(meanGainSeasonal, 2)}</strong></td>
                   <td class="td-num"><strong>${formatNum(meanGainPolar, 2)}</strong></td>
                   <td class="td-num"><strong>${formatNum(meanGainAzim, 2)}</strong></td>
+                  <td class="td-num"><strong>${formatNum(meanGainDual, 2)}</strong></td>
                 </tr>
               </tfoot>
             </table>

@@ -74,6 +74,10 @@ export function renderTrackingAzimuthalStudyPanel(props: TrackingStudyProps): HT
     const radSeasonalOpt = res.seasonal.monthlyDailyKwh;
     const radPolar = res.tracking.polarAxis.monthlyDailyKwh;
     const radHorizTrack = res.tracking.horizontalAxis.monthlyDailyKwh;
+    const dualComps = res.tracking.dualAxis.components;
+    const radDual = dualComps
+      ? (dualComps[compActual as keyof typeof dualComps] || res.tracking.dualAxis.monthlyDailyKwh)
+      : res.tracking.dualAxis.monthlyDailyKwh;
 
     const calcGains = (target: number[]) =>
       radAzim.map((a, i) => (target[i] > 0 ? ((a - target[i]) / target[i]) * 100 : 0));
@@ -83,6 +87,7 @@ export function renderTrackingAzimuthalStudyPanel(props: TrackingStudyProps): HT
     const gainsOverSeasonal = calcGains(radSeasonalOpt);
     const gainsOverPolar = calcGains(radPolar);
     const gainsOverHorizTrack = calcGains(radHorizTrack);
+    const gainsOverDual = calcGains(radDual);
 
     const meanHoriz = radHoriz.reduce((a, b) => a + b, 0) / 12;
     const meanAzim = radAzim.reduce((a, b) => a + b, 0) / 12;
@@ -91,6 +96,7 @@ export function renderTrackingAzimuthalStudyPanel(props: TrackingStudyProps): HT
     const meanGainSeasonal = ((meanAzim - res.seasonal.annualMeanDailyKwh) / res.seasonal.annualMeanDailyKwh) * 100;
     const meanGainPolar = ((meanAzim - res.tracking.polarAxis.annualMeanDailyKwh) / res.tracking.polarAxis.annualMeanDailyKwh) * 100;
     const meanGainHorizTrack = ((meanAzim - res.tracking.horizontalAxis.annualMeanDailyKwh) / res.tracking.horizontalAxis.annualMeanDailyKwh) * 100;
+    const meanGainDual = ((meanAzim - res.tracking.dualAxis.annualMeanDailyKwh) / res.tracking.dualAxis.annualMeanDailyKwh) * 100;
 
     // SVG Diagram of Azimuthal Tracking (Vertical Axis rotation)
     const azimDiagramSvg = `
@@ -180,7 +186,7 @@ export function renderTrackingAzimuthalStudyPanel(props: TrackingStudyProps): HT
                   <th rowspan="2" class="th-track-h0">${compSym} (0°)</th>
                   <th rowspan="2" class="th-track-opt">${compSym}</th>
                   <th rowspan="2" class="th-track-temp">${isEn ? 'Mean Temp' : 'Tª media'}</th>
-                  <th colspan="5" class="th-track-gains-super">${isEn ? 'Gains (%)' : 'Ganancias (%)'}</th>
+                  <th colspan="6" class="th-track-gains-super">${isEn ? 'Gains (%)' : 'Ganancias (%)'}</th>
                 </tr>
                 <tr class="tracking-sub-th-row">
                   <th class="th-gain-sub">${isEn ? 'Horiz.<br/>plane' : 'Plano<br/>horiz.'}</th>
@@ -188,6 +194,7 @@ export function renderTrackingAzimuthalStudyPanel(props: TrackingStudyProps): HT
                   <th class="th-gain-sub">${isEn ? 'Seasonal opt.<br/>tilt' : 'Inclin. ópt.<br/>estacional'}</th>
                   <th class="th-gain-sub">${isEn ? 'Polar<br/>1-axis' : '1 eje<br/>polar'}</th>
                   <th class="th-gain-sub">${isEn ? 'Horizontal<br/>1-axis' : '1 eje<br/>horizontal'}</th>
+                  <th class="th-gain-sub">${isEn ? 'Two-axis' : '2 ejes'}</th>
                 </tr>
               </thead>
               <tbody>
@@ -200,6 +207,7 @@ export function renderTrackingAzimuthalStudyPanel(props: TrackingStudyProps): HT
                   const gSeas = gainsOverSeasonal[i];
                   const gPol = gainsOverPolar[i];
                   const gHz = gainsOverHorizTrack[i];
+                  const gDual = gainsOverDual[i];
                   const noonAzim = getNoonAzimuthDeg(res.latitude, i);
 
                   return `
@@ -216,6 +224,7 @@ export function renderTrackingAzimuthalStudyPanel(props: TrackingStudyProps): HT
                       <td class="td-num">${formatNum(gSeas, 2)}</td>
                       <td class="td-num">${formatNum(gPol, 2)}</td>
                       <td class="td-num">${formatNum(gHz, 2)}</td>
+                      <td class="td-num">${formatNum(gDual, 2)}</td>
                     </tr>
                   `;
                 }).join('')}
@@ -234,6 +243,7 @@ export function renderTrackingAzimuthalStudyPanel(props: TrackingStudyProps): HT
                   <td class="td-num"><strong>${formatNum(meanGainSeasonal, 2)}</strong></td>
                   <td class="td-num"><strong>${formatNum(meanGainPolar, 2)}</strong></td>
                   <td class="td-num"><strong>${formatNum(meanGainHorizTrack, 2)}</strong></td>
+                  <td class="td-num"><strong>${formatNum(meanGainDual, 2)}</strong></td>
                 </tr>
               </tfoot>
             </table>

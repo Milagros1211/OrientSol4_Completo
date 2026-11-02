@@ -244,14 +244,14 @@ export function renderOptimalMonthlyStudyPanel(props: OptimalMonthlyStudyProps):
 
           <div class="kpi-mini-card kpi-gain">
             <span class="kpi-mini-title">${isEn ? 'Gain vs Optimal Annual' : 'Ganancia s/ Óptimo Anual Fijo'}</span>
-            <div class="kpi-mini-main text-gain">+${formatNum(meanGainAnnualPct, 2)}%</div>
-            <span class="kpi-mini-sub">+${formatInt((meanMonthlyOpt - meanAnnualOpt) * 365)} kWh/m²·${isEn ? 'yr' : 'año'}</span>
+            <div class="kpi-mini-main ${meanGainAnnualPct >= 0 ? 'text-gain' : 'text-danger'}">${meanGainAnnualPct >= 0 ? '+' : ''}${formatNum(meanGainAnnualPct, 2)}%</div>
+            <span class="kpi-mini-sub">${(meanMonthlyOpt - meanAnnualOpt) >= 0 ? '+' : ''}${formatInt((meanMonthlyOpt - meanAnnualOpt) * 365)} kWh/m²·${isEn ? 'yr' : 'año'}</span>
           </div>
 
           <div class="kpi-mini-card kpi-horiz">
             <span class="kpi-mini-title">${isEn ? 'Gain over Horizontal (0°)' : 'Ganancia s/ Horizontal (0°)'}</span>
-            <div class="kpi-mini-main" style="color: var(--accent-cyan);">${isAlbedo ? '-' : `+${formatNum(meanGainHorizPct, 2)}%`}</div>
-            <span class="kpi-mini-sub">${isAlbedo ? 'Rdm(0°) = 0' : `+${formatInt(Math.round((meanMonthlyOpt - mean0) * 365))} kWh/m²·${isEn ? 'yr' : 'año'}`}</span>
+            <div class="kpi-mini-main" style="color: var(--accent-cyan);">${isAlbedo ? '-' : `${meanGainHorizPct >= 0 ? '+' : ''}${formatNum(meanGainHorizPct, 2)}%`}</div>
+            <span class="kpi-mini-sub">${isAlbedo ? 'Rdm(0°) = 0' : `${(meanMonthlyOpt - mean0) >= 0 ? '+' : ''}${formatInt(Math.round((meanMonthlyOpt - mean0) * 365))} kWh/m²·${isEn ? 'yr' : 'año'}`}</span>
           </div>
         </div>
 
@@ -431,9 +431,9 @@ export function renderOptimalMonthlyStudyPanel(props: OptimalMonthlyStudyProps):
                 <td class="td-num td-col-opt"><strong>${formatNum(meanMonthlyOpt, 2)}</strong></td>
                 <td class="td-num td-col-temp"><strong>${formatNum(meanTemp, 1)}</strong></td>
                 <td class="td-num td-gain-factor"><strong>${isAlbedo ? '-' : (mean0 > 0.001 ? formatNum(meanMonthlyOpt / mean0, 2) : '1,00')}</strong></td>
-                <td class="td-num td-gain-pct gain-pos"><strong>${isAlbedo ? '-' : `+${formatNum(meanGainHorizPct, 2)}%`}</strong></td>
+                <td class="td-num td-gain-pct ${!isAlbedo && meanGainHorizPct >= 0 ? 'gain-pos' : !isAlbedo ? 'gain-neg' : ''}"><strong>${isAlbedo ? '-' : `${meanGainHorizPct >= 0 ? '+' : ''}${formatNum(meanGainHorizPct, 2)}%`}</strong></td>
                 <td class="td-num td-gain-factor"><strong>${(meanAnnualOpt > 0.001 ? formatNum(meanMonthlyOpt / meanAnnualOpt, 2) : '1,00')}</strong></td>
-                <td class="td-num td-gain-pct gain-pos"><strong>+${formatNum(meanGainAnnualPct, 2)}%</strong></td>
+                <td class="td-num td-gain-pct ${meanGainAnnualPct >= 0 ? 'gain-pos' : 'gain-neg'}"><strong>${meanGainAnnualPct >= 0 ? '+' : ''}${formatNum(meanGainAnnualPct, 2)}%</strong></td>
               </tr>
             </tfoot>
           </table>

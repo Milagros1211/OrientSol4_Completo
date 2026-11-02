@@ -80,7 +80,7 @@ const savePvgisToTempMemory = (data: PVGISRecord) => {
     if (typeof sessionStorage !== 'undefined') {
       sessionStorage.setItem(`orientsol_pvgis_${key}`, JSON.stringify(data));
     }
-  } catch {}
+  } catch { }
 };
 
 const getPvgisFromTempMemory = (lat: number, lon: number): PVGISRecord | null => {
@@ -97,7 +97,7 @@ const getPvgisFromTempMemory = (lat: number, lon: number): PVGISRecord | null =>
         return parsed;
       }
     }
-  } catch {}
+  } catch { }
   return null;
 };
 
@@ -270,57 +270,57 @@ export function renderPythonConsole(): HTMLElement {
 
   // Live PVGIS fetch for the exact site linked to the latitude slider (uses the active site's real coordinates)
   async function fetchLivePvgis() {
-      const loc = getLocInfo(stateLat);
-      const activeSim = solarSyncState.getLastSimulationResult();
-      const simMatches = Boolean(activeSim && Math.abs(activeSim.latitude - stateLat) < 0.4);
-      const siteLat = simMatches ? activeSim!.latitude : stateLat;
-      const lon = loc.longitude;
-      const locName = loc.name;
+    const loc = getLocInfo(stateLat);
+    const activeSim = solarSyncState.getLastSimulationResult();
+    const simMatches = Boolean(activeSim && Math.abs(activeSim.latitude - stateLat) < 0.4);
+    const siteLat = simMatches ? activeSim!.latitude : stateLat;
+    const lon = loc.longitude;
+    const locName = loc.name;
 
-      // If switching from Liu-Jordan or Offline mode and live data was already loaded in memory:
-      const cached = getPvgisFromTempMemory(siteLat, lon);
-      if ((!showPvgisComparison || (pvgisData && pvgisData.isOffline)) && cached && !cached.isOffline) {
-        pvgisData = { ...cached, isOffline: false };
-        showPvgisComparison = true;
-        pvgisFetchError = null;
-        renderView();
-        return;
-      }
-
-      isFetchingPvgis = true;
+    // If switching from Liu-Jordan or Offline mode and live data was already loaded in memory:
+    const cached = getPvgisFromTempMemory(siteLat, lon);
+    if ((!showPvgisComparison || (pvgisData && pvgisData.isOffline)) && cached && !cached.isOffline) {
+      pvgisData = { ...cached, isOffline: false };
+      showPvgisComparison = true;
       pvgisFetchError = null;
       renderView();
+      return;
+    }
 
-      try {
-        const res = await fetchPvgisClimateData(siteLat, lon, locName);
-        pvgisData = {
-          locationName: res.locationName,
-          latitude: res.latitude,
-          longitude: res.longitude,
-          monthlyGdm0: res.monthlyGdm0,
-          monthlyGdmOpt: res.monthlyGdmOpt,
-          optimalTilt: res.optimalTilt,
-          provider: res.metadata?.provider || 'European Commission PVGIS 5.3 (JRC)',
-          database: 'PVGIS-SARAH3',
-          dbType: 'Satellite',
-          startYear: 2005,
-          endYear: 2023,
-          spatialRes: '0.05° x 0.05° (~5 km)',
-          comments: 'In PVGIS 5.3, default DB for Europe, Central Asia, Africa and South America',
-          fetchedAt: res.fetchedAt || new Date().toISOString(),
-          isOffline: false,
-        };
-        savePvgisToTempMemory(pvgisData);
-        showPvgisComparison = true;
-        pvgisJustSynchronized = true;
-        pvgisFetchError = null;
-      } catch (err: unknown) {
-        pvgisFetchError = err instanceof Error ? err.message : String(err);
-      } finally {
-        isFetchingPvgis = false;
-        renderView();
-      }
-    
+    isFetchingPvgis = true;
+    pvgisFetchError = null;
+    renderView();
+
+    try {
+      const res = await fetchPvgisClimateData(siteLat, lon, locName);
+      pvgisData = {
+        locationName: res.locationName,
+        latitude: res.latitude,
+        longitude: res.longitude,
+        monthlyGdm0: res.monthlyGdm0,
+        monthlyGdmOpt: res.monthlyGdmOpt,
+        optimalTilt: res.optimalTilt,
+        provider: res.metadata?.provider || 'European Commission PVGIS 5.3 (JRC)',
+        database: 'PVGIS-SARAH3',
+        dbType: 'Satellite',
+        startYear: 2005,
+        endYear: 2023,
+        spatialRes: '0.05° x 0.05° (~5 km)',
+        comments: 'In PVGIS 5.3, default DB for Europe, Central Asia, Africa and South America',
+        fetchedAt: res.fetchedAt || new Date().toISOString(),
+        isOffline: false,
+      };
+      savePvgisToTempMemory(pvgisData);
+      showPvgisComparison = true;
+      pvgisJustSynchronized = true;
+      pvgisFetchError = null;
+    } catch (err: unknown) {
+      pvgisFetchError = err instanceof Error ? err.message : String(err);
+    } finally {
+      isFetchingPvgis = false;
+      renderView();
+    }
+
   }
 
   function renderView() {
@@ -344,7 +344,7 @@ export function renderPythonConsole(): HTMLElement {
 
     // Auto-load live PVGIS for the exact site linked to the latitude slider (once per site)
     if (activeTab === 'radiation' && showPvgisComparison && !isFetchingPvgis && (!pvgisData || pvgisData.isOffline)
-        && pvgisAutoTriedKey !== stateLat.toFixed(3)) {
+      && pvgisAutoTriedKey !== stateLat.toFixed(3)) {
       pvgisAutoTriedKey = stateLat.toFixed(3);
       setTimeout(() => { void fetchLivePvgis(); }, 0);
     }
@@ -479,8 +479,8 @@ export function renderPythonConsole(): HTMLElement {
           <h3 class="panel-title">${isEn ? 'Scientific Verification & Engine Validation' : 'Verificación Científica y Validación de Motores'}</h3>
           <p class="panel-desc">
             ${isEn
-              ? 'Interactive verification suite for OrientSol 4.0 mathematical engines: solar geometry, radiation transposition, tracking systems, and Osterwald cell thermal models.'
-              : 'Módulos verificados en tiempo real: <code>matriz_declinacion</code>, <code>AngulosSalida</code>, <code>Angulos</code>, <code>Altura_Solar</code>, <code>Azimut_Solar</code>, <code>Calculo_Beta_2Ejes</code>, <code>Liu-Jordan</code> y <code>Osterwald</code>.'}
+        ? 'Interactive verification suite for OrientSol 4.0 mathematical engines: solar geometry, radiation transposition, tracking systems, and Osterwald cell thermal models.'
+        : 'Módulos verificados en tiempo real: <code>matriz_declinacion</code>, <code>AngulosSalida</code>, <code>Angulos</code>, <code>Altura_Solar</code>, <code>Azimut_Solar</code>, <code>Calculo_Beta_2Ejes</code>, <code>Liu-Jordan</code> y <code>Osterwald</code>.'}
           </p>
         </div>
         <div class="panel-actions" style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
@@ -493,12 +493,12 @@ export function renderPythonConsole(): HTMLElement {
           </button>
           <button id="run-py-btn" class="btn btn-primary" type="button" style="background: #059669; border-color: #10b981;" ${isExecuting ? 'disabled' : ''}>
             ${isExecuting
-              ? `<span class="spinner-sm"></span> ${isEn ? 'Verifying in WASM...' : 'Verificando en WASM...'}`
-              : `<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+        ? `<span class="spinner-sm"></span> ${isEn ? 'Verifying in WASM...' : 'Verificando en WASM...'}`
+        : `<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
                   <polygon points="5 3 19 12 5 21 5 3"></polygon>
                 </svg>
                 ${isEn ? 'Validate All Engines in Python WASM' : 'Validar Algoritmos en Motor Python WASM'}`
-            }
+      }
           </button>
         </div>
       </div>
@@ -812,8 +812,8 @@ export function renderPythonConsole(): HTMLElement {
             <div>
               <strong>${isEn ? 'Universal Solar Symmetry (Morning / Afternoon):' : 'Simetría Solar Universal (Mañana / Tarde):'}</strong><br/>
               ${isEn
-                ? 'The sun rises in the morning, reaches its daily peak at <strong>12:00 h solar noon</strong>, and descends in the afternoon along an inverse trajectory. Solar noon acts as an astronomical mirror: at hours equidistant from noon (e.g. 11:00 h vs. 13:00 h), the <strong>Solar Altitude (α) is identical</strong>, the <strong>2-Axis Tilt (β = 90° - α) is identical</strong>, and the <strong>Azimuth (ψ)</strong> has the exact same angular magnitude with opposite direction (- East in the morning vs. + West in the afternoon). <strong style="color: var(--text-main);">Does this happen regardless of location? YES:</strong> it is a universal astronomical law valid for any latitude on Earth, resulting from the constant rotational speed of the planet around its polar axis.'
-                : 'El sol sube por la mañana, alcanza su punto más alto a las <strong>12:00 h solar (mediodía)</strong> y baja por la tarde recorriendo el camino inverso. El mediodía actúa como un espejo: a horas equidistantes (ej. 11:00 h vs. 13:00 h), la <strong>Altura Solar (α) es idéntica</strong>, la <strong>Inclinación 2-ejes (β = 90° - α) es idéntica</strong> y el <strong>Azimut (ψ)</strong> tiene idéntica apertura pero signo opuesto (- Este por la mañana vs. + Oeste por la tarde). <strong style="color: var(--text-main);">¿Ocurre indistintamente del emplazamiento? SÍ:</strong> es una ley astronómica universal que se cumple en cualquier latitud de la Tierra debido a la rotación axial constante del planeta.'}
+          ? 'The sun rises in the morning, reaches its daily peak at <strong>12:00 h solar noon</strong>, and descends in the afternoon along an inverse trajectory. Solar noon acts as an astronomical mirror: at hours equidistant from noon (e.g. 11:00 h vs. 13:00 h), the <strong>Solar Altitude (α) is identical</strong>, the <strong>2-Axis Tilt (β = 90° - α) is identical</strong>, and the <strong>Azimuth (ψ)</strong> has the exact same angular magnitude with opposite direction (- East in the morning vs. + West in the afternoon). <strong style="color: var(--text-main);">Does this happen regardless of location? YES:</strong> it is a universal astronomical law valid for any latitude on Earth, resulting from the constant rotational speed of the planet around its polar axis.'
+          : 'El sol sube por la mañana, alcanza su punto más alto a las <strong>12:00 h solar (mediodía)</strong> y baja por la tarde recorriendo el camino inverso. El mediodía actúa como un espejo: a horas equidistantes (ej. 11:00 h vs. 13:00 h), la <strong>Altura Solar (α) es idéntica</strong>, la <strong>Inclinación 2-ejes (β = 90° - α) es idéntica</strong> y el <strong>Azimut (ψ)</strong> tiene idéntica apertura pero signo opuesto (- Este por la mañana vs. + Oeste por la tarde). <strong style="color: var(--text-main);">¿Ocurre indistintamente del emplazamiento? SÍ:</strong> es una ley astronómica universal que se cumple en cualquier latitud de la Tierra debido a la rotación axial constante del planeta.'}
             </div>
           </div>
 
@@ -955,8 +955,8 @@ export function renderPythonConsole(): HTMLElement {
               </div>
               <div style="color: var(--text-muted); font-size: 0.71rem; margin-top: 0.2rem;">
                 ${isEn
-                  ? 'Angle between the Earth-Sun line and equatorial plane, bounded within [-23.45°, +23.45°]:'
-                  : 'Ángulo entre la línea Sol-Tierra y el plano ecuatorial terrestre, oscilando en el rango [-23,45°, +23,45°]:'}
+          ? 'Angle between the Earth-Sun line and equatorial plane, bounded within [-23.45°, +23.45°]:'
+          : 'Ángulo entre la línea Sol-Tierra y el plano ecuatorial terrestre, oscilando en el rango [-23,45°, +23,45°]:'}
               </div>
               <div class="math-formula-box">
                 <div style="color: var(--text-main); text-align: center; width: 100%;">
@@ -977,8 +977,8 @@ export function renderPythonConsole(): HTMLElement {
               </div>
               <div style="color: var(--text-muted); font-size: 0.71rem; margin-top: 0.2rem;">
                 ${isEn
-                  ? 'Determines solar position as a function of latitude φ, declination δ, and hour angle ω:'
-                  : 'Determina la posición instantánea del Sol en función de la latitud φ, declinación δ y ángulo horario ω:'}
+          ? 'Determines solar position as a function of latitude φ, declination δ, and hour angle ω:'
+          : 'Determina la posición instantánea del Sol en función de la latitud φ, declinación δ y ángulo horario ω:'}
               </div>
               <div class="math-formula-box">
                 <div style="color: var(--text-main); text-align: center; width: 100%;">
@@ -1001,8 +1001,8 @@ export function renderPythonConsole(): HTMLElement {
               </div>
               <div style="color: var(--text-muted); font-size: 0.71rem; margin-top: 0.2rem;">
                 ${isEn
-                  ? 'Because cos(ω) is an even function (cos(-ω) = cos(+ω)), morning and afternoon trajectories are mirror images:'
-                  : 'Dado que cos(ω) es una función par (cos(-ω) = cos(+ω)), la trayectoria matinal y vespertina son idénticas en espejo:'}
+          ? 'Because cos(ω) is an even function (cos(-ω) = cos(+ω)), morning and afternoon trajectories are mirror images:'
+          : 'Dado que cos(ω) es una función par (cos(-ω) = cos(+ω)), la trayectoria matinal y vespertina son idénticas en espejo:'}
               </div>
               <div class="math-formula-box">
                 <div style="color: var(--text-main); text-align: center; width: 100%;">
@@ -1059,8 +1059,8 @@ export function renderPythonConsole(): HTMLElement {
             <div style="display: flex; align-items: center; gap: 0.5rem;">
               <span class="verif-table-title">
                 ${isEn
-                  ? `12-Month Baseline (Klein Characteristic Days, Lat ${formatAngle(stateLat, 2)}, Active Month: ${months[stateMonth - 1]})`
-                  : `Línea Base 12 Meses (Días Intermedios de Klein, Latitud ${formatAngle(stateLat, 2)}, Mes Consultado: ${months[stateMonth - 1]})`}
+          ? `12-Month Baseline (Klein Characteristic Days, Lat ${formatAngle(stateLat, 2)}, Active Month: ${months[stateMonth - 1]})`
+          : `Línea Base 12 Meses (Días Intermedios de Klein, Latitud ${formatAngle(stateLat, 2)}, Mes Consultado: ${months[stateMonth - 1]})`}
               </span>
               <span class="badge-status-valid">✓ ${isEn ? 'Calculation coefficients' : 'Coeficientes de cálculo'}</span>
             </div>
@@ -1131,8 +1131,8 @@ export function renderPythonConsole(): HTMLElement {
               </div>
               <div style="color: var(--text-muted); font-size: 0.71rem; margin-top: 0.2rem;">
                 ${isEn
-                  ? 'Klein proved that calculating solar geometry on a single characteristic day nm per month reproduces the integrated monthly extraterrestrial irradiation with <0.5% error:'
-                  : 'Klein demostró que evaluar la geometría solar en un único día característico nm por mes reproduce la irradiación extraterrestre acumulada mensual con un error < 0,5%:'}
+          ? 'Klein proved that calculating solar geometry on a single characteristic day nm per month reproduces the integrated monthly extraterrestrial irradiation with <0.5% error:'
+          : 'Klein demostró que evaluar la geometría solar en un único día característico nm por mes reproduce la irradiación extraterrestre acumulada mensual con un error < 0,5%:'}
               </div>
               <div class="math-formula-box">
                 <div style="color: var(--text-main); text-align: center; width: 100%;">
@@ -1153,8 +1153,8 @@ export function renderPythonConsole(): HTMLElement {
               </div>
               <div style="color: var(--text-muted); font-size: 0.71rem; margin-top: 0.2rem;">
                 ${isEn
-                  ? 'Total solar radiation on top of the atmosphere over a horizontal plane throughout the daylight hours:'
-                  : 'Radiación solar en el tope de la atmósfera sobre plano horizontal integrada a lo largo del día:'}
+          ? 'Total solar radiation on top of the atmosphere over a horizontal plane throughout the daylight hours:'
+          : 'Radiación solar en el tope de la atmósfera sobre plano horizontal integrada a lo largo del día:'}
               </div>
               <div class="math-formula-box">
                 <div style="color: var(--text-main); text-align: center; width: 100%;">
@@ -1177,8 +1177,8 @@ export function renderPythonConsole(): HTMLElement {
               </div>
               <div style="color: var(--text-muted); font-size: 0.71rem; margin-top: 0.2rem;">
                 ${isEn
-                  ? 'Fraction of extraterrestrial radiation that penetrates the atmosphere and reaches ground level:'
-                  : 'Fracción de radiación extraterrestre que atraviesa la atmósfera y alcanza la superficie terrestre:'}
+          ? 'Fraction of extraterrestrial radiation that penetrates the atmosphere and reaches ground level:'
+          : 'Fracción de radiación extraterrestre que atraviesa la atmósfera y alcanza la superficie terrestre:'}
               </div>
               <div class="math-formula-box">
                 <div style="color: var(--text-main); text-align: center; width: 100%;">
@@ -1206,8 +1206,8 @@ export function renderPythonConsole(): HTMLElement {
       const defaultSimG0 = isMadrid
         ? [2.00, 2.73, 4.48, 5.17, 6.58, 7.24, 7.32, 6.41, 4.97, 3.36, 2.15, 1.64]
         : (isJaen
-            ? [2.47, 3.18, 4.72, 5.34, 6.62, 7.18, 7.04, 6.22, 4.98, 3.77, 2.50, 2.10]
-            : null);
+          ? [2.47, 3.18, 4.72, 5.34, 6.62, 7.18, 7.04, 6.22, 4.98, 3.77, 2.50, 2.10]
+          : null);
 
       const latR = (stateLat * Math.PI) / 180;
 
@@ -1228,8 +1228,8 @@ export function renderPythonConsole(): HTMLElement {
         const g0 = hasSimForLat
           ? simRes!.horizontal.gdm0[idx]
           : (defaultSimG0
-              ? defaultSimG0[idx]
-              : Math.round(g0d * (0.54 + 0.08 * Math.cos(decR) * Math.cos(latR)) * 100) / 100);
+            ? defaultSimG0[idx]
+            : Math.round(g0d * (0.54 + 0.08 * Math.cos(decR) * Math.cos(latR)) * 100) / 100);
 
         // Canonical OrientSol Liu-Jordan decomposition from Bdm0 & Ddm0:
         const ktm = Math.min(1.0, Math.max(0.01, g0 / g0d));
@@ -1363,8 +1363,8 @@ export function renderPythonConsole(): HTMLElement {
                   <td class="td-num" style="padding: 0.35rem 0.15rem; font-size: 0.67rem; color: ${r.gain >= 0 ? '#059669' : '#dc2626'}; font-weight: 600; white-space: normal !important; word-break: break-word !important;">${formatPercent(r.gain, 1, true)}</td>
                   <td style="padding: 0.35rem 0.15rem; text-align: center; white-space: normal !important; word-break: break-word !important;">
                     ${r.isPhysicalValid
-                      ? `<span class="badge-status-valid" style="font-size: 0.58rem; padding: 0.1rem 0.25rem; white-space: normal !important; word-break: break-word !important; display: inline-block; line-height: 1.1;">✓ ${isEn ? 'Verified' : 'Verificado'}</span>`
-                      : `<span class="badge-status-warn" style="font-size: 0.58rem; padding: 0.1rem 0.25rem; white-space: normal !important; word-break: break-word !important; display: inline-block; line-height: 1.1;">${isEn ? 'Deviation' : 'Desviación'}</span>`}
+          ? `<span class="badge-status-valid" style="font-size: 0.58rem; padding: 0.1rem 0.25rem; white-space: normal !important; word-break: break-word !important; display: inline-block; line-height: 1.1;">✓ ${isEn ? 'Verified' : 'Verificado'}</span>`
+          : `<span class="badge-status-warn" style="font-size: 0.58rem; padding: 0.1rem 0.25rem; white-space: normal !important; word-break: break-word !important; display: inline-block; line-height: 1.1;">${isEn ? 'Deviation' : 'Desviación'}</span>`}
                   </td>
                 </tr>
               `).join('')}
@@ -1380,8 +1380,8 @@ export function renderPythonConsole(): HTMLElement {
                 <td class="td-num" style="padding: 0.4rem 0.15rem; font-size: 0.66rem; color: ${meanGain >= 0 ? '#059669' : '#dc2626'}; white-space: normal !important;"><strong>${formatPercent(meanGain, 1, true)}</strong></td>
                 <td style="padding: 0.4rem 0.15rem; text-align: center; white-space: normal !important; word-break: break-word !important;">
                   ${allRowsValid
-                    ? `<span class="badge-status-valid" style="font-size: 0.58rem; padding: 0.1rem 0.25rem; white-space: normal !important; display: inline-block;">✓ ${isEn ? '100% Consistent' : '100% Consistente'}</span>`
-                    : `<span class="badge-status-warn" style="font-size: 0.58rem; padding: 0.1rem 0.25rem; white-space: normal !important; display: inline-block;">${isEn ? 'Check Bounds' : 'Revisar Límites'}</span>`}
+          ? `<span class="badge-status-valid" style="font-size: 0.58rem; padding: 0.1rem 0.25rem; white-space: normal !important; display: inline-block;">✓ ${isEn ? '100% Consistent' : '100% Consistente'}</span>`
+          : `<span class="badge-status-warn" style="font-size: 0.58rem; padding: 0.1rem 0.25rem; white-space: normal !important; display: inline-block;">${isEn ? 'Check Bounds' : 'Revisar Límites'}</span>`}
                 </td>
               </tr>
             </tfoot>
@@ -1557,8 +1557,8 @@ export function renderPythonConsole(): HTMLElement {
               <div style="display: flex; align-items: center; gap: 0.4rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                 <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                   ${isEn
-                    ? `Live PVGIS API synchronized! Database: <strong>${pvgisData.database}</strong> (${pvgisData.dbType}) • Coverage: <strong>${pvgisData.startYear}–${pvgisData.endYear}</strong> • Res: <strong>${pvgisData.spatialRes}</strong> • Source: European Commission JRC PVGIS 5.3.`
-                    : `¡API PVGIS sincronizada! Base: <strong>${pvgisData.database}</strong> (${pvgisData.dbType}) • Cobertura: <strong>${pvgisData.startYear}–${pvgisData.endYear}</strong> • Res: <strong>${pvgisData.spatialRes}</strong> • Fuente: CE JRC PVGIS 5.3.`}
+              ? `Live PVGIS API synchronized! Database: <strong>${pvgisData.database}</strong> (${pvgisData.dbType}) • Coverage: <strong>${pvgisData.startYear}–${pvgisData.endYear}</strong> • Res: <strong>${pvgisData.spatialRes}</strong> • Source: European Commission JRC PVGIS 5.3.`
+              : `¡API PVGIS sincronizada! Base: <strong>${pvgisData.database}</strong> (${pvgisData.dbType}) • Cobertura: <strong>${pvgisData.startYear}–${pvgisData.endYear}</strong> • Res: <strong>${pvgisData.spatialRes}</strong> • Fuente: CE JRC PVGIS 5.3.`}
                 </span>
               </div>
               <button type="button" id="btn-dismiss-sync-banner" class="btn btn-xs btn-secondary" style="font-size: 0.68rem; padding: 0.12rem 0.42rem; cursor: pointer; flex-shrink: 0;" title="${isEn ? 'Close notice' : 'Cerrar aviso'}">
@@ -1593,8 +1593,8 @@ export function renderPythonConsole(): HTMLElement {
             </div>
             <div style="font-size: 0.70rem; color: var(--text-muted); line-height: 1.35;">
               ${isEn
-                ? 'Both datasets are evaluated through the exact same OrientSol mathematical algorithms. Any divergence strictly reflects pure climatological differences between the terrestrial/atlas dataset and satellite records.'
-                : 'Ambos conjuntos de datos se procesan con los mismos algoritmos matemáticos de OrientSol. Cualquier diferencia observada se debe exclusivamente a la fuente climatológica (datos terrestres/atlas vs satélite), garantizando una comparación científica rigurosa.'}
+            ? 'Both datasets are evaluated through the exact same OrientSol mathematical algorithms. Any divergence strictly reflects pure climatological differences between the terrestrial/atlas dataset and satellite records.'
+            : 'Ambos conjuntos de datos se procesan con los mismos algoritmos matemáticos de OrientSol. Cualquier diferencia observada se debe exclusivamente a la fuente climatológica (datos terrestres/atlas vs satélite), garantizando una comparación científica rigurosa.'}
             </div>
           </div>
         `;
@@ -1638,8 +1638,8 @@ export function renderPythonConsole(): HTMLElement {
                 <span style="color: var(--text-main);">
                   <strong style="color: #2563eb;">${isEn ? 'Parameter Evaluated by "WMO-No. 8 Validation" Column:' : 'Parámetro evaluado en la columna «Validación Norma OMM Nº 8»:'}</strong>
                   ${isEn
-                    ? 'Audits the monthly relative deviation of the <strong>Optimal Tilted Global Daily Irradiation G<sub>dm</sub>(β<sub>opt</sub>) [kWh/m²·d]</strong> between the OrientSol simulation and PVGIS-ERA5 satellite data: <code>|Gdm_OS(β_opt) - Gdm_PVGIS(β_opt)| / Gdm_PVGIS(β_opt) × 100</code>.'
-                    : 'Audita la desviación relativa mensual de la <strong>Irradiación Global Diaria sobre Plano Inclinado Óptimo G<sub>dm</sub>(β<sub>opt</sub>) [kWh/m²·d]</strong> entre la simulación OrientSol y el reanálisis satelital PVGIS-ERA5: <code>|G<sub>dm</sub><sup>OS</sup>(β<sub>opt</sub>) − G<sub>dm</sub><sup>PVGIS</sup>(β<sub>opt</sub>)| / G<sub>dm</sub><sup>PVGIS</sup>(β<sub>opt</sub>) × 100</code>.'}
+            ? 'Audits the monthly relative deviation of the <strong>Optimal Tilted Global Daily Irradiation G<sub>dm</sub>(β<sub>opt</sub>) [kWh/m²·d]</strong> between the OrientSol simulation and PVGIS-ERA5 satellite data: <code>|Gdm_OS(β_opt) - Gdm_PVGIS(β_opt)| / Gdm_PVGIS(β_opt) × 100</code>.'
+            : 'Audita la desviación relativa mensual de la <strong>Irradiación Global Diaria sobre Plano Inclinado Óptimo G<sub>dm</sub>(β<sub>opt</sub>) [kWh/m²·d]</strong> entre la simulación OrientSol y el reanálisis satelital PVGIS-ERA5: <code>|G<sub>dm</sub><sup>OS</sup>(β<sub>opt</sub>) − G<sub>dm</sub><sup>PVGIS</sup>(β<sub>opt</sub>)| / G<sub>dm</sub><sup>PVGIS</sup>(β<sub>opt</sub>) × 100</code>.'}
                 </span>
               </div>
             </div>
@@ -1681,18 +1681,18 @@ export function renderPythonConsole(): HTMLElement {
               </thead>
               <tbody>
                 ${pvgisRows.map((r) => {
-                  let ratingBadge = '';
-                  if (r.absDiffOptPct <= 5.0) {
-                    ratingBadge = `<span class="badge-status-valid" style="background: rgba(16,185,129,0.12); color:#059669; border: 1px solid rgba(16,185,129,0.3); font-size: 0.58rem; padding: 0.1rem 0.2rem; border-radius: 4px; display: inline-block; white-space: normal !important; word-break: break-word !important; line-height: 1.1;" title="${isEn ? 'Gdm(β_opt) deviation <= 5%: High precision WMO Class 1 / Secondary Standard pyranometer' : 'Desviación en Gdm(β_opt) <= 5%: Conforme OMM Alta Precisión (Estándar Secundario)'}">✓ OMM (&lt;5%)</span>`;
-                  } else if (r.absDiffOptPct <= 10.0) {
-                    ratingBadge = `<span class="badge-status-valid" style="background: rgba(37,99,235,0.12); color:#2563eb; border: 1px solid rgba(37,99,235,0.3); font-size: 0.58rem; padding: 0.1rem 0.2rem; border-radius: 4px; display: inline-block; white-space: normal !important; word-break: break-word !important; line-height: 1.1;" title="${isEn ? 'Gdm(β_opt) deviation <= 10%: WMO-No. 8 Standard (First Class operational pyranometer network)' : 'Desviación en Gdm(β_opt) <= 10%: Norma OMM Nº 8 Estándar (Red operacional Primera Clase)'}">✓ OMM (&lt;10%)</span>`;
-                  } else if (r.absDiffOptPct <= 25.0) {
-                    ratingBadge = `<span class="badge-status-valid" style="background: rgba(2,132,199,0.12); color:#0284c7; border: 1px solid rgba(2,132,199,0.3); font-size: 0.58rem; padding: 0.1rem 0.2rem; border-radius: 4px; display: inline-block; white-space: normal !important; word-break: break-word !important; line-height: 1.1;" title="${isEn ? 'Gdm(β_opt) deviation <= 25%: Admissible seasonal transition variability (spring/autumn interannual cloudiness)' : 'Desviación en Gdm(β_opt) <= 25%: Variabilidad estacional admisible OMM (meses de transición y nubosidad interanual)'}">✓ Var. Estacional</span>`;
-                  } else {
-                    ratingBadge = `<span class="badge-status-warn" style="background: rgba(217,119,6,0.12); color:#d97706; border: 1px solid rgba(217,119,6,0.3); font-size: 0.58rem; padding: 0.1rem 0.2rem; border-radius: 4px; display: inline-block; white-space: normal !important; word-break: break-word !important; line-height: 1.1;" title="${isEn ? 'Gdm(β_opt) deviation > 25%: Exceeds standard meteorological uncertainty' : 'Desviación en Gdm(β_opt) > 25%: Supera la tolerancia meteorológica estándar'}">&gt;25% OMM</span>`;
-                  }
+              let ratingBadge = '';
+              if (r.absDiffOptPct <= 5.0) {
+                ratingBadge = `<span class="badge-status-valid" style="background: rgba(16,185,129,0.12); color:#059669; border: 1px solid rgba(16,185,129,0.3); font-size: 0.58rem; padding: 0.1rem 0.2rem; border-radius: 4px; display: inline-block; white-space: normal !important; word-break: break-word !important; line-height: 1.1;" title="${isEn ? 'Gdm(β_opt) deviation <= 5%: High precision WMO Class 1 / Secondary Standard pyranometer' : 'Desviación en Gdm(β_opt) <= 5%: Conforme OMM Alta Precisión (Estándar Secundario)'}">✓ OMM (&lt;5%)</span>`;
+              } else if (r.absDiffOptPct <= 10.0) {
+                ratingBadge = `<span class="badge-status-valid" style="background: rgba(37,99,235,0.12); color:#2563eb; border: 1px solid rgba(37,99,235,0.3); font-size: 0.58rem; padding: 0.1rem 0.2rem; border-radius: 4px; display: inline-block; white-space: normal !important; word-break: break-word !important; line-height: 1.1;" title="${isEn ? 'Gdm(β_opt) deviation <= 10%: WMO-No. 8 Standard (First Class operational pyranometer network)' : 'Desviación en Gdm(β_opt) <= 10%: Norma OMM Nº 8 Estándar (Red operacional Primera Clase)'}">✓ OMM (&lt;10%)</span>`;
+              } else if (r.absDiffOptPct <= 25.0) {
+                ratingBadge = `<span class="badge-status-valid" style="background: rgba(2,132,199,0.12); color:#0284c7; border: 1px solid rgba(2,132,199,0.3); font-size: 0.58rem; padding: 0.1rem 0.2rem; border-radius: 4px; display: inline-block; white-space: normal !important; word-break: break-word !important; line-height: 1.1;" title="${isEn ? 'Gdm(β_opt) deviation <= 25%: Admissible seasonal transition variability (spring/autumn interannual cloudiness)' : 'Desviación en Gdm(β_opt) <= 25%: Variabilidad estacional admisible OMM (meses de transición y nubosidad interanual)'}">✓ Var. Estacional</span>`;
+              } else {
+                ratingBadge = `<span class="badge-status-warn" style="background: rgba(217,119,6,0.12); color:#d97706; border: 1px solid rgba(217,119,6,0.3); font-size: 0.58rem; padding: 0.1rem 0.2rem; border-radius: 4px; display: inline-block; white-space: normal !important; word-break: break-word !important; line-height: 1.1;" title="${isEn ? 'Gdm(β_opt) deviation > 25%: Exceeds standard meteorological uncertainty' : 'Desviación en Gdm(β_opt) > 25%: Supera la tolerancia meteorológica estándar'}">&gt;25% OMM</span>`;
+              }
 
-                  return `
+              return `
                     <tr style="${r.isSelectedMonth ? 'background: rgba(16, 185, 129, 0.12); font-weight: 700;' : ''}">
                       <td style="padding: 0.35rem 0.12rem; font-size: 0.65rem; white-space: normal !important; word-break: break-word !important;">
                         <strong>${r.month} ${r.isSelectedMonth ? '★' : ''}</strong>
@@ -1769,7 +1769,7 @@ export function renderPythonConsole(): HTMLElement {
                       </td>
                     </tr>
                   `;
-                }).join('')}
+            }).join('')}
               </tbody>
               <tfoot>
                 <tr class="table-media-row verif-media-row" style="background: rgba(2, 132, 199, 0.05); font-weight: 700;">
@@ -1846,12 +1846,12 @@ export function renderPythonConsole(): HTMLElement {
                   <!-- WMO badge -->
                   <td style="padding: 0.4rem 0.12rem; text-align: center; white-space: normal !important; word-break: break-word !important;">
                     ${mapeG0 <= 5.0
-                      ? `<span class="badge-status-valid" style="background: rgba(16,185,129,0.15); color:#059669; font-weight: 700; font-size: 0.58rem; padding: 0.1rem 0.25rem;" title="${isEn ? 'Global Mean <= 5% (High Precision OMM Class 1)' : 'Media Global <= 5% (OMM Alta Precisión Clase 1)'}">✓ OMM (&lt;5%)</span>`
-                      : (mapeG0 <= 10.0
-                          ? `<span class="badge-status-valid" style="background: rgba(37,99,235,0.15); color:#2563eb; font-weight: 700; font-size: 0.58rem; padding: 0.1rem 0.25rem;" title="${isEn ? 'Global Mean <= 10% (OMM-No. 8 Standard)' : 'Media Global <= 10% (Norma OMM Nº 8 Estándar)'}">✓ OMM (&lt;10%)</span>`
-                          : (mapeG0 <= 25.0
-                              ? `<span class="badge-status-valid" style="background: rgba(2,132,199,0.15); color:#0284c7; font-weight: 700; font-size: 0.58rem; padding: 0.1rem 0.25rem;" title="${isEn ? 'Global Mean <= 25% (Seasonal Transition Spread)' : 'Media Global <= 25% (Variabilidad Estacional OMM)'}">✓ Var. Estacional</span>`
-                              : `<span class="badge-status-warn" style="background: rgba(217,119,6,0.15); color:#d97706; font-weight: 700; font-size: 0.58rem; padding: 0.1rem 0.25rem;">&gt;25% OMM</span>`))}
+            ? `<span class="badge-status-valid" style="background: rgba(16,185,129,0.15); color:#059669; font-weight: 700; font-size: 0.58rem; padding: 0.1rem 0.25rem;" title="${isEn ? 'Global Mean <= 5% (High Precision OMM Class 1)' : 'Media Global <= 5% (OMM Alta Precisión Clase 1)'}">✓ OMM (&lt;5%)</span>`
+            : (mapeG0 <= 10.0
+              ? `<span class="badge-status-valid" style="background: rgba(37,99,235,0.15); color:#2563eb; font-weight: 700; font-size: 0.58rem; padding: 0.1rem 0.25rem;" title="${isEn ? 'Global Mean <= 10% (OMM-No. 8 Standard)' : 'Media Global <= 10% (Norma OMM Nº 8 Estándar)'}">✓ OMM (&lt;10%)</span>`
+              : (mapeG0 <= 25.0
+                ? `<span class="badge-status-valid" style="background: rgba(2,132,199,0.15); color:#0284c7; font-weight: 700; font-size: 0.58rem; padding: 0.1rem 0.25rem;" title="${isEn ? 'Global Mean <= 25% (Seasonal Transition Spread)' : 'Media Global <= 25% (Variabilidad Estacional OMM)'}">✓ Var. Estacional</span>`
+                : `<span class="badge-status-warn" style="background: rgba(217,119,6,0.15); color:#d97706; font-weight: 700; font-size: 0.58rem; padding: 0.1rem 0.25rem;">&gt;25% OMM</span>`))}
                   </td>
                 </tr>
               </tfoot>
@@ -1864,8 +1864,8 @@ export function renderPythonConsole(): HTMLElement {
               <span style="font-weight: 800; color: var(--accent-cyan, #0284c7); font-size: 0.82rem; display: flex; align-items: center; gap: 0.4rem;">
                 <span></span>
                 ${isEn
-                  ? 'Comparative Error Metrics: Simulator vs PVGIS (Evaluated with the Same OrientSol Motor)'
-                  : 'Métricas Estadísticas de Error: Simulador vs PVGIS (Evaluados con el Mismo Motor OrientSol)'}
+            ? 'Comparative Error Metrics: Simulator vs PVGIS (Evaluated with the Same OrientSol Motor)'
+            : 'Métricas Estadísticas de Error: Simulador vs PVGIS (Evaluados con el Mismo Motor OrientSol)'}
               </span>
               <span class="badge" style="background: rgba(16, 185, 129, 0.12); color: #059669; font-size: 0.72rem; font-weight: 700;">
                 ${pvgisData.provider}
@@ -1950,16 +1950,16 @@ export function renderPythonConsole(): HTMLElement {
                     <strong style="color: var(--text-main); display: block; margin-bottom: 0.2rem;">${isEn ? 'Where do these reference data come from?' : '¿De dónde sale esta serie de referencia?'}</strong>
                     <span style="color: var(--text-muted);">
                       ${isEn
-                        ? `Official solar radiation records computed by the European Commission (JRC PVGIS 5.3, PVGIS-SARAH3) across 2005–2023 for ${pvgisData.locationName} (${formatAngle(stateLat, 2)}).`
-                        : `Son los datos oficiales de radiación solar calculados por la Comisión Europea (JRC PVGIS 5.3, PVGIS-SARAH3) de la serie 2005–2023 para ${pvgisData.locationName} (${formatAngle(stateLat, 2)}).`}
+              ? `Official solar radiation records computed by the European Commission (JRC PVGIS 5.3, PVGIS-SARAH3) across 2005–2023 for ${pvgisData.locationName} (${formatAngle(stateLat, 2)}).`
+              : `Son los datos oficiales de radiación solar calculados por la Comisión Europea (JRC PVGIS 5.3, PVGIS-SARAH3) de la serie 2005–2023 para ${pvgisData.locationName} (${formatAngle(stateLat, 2)}).`}
                     </span>
                   </div>
                   <div style="background: var(--bg-card); padding: 0.55rem 0.7rem; border-radius: 5px; border: 1px solid var(--border-subtle);">
                     <strong style="color: var(--text-main); display: block; margin-bottom: 0.2rem;">${isEn ? 'Why does it match OrientSol so closely?' : '¿Por qué coincide tanto con OrientSol?'}</strong>
                     <span style="color: var(--text-muted);">
                       ${isEn
-                        ? 'Being a multi-year climatological average, isolated cloud anomalies balance out, proving the strict mathematical fidelity of OrientSol\'s physics.'
-                        : 'Al ser una media climatológica multianual, las anomalías puntuales de nubosidad se equilibran, demostrando la fidelidad matemática de la física de OrientSol.'}
+              ? 'Being a multi-year climatological average, isolated cloud anomalies balance out, proving the strict mathematical fidelity of OrientSol\'s physics.'
+              : 'Al ser una media climatológica multianual, las anomalías puntuales de nubosidad se equilibran, demostrando la fidelidad matemática de la física de OrientSol.'}
                     </span>
                   </div>
                 </div>
@@ -1980,8 +1980,8 @@ export function renderPythonConsole(): HTMLElement {
 
               <div style="font-size: 0.71rem; color: var(--text-muted); margin-bottom: 0.45rem; line-height: 1.45;">
                 ${isEn
-                  ? 'The <strong>"WMO-No. 8 Validation"</strong> column benchmarks the accuracy of the optimal monthly solar irradiation calculated by OrientSol against satellite reanalysis data (PVGIS ERA5/SARAH3), verifying compliance with international meteorological tolerance envelopes based on: <code>|Gdm_OS(β_opt) - Gdm_PVGIS(β_opt)| / Gdm_PVGIS(β_opt) × 100</code>.'
-                  : 'La columna <strong>«Validación Norma OMM Nº 8»</strong> comprueba la precisión de la irradiación solar mensual óptima calculada por OrientSol frente a los datos de reanálisis satelital oficial (PVGIS ERA5/SARAH3), auditando el cumplimiento de los márgenes internacionales de tolerancia meteorológica mediante: <code>|G<sub>dm</sub><sup>OS</sup>(β<sub>opt</sub>) − G<sub>dm</sub><sup>PVGIS</sup>(β<sub>opt</sub>)| / G<sub>dm</sub><sup>PVGIS</sup>(β<sub>opt</sub>) × 100</code>.'}
+            ? 'The <strong>"WMO-No. 8 Validation"</strong> column benchmarks the accuracy of the optimal monthly solar irradiation calculated by OrientSol against satellite reanalysis data (PVGIS ERA5/SARAH3), verifying compliance with international meteorological tolerance envelopes based on: <code>|Gdm_OS(β_opt) - Gdm_PVGIS(β_opt)| / Gdm_PVGIS(β_opt) × 100</code>.'
+            : 'La columna <strong>«Validación Norma OMM Nº 8»</strong> comprueba la precisión de la irradiación solar mensual óptima calculada por OrientSol frente a los datos de reanálisis satelital oficial (PVGIS ERA5/SARAH3), auditando el cumplimiento de los márgenes internacionales de tolerancia meteorológica mediante: <code>|G<sub>dm</sub><sup>OS</sup>(β<sub>opt</sub>) − G<sub>dm</sub><sup>PVGIS</sup>(β<sub>opt</sub>)| / G<sub>dm</sub><sup>PVGIS</sup>(β<sub>opt</sub>) × 100</code>.'}
               </div>
 
               <ul style="margin: 0; padding-left: 1.2rem; font-size: 0.72rem; color: var(--text-muted); line-height: 1.55;">
@@ -1992,8 +1992,8 @@ export function renderPythonConsole(): HTMLElement {
               </ul>
               <p style="margin-top: 0.5rem; margin-bottom: 0; font-size: 0.72rem; color: var(--text-dim);">
                 ${isEn
-                  ? '<strong>Tribunal Defense Note:</strong> 100% of OrientSol monthly values conform strictly to World Meteorological Organization standards and JRC satellite confidence envelopes, demonstrating rigorous mathematical and physical validity.'
-                  : '<strong>Blindaje Metodológico para Tribunal (TFM):</strong> El 100% de los valores mensuales de OrientSol se encuentra estrictamente dentro de los límites de la Organización Meteorológica Mundial y las envolventes de confianza del JRC, demostrando una total validez física y matemática.'}
+            ? '<strong>Tribunal Defense Note:</strong> 100% of OrientSol monthly values conform strictly to World Meteorological Organization standards and JRC satellite confidence envelopes, demonstrating rigorous mathematical and physical validity.'
+            : '<strong>Blindaje Metodológico para Tribunal (TFM):</strong> El 100% de los valores mensuales de OrientSol se encuentra estrictamente dentro de los límites de la Organización Meteorológica Mundial y las envolventes de confianza del JRC, demostrando una total validez física y matemática.'}
               </p>
 
               <!-- Quick Navigation Button to Databases Differences Tab -->
@@ -2019,8 +2019,8 @@ export function renderPythonConsole(): HTMLElement {
                   <span style="font-size: 0.95rem;"></span>
                   <strong style="color: var(--text-main); font-size: 0.82rem;">
                     ${isEn
-                      ? 'Exhaustive Mathematical Foundation: Liu-Jordan Method & Verification Algorithms'
-                      : 'Fundamento Matemático Exhaustivo: Método de Liu-Jordan y Algoritmos de Verificación'}
+            ? 'Exhaustive Mathematical Foundation: Liu-Jordan Method & Verification Algorithms'
+            : 'Fundamento Matemático Exhaustivo: Método de Liu-Jordan y Algoritmos de Verificación'}
                   </strong>
                 </div>
               </div>
@@ -2034,8 +2034,8 @@ export function renderPythonConsole(): HTMLElement {
                   </div>
                   <div style="color: var(--text-muted); font-size: 0.71rem;">
                     ${isEn
-                      ? 'Extraterrestrial horizontal daily radiation <em>G<sub>0d</sub></em> computed on Klein characteristic day <em>n</em>:'
-                      : 'Radiación extraterrestre diaria sobre superficie horizontal <em>G<sub>0d</sub></em> evaluada en el día medio de Klein <em>n</em>:'}
+            ? 'Extraterrestrial horizontal daily radiation <em>G<sub>0d</sub></em> computed on Klein characteristic day <em>n</em>:'
+            : 'Radiación extraterrestre diaria sobre superficie horizontal <em>G<sub>0d</sub></em> evaluada en el día medio de Klein <em>n</em>:'}
                   </div>
                   <!-- Auto-fit KaTeX Equation (Zero Scroll) -->
                   <div class="math-formula-box">
@@ -2045,19 +2045,19 @@ export function renderPythonConsole(): HTMLElement {
                   </div>
                   <div style="color: var(--text-muted); font-size: 0.70rem;">
                     ${isEn
-                      ? `where ${renderTex('I_{sc} = 1367\\text{ W/m}^2')}, ${renderTex('E_0 = 1 + 0.033\\cos(360^\\circ n/365)')}, declination ${renderTex('\\delta')} and sunset angle ${renderTex('\\omega_s = \\arccos(-\\tan\\phi \\tan\\delta)')}.`
-                      : `donde ${renderTex('I_{sc} = 1367\\text{ W/m}^2')}, ${renderTex('E_0 = 1 + 0{,}033\\cos(360^\\circ n/365)')}, declinación ${renderTex('\\delta')} y ángulo de puesta ${renderTex('\\omega_s = \\arccos(-\\tan\\phi \\tan\\delta)')}.`}
+            ? `where ${renderTex('I_{sc} = 1367\\text{ W/m}^2')}, ${renderTex('E_0 = 1 + 0.033\\cos(360^\\circ n/365)')}, declination ${renderTex('\\delta')} and sunset angle ${renderTex('\\omega_s = \\arccos(-\\tan\\phi \\tan\\delta)')}.`
+            : `donde ${renderTex('I_{sc} = 1367\\text{ W/m}^2')}, ${renderTex('E_0 = 1 + 0{,}033\\cos(360^\\circ n/365)')}, declinación ${renderTex('\\delta')} y ángulo de puesta ${renderTex('\\omega_s = \\arccos(-\\tan\\phi \\tan\\delta)')}.`}
                   </div>
                   <div style="color: var(--text-muted); font-size: 0.71rem; margin-top: 0.15rem;">
                     ${isEn
-                      ? 'Monthly clearness index and canonical Liu-Jordan diffuse fraction:'
-                      : 'Índice de claridad mensual y fracción difusa de Liu y Jordan:'}
+            ? 'Monthly clearness index and canonical Liu-Jordan diffuse fraction:'
+            : 'Índice de claridad mensual y fracción difusa de Liu y Jordan:'}
                   </div>
                   <div class="math-formula-box">
                     <div style="color: var(--text-main); text-align: center; width: 100%;">
                       ${renderTex(isEn
-                        ? 'K_{tm} = \\frac{G_{dm}(0)}{G_{0d}}, \\qquad K_{dm} = 1.0 - 1.13\\, K_{tm}'
-                        : 'K_{tm} = \\frac{G_{dm}(0)}{G_{0d}}, \\qquad K_{dm} = 1{,}0 - 1{,}13\\, K_{tm}', true)}
+              ? 'K_{tm} = \\frac{G_{dm}(0)}{G_{0d}}, \\qquad K_{dm} = 1.0 - 1.13\\, K_{tm}'
+              : 'K_{tm} = \\frac{G_{dm}(0)}{G_{0d}}, \\qquad K_{dm} = 1{,}0 - 1{,}13\\, K_{tm}', true)}
                     </div>
                     <div style="color: var(--text-muted); text-align: center; width: 100%; border-top: 1px dashed var(--border-subtle); padding-top: 0.35rem;">
                       ${renderTex('D_{dm}(0) = K_{dm} \\cdot G_{dm}(0), \\qquad B_{dm}(0) = G_{dm}(0) - D_{dm}(0)', true)}
@@ -2073,8 +2073,8 @@ export function renderPythonConsole(): HTMLElement {
                   </div>
                   <div style="color: var(--text-muted); font-size: 0.71rem;">
                     ${isEn
-                      ? `Global daily irradiation on surface tilted at slope ${renderTex('\\beta')} facing equator (Liu-Jordan model):`
-                      : `Irradiación global diaria sobre superficie con inclinación ${renderTex('\\beta')} orientada al ecuador (modelo de Liu-Jordan):`}
+            ? `Global daily irradiation on surface tilted at slope ${renderTex('\\beta')} facing equator (Liu-Jordan model):`
+            : `Irradiación global diaria sobre superficie con inclinación ${renderTex('\\beta')} orientada al ecuador (modelo de Liu-Jordan):`}
                   </div>
                   <div class="math-formula-box">
                     <div style="color: var(--text-main); text-align: center; width: 100%;">
@@ -2083,8 +2083,8 @@ export function renderPythonConsole(): HTMLElement {
                   </div>
                   <div style="color: var(--text-muted); font-size: 0.70rem;">
                     ${isEn
-                      ? `Geometric direct beam transposition ratio ${renderTex('R_b')} (Klein, 1977) and ground albedo ${renderTex('\\rho = 0.20')}:`
-                      : `Factor geométrico de transposición directa ${renderTex('R_b')} (Klein, 1977) y albedo del suelo ${renderTex('\\rho = 0{,}20')}:`}
+            ? `Geometric direct beam transposition ratio ${renderTex('R_b')} (Klein, 1977) and ground albedo ${renderTex('\\rho = 0.20')}:`
+            : `Factor geométrico de transposición directa ${renderTex('R_b')} (Klein, 1977) y albedo del suelo ${renderTex('\\rho = 0{,}20')}:`}
                   </div>
                   <div class="math-formula-box math-compact">
                     <div style="color: var(--text-main); text-align: center; width: 100%;">
@@ -2104,8 +2104,8 @@ export function renderPythonConsole(): HTMLElement {
                   </div>
                   <div style="color: var(--text-muted); font-size: 0.71rem;">
                     ${isEn
-                      ? `Discrete angular sweep across 91 inclination angles ${renderTex('\\beta \\in [0^\\circ, 90^\\circ]')} maximizing annual collection:`
-                      : `Barrido angular discreto en 91 inclinaciones ${renderTex('\\beta \\in [0^\\circ, 90^\\circ]')} para maximizar la captación anual:`}
+            ? `Discrete angular sweep across 91 inclination angles ${renderTex('\\beta \\in [0^\\circ, 90^\\circ]')} maximizing annual collection:`
+            : `Barrido angular discreto en 91 inclinaciones ${renderTex('\\beta \\in [0^\\circ, 90^\\circ]')} para maximizar la captación anual:`}
                   </div>
                   <div class="math-formula-box">
                     <div style="color: var(--text-main); text-align: center; width: 100%;">
@@ -2113,8 +2113,8 @@ export function renderPythonConsole(): HTMLElement {
                     </div>
                     <div style="color: var(--text-muted); text-align: center; width: 100%; border-top: 1px dashed var(--border-subtle); padding-top: 0.35rem;">
                       ${renderTex(isEn
-                        ? '\\text{Gain (\\%)} = \\left[ \\frac{G_{dm}(\\beta_{opt}) - G_{dm}(0)}{G_{dm}(0)} \\right] \\times 100'
-                        : '\\text{Ganancia (\\%)} = \\left[ \\frac{G_{dm}(\\beta_{opt}) - G_{dm}(0)}{G_{dm}(0)} \\right] \\times 100', true)}
+              ? '\\text{Gain (\\%)} = \\left[ \\frac{G_{dm}(\\beta_{opt}) - G_{dm}(0)}{G_{dm}(0)} \\right] \\times 100'
+              : '\\text{Ganancia (\\%)} = \\left[ \\frac{G_{dm}(\\beta_{opt}) - G_{dm}(0)}{G_{dm}(0)} \\right] \\times 100', true)}
                     </div>
                   </div>
                   <div style="color: var(--text-muted); font-size: 0.70rem; margin-top: 0.15rem;">
@@ -2159,8 +2159,8 @@ export function renderPythonConsole(): HTMLElement {
             <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
               <span class="verif-table-title">
                 ${showPvgisComparison && pvgisData
-                  ? `${isEn ? 'Comparative Analysis: Simulator vs PVGIS (Same OrientSol Motor)' : 'Comparativa: Simulador & Optimización Solar vs PVGIS (Mismo Motor OrientSol)'} (${pvgisData.locationName}, ${formatAngle(stateLat, 2)})`
-                  : `${isEn ? `Monthly Radiative Decomposition & Transposition (Lat ${formatAngle(stateLat, 2)}, Active Month: ${months[stateMonth - 1]})` : `Descomposición Radiativa y Transposición Liu-Jordan (Latitud ${formatAngle(stateLat, 2)}, Mes Consultado: ${months[stateMonth - 1]})`}`}
+          ? `${isEn ? 'Comparative Analysis: Simulator vs PVGIS (Same OrientSol Motor)' : 'Comparativa: Simulador & Optimización Solar vs PVGIS (Mismo Motor OrientSol)'} (${pvgisData.locationName}, ${formatAngle(stateLat, 2)})`
+          : `${isEn ? `Monthly Radiative Decomposition & Transposition (Lat ${formatAngle(stateLat, 2)}, Active Month: ${months[stateMonth - 1]})` : `Descomposición Radiativa y Transposición Liu-Jordan (Latitud ${formatAngle(stateLat, 2)}, Mes Consultado: ${months[stateMonth - 1]})`}`}
               </span>
               <span class="badge-status-valid">${showPvgisComparison && pvgisData ? (pvgisData.isOffline ? '✓ PVGIS-SARAH3 Offline' : '✓ JRC v5.3 / ERA5 Live') : '✓ Bdm0, Ddm0, Calculos_optimo, GdBeta'}</span>
             </div>
@@ -2173,8 +2173,8 @@ export function renderPythonConsole(): HTMLElement {
 
               <button type="button" id="btn-fetch-pvgis" class="btn btn-xs ${isPvgisLiveActive ? 'btn-primary' : 'btn-secondary'}" ${isFetchingPvgis ? 'disabled' : ''} style="font-size: 0.72rem; padding: 0.25rem 0.6rem; ${isPvgisLiveActive ? 'background: #0284c7; color: #fff; border: 1px solid #0284c7; font-weight: 700;' : ''} border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 0.35rem;" title="${isEn ? 'Query European Commission PVGIS 5.3 Live API' : 'Consultar API en vivo de PVGIS 5.3 de la Comisión Europea'}">
                 ${isFetchingPvgis
-                  ? `${isEn ? 'Querying PVGIS JRC...' : 'Consultando PVGIS JRC...'}`
-                  : `${isEn ? 'Query PVGIS JRC (Live)' : 'Consultar PVGIS JRC (En vivo)'}`}
+          ? `${isEn ? 'Querying PVGIS JRC...' : 'Consultando PVGIS JRC...'}`
+          : `${isEn ? 'Query PVGIS JRC (Live)' : 'Consultar PVGIS JRC (En vivo)'}`}
               </button>
 
               <button type="button" id="btn-pvgis-benchmark" class="btn btn-xs ${isPvgisOfflineActive ? 'btn-primary' : 'btn-secondary'}" style="font-size: 0.72rem; padding: 0.25rem 0.6rem; ${isPvgisOfflineActive ? 'background: #059669; color: #fff; border: 1px solid #059669; font-weight: 700;' : ''} cursor: pointer; border-radius: 4px;" title="${isEn ? 'Load Official PVGIS Reference Data (Offline)' : 'Cargar Datos Oficiales PVGIS de Referencia (Sin Internet)'}">
@@ -2404,8 +2404,8 @@ export function renderPythonConsole(): HTMLElement {
             <div style="display: flex; align-items: center; gap: 0.5rem;">
               <span class="verif-table-title">
                 ${isEn
-                  ? `Performance Comparison of Tracking & Seasonal Topologies (${activeCityName}, Lat ${formatAngle(stateLat, 2)})`
-                  : `Comparativa de Rendimiento de Topologías de Seguimiento y Estacional (${activeCityName}, Latitud ${formatAngle(stateLat, 2)})`}
+          ? `Performance Comparison of Tracking & Seasonal Topologies (${activeCityName}, Lat ${formatAngle(stateLat, 2)})`
+          : `Comparativa de Rendimiento de Topologías de Seguimiento y Estacional (${activeCityName}, Latitud ${formatAngle(stateLat, 2)})`}
               </span>
               <span class="badge badge-success" style="font-size: 0.75rem;">✓ ${isEn ? '6 Validated Topologies' : '6 Topologías Validadas'}</span>
             </div>
@@ -2428,12 +2428,12 @@ export function renderPythonConsole(): HTMLElement {
               <span>
                 <strong>${activeCityName} (Lat ${formatAngle(stateLat, 2)}):</strong>
                 ${isAnnualView
-                  ? (isEn
-                      ? `Displaying 12-Month Annual Resource Baseline (OrientSol Historical Benchmark: Horiz ${formatNum(rHorizAnnual, 2)} kWh/m²·d | H-Tracker ${formatNum(rHTrkAnnual, 2)} kWh/m²·d @ ${formatAngle(annualHorizTrackerTilt, 1)} mean tilt).`
-                      : `Mostrando Base Histórica Anual de 12 Meses (Cálculo OrientSol: Horiz ${formatNum(rHorizAnnual, 2)} kWh/m²·d | Eje Horizontal ${formatNum(rHTrkAnnual, 2)} kWh/m²·d con ${formatAngle(annualHorizTrackerTilt, 1)} inclinación media).`)
-                  : (isEn
-                      ? `Displaying daily irradiance on ${stateDay} ${months[mIdx]} (H-Tracker ${formatNum(rHTrkDay, 2)} kWh/m²·d @ ${formatAngle(hDailyTilt, 1)} daily mean tilt).`
-                      : `Mostrando irradiancia diaria para el día ${stateDay} de ${months[mIdx]} (Eje Horizontal ${formatNum(rHTrkDay, 2)} kWh/m²·d con ${formatAngle(hDailyTilt, 1)} inclinación diurna media).`)}
+          ? (isEn
+            ? `Displaying 12-Month Annual Resource Baseline (OrientSol Historical Benchmark: Horiz ${formatNum(rHorizAnnual, 2)} kWh/m²·d | H-Tracker ${formatNum(rHTrkAnnual, 2)} kWh/m²·d @ ${formatAngle(annualHorizTrackerTilt, 1)} mean tilt).`
+            : `Mostrando Base Histórica Anual de 12 Meses (Cálculo OrientSol: Horiz ${formatNum(rHorizAnnual, 2)} kWh/m²·d | Eje Horizontal ${formatNum(rHTrkAnnual, 2)} kWh/m²·d con ${formatAngle(annualHorizTrackerTilt, 1)} inclinación media).`)
+          : (isEn
+            ? `Displaying daily irradiance on ${stateDay} ${months[mIdx]} (H-Tracker ${formatNum(rHTrkDay, 2)} kWh/m²·d @ ${formatAngle(hDailyTilt, 1)} daily mean tilt).`
+            : `Mostrando irradiancia diaria para el día ${stateDay} de ${months[mIdx]} (Eje Horizontal ${formatNum(rHTrkDay, 2)} kWh/m²·d con ${formatAngle(hDailyTilt, 1)} inclinación diurna media).`)}
               </span>
             </div>
             ${simRes && !hasMatchingSim ? `
@@ -2463,8 +2463,8 @@ export function renderPythonConsole(): HTMLElement {
                     <td><code>${r.inc}</code></td>
                     <td><code>${r.ori}</code></td>
                     <td class="td-num"><strong>${formatNum(r.rad, 2)}</strong></td>
-                    <td class="td-num" style="color: #059669; font-weight: 600;">${r.gainH >= 0 ? `+${formatPercent(r.gainH, 1)}` : formatPercent(r.gainH, 1)}</td>
-                    <td class="td-num" style="color: #2563eb; font-weight: 600;">${r.gainOpt >= 0 ? `+${formatPercent(r.gainOpt, 1)}` : formatPercent(r.gainOpt, 1)}</td>
+                    <td class="td-num ${r.gainH >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">${r.gainH >= 0 ? `+${formatPercent(r.gainH, 1)}` : formatPercent(r.gainH, 1)}</td>
+                    <td class="td-num ${r.gainOpt >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">${r.gainOpt >= 0 ? `+${formatPercent(r.gainOpt, 1)}` : formatPercent(r.gainOpt, 1)}</td>
                     <td style="text-align: center;"><span class="badge-status-valid">${r.status}</span></td>
                   </tr>
                 `).join('')}
@@ -2475,8 +2475,8 @@ export function renderPythonConsole(): HTMLElement {
                   <td>-</td>
                   <td>-</td>
                   <td class="td-num"><strong>${formatNum(meanRad, 2)}</strong></td>
-                  <td class="td-num" style="color: #059669;"><strong>${meanGainH >= 0 ? `+${formatPercent(meanGainH, 1)}` : formatPercent(meanGainH, 1)}</strong></td>
-                  <td class="td-num" style="color: #2563eb;"><strong>${meanGainOpt >= 0 ? `+${formatPercent(meanGainOpt, 1)}` : formatPercent(meanGainOpt, 1)}</strong></td>
+                  <td class="td-num ${meanGainH >= 0 ? 'text-gain-pos' : 'text-gain-neg'}"><strong>${meanGainH >= 0 ? `+${formatPercent(meanGainH, 1)}` : formatPercent(meanGainH, 1)}</strong></td>
+                  <td class="td-num ${meanGainOpt >= 0 ? 'text-gain-pos' : 'text-gain-neg'}"><strong>${meanGainOpt >= 0 ? `+${formatPercent(meanGainOpt, 1)}` : formatPercent(meanGainOpt, 1)}</strong></td>
                   <td style="text-align: center;"><span class="badge-status-valid">✓ 100% OK</span></td>
                 </tr>
               </tfoot>
@@ -2499,8 +2499,8 @@ export function renderPythonConsole(): HTMLElement {
               </div>
               <div style="color: var(--text-muted); font-size: 0.71rem; margin-top: 0.2rem;">
                 ${isEn
-                  ? 'Annual fixed tilt maximizes whole-year energy. Seasonal tilt adjusts angle 4 times per year to match solar altitude:'
-                  : 'La inclinación fija anual maximiza la captación integral del año. El ajuste estacional cambia 4 veces al año adaptándose a la altura solar:'}
+          ? 'Annual fixed tilt maximizes whole-year energy. Seasonal tilt adjusts angle 4 times per year to match solar altitude:'
+          : 'La inclinación fija anual maximiza la captación integral del año. El ajuste estacional cambia 4 veces al año adaptándose a la altura solar:'}
               </div>
               <div class="math-formula-box">
                 <div style="color: var(--text-main); text-align: center; width: 100%;">
@@ -2523,8 +2523,8 @@ export function renderPythonConsole(): HTMLElement {
               </div>
               <div style="color: var(--text-muted); font-size: 0.71rem; margin-top: 0.2rem;">
                 ${isEn
-                  ? 'Rotating around one rotational axis maintains high direct beam capture throughout the daytime hours:'
-                  : 'El giro alrededor de un único eje mecánico maximiza la captación directa durante el transcurso del día:'}
+          ? 'Rotating around one rotational axis maintains high direct beam capture throughout the daytime hours:'
+          : 'El giro alrededor de un único eje mecánico maximiza la captación directa durante el transcurso del día:'}
               </div>
               <div class="math-formula-box">
                 <div style="color: var(--text-main); text-align: center; width: 100%;">
@@ -2547,8 +2547,8 @@ export function renderPythonConsole(): HTMLElement {
               </div>
               <div style="color: var(--text-muted); font-size: 0.71rem; margin-top: 0.2rem;">
                 ${isEn
-                  ? 'Collector normal strictly coincides with the instantaneous solar vector (incidence angle θ = 0°):'
-                  : 'La normal del módulo fotovoltaico coincide estrictamente con el vector solar instantáneo (ángulo de incidencia θ = 0°):'}
+          ? 'Collector normal strictly coincides with the instantaneous solar vector (incidence angle θ = 0°):'
+          : 'La normal del módulo fotovoltaico coincide estrictamente con el vector solar instantáneo (ángulo de incidencia θ = 0°):'}
               </div>
               <div class="math-formula-box">
                 <div style="color: var(--text-main); text-align: center; width: 100%;">
@@ -2611,8 +2611,8 @@ export function renderPythonConsole(): HTMLElement {
           <div class="verif-table-title-bar">
             <span class="verif-table-title">
               ${isEn
-                ? `PV Energy Yield & Osterwald Cell Thermal Derating (Emplacement Lat: ${formatAngle(stateLat, 2)}, Active Month: ${months[mIdx]})`
-                : `Balance de Energía FV y Modelo Térmico Osterwald (Emplazamiento Lat: ${formatAngle(stateLat, 2)}, Mes Consultado: ${months[mIdx]})`}
+          ? `PV Energy Yield & Osterwald Cell Thermal Derating (Emplacement Lat: ${formatAngle(stateLat, 2)}, Active Month: ${months[mIdx]})`
+          : `Balance de Energía FV y Modelo Térmico Osterwald (Emplazamiento Lat: ${formatAngle(stateLat, 2)}, Mes Consultado: ${months[mIdx]})`}
             </span>
             <span class="badge-status-valid">✓ Osterwald (TONC = ${formatNum(toncVal, 1)} °C, Pn = ${formatNum(peakKw, 1)} kWp)</span>
           </div>
@@ -2638,11 +2638,11 @@ export function renderPythonConsole(): HTMLElement {
                     <td class="td-num" style="color: ${r.tc > 45 ? '#dc2626' : '#2563eb'}; font-weight: 700;">${formatNum(r.tc, 1)} °C</td>
                     <td class="td-num"><strong>${formatInt(r.eOster)} kWh</strong></td>
                     <td class="td-num">${formatInt(r.eSimp)} kWh</td>
-                    <td class="td-num" style="color: #dc2626;">${r.thLoss < 0 ? formatPercent(r.thLoss, 2) : `+${formatPercent(Math.abs(r.thLoss), 2)}`}</td>
+                    <td class="td-num ${r.thLoss >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">${r.thLoss >= 0 ? `+${formatPercent(r.thLoss, 2)}` : formatPercent(r.thLoss, 2)}</td>
                     <td style="text-align: center;">
                       ${r.eOster > 0 && r.tc >= (r.tAmb - 2) && r.thLoss <= 5
-                        ? `<span class="badge-status-valid">✓ ${isEn ? 'Consistent' : 'Coherente'}</span>`
-                        : `<span class="badge-status-warn">${isEn ? 'Review' : 'Revisar'}</span>`}
+              ? `<span class="badge-status-valid">✓ ${isEn ? 'Consistent' : 'Coherente'}</span>`
+              : `<span class="badge-status-warn">${isEn ? 'Review' : 'Revisar'}</span>`}
                     </td>
                   </tr>
                 `).join('')}
@@ -2654,11 +2654,11 @@ export function renderPythonConsole(): HTMLElement {
                   <td class="td-num" style="color: #2563eb; font-weight: 700;"><strong>${formatNum(meanTc, 1)} °C</strong></td>
                   <td class="td-num"><strong>${formatInt(Math.round(meanEOster))} kWh</strong></td>
                   <td class="td-num"><strong>${formatInt(Math.round(meanESimp))} kWh</strong></td>
-                  <td class="td-num" style="color: #dc2626;"><strong>${formatPercent(meanThLoss, 2)}</strong></td>
+                  <td class="td-num ${meanThLoss >= 0 ? 'text-gain-pos' : 'text-gain-neg'}"><strong>${meanThLoss >= 0 ? `+${formatPercent(meanThLoss, 2)}` : formatPercent(meanThLoss, 2)}</strong></td>
                   <td style="text-align: center;">
                     ${energyRows.every(r => r.eOster > 0 && r.tc >= (r.tAmb - 2))
-                      ? `<span class="badge-status-valid">✓ ${isEn ? '100% Consistent' : '100% Coherente'}</span>`
-                      : `<span class="badge-status-warn">${isEn ? 'Review' : 'Revisar'}</span>`}
+          ? `<span class="badge-status-valid">✓ ${isEn ? '100% Consistent' : '100% Coherente'}</span>`
+          : `<span class="badge-status-warn">${isEn ? 'Review' : 'Revisar'}</span>`}
                   </td>
                 </tr>
               </tfoot>
@@ -2680,8 +2680,8 @@ export function renderPythonConsole(): HTMLElement {
                 </div>
                 <div style="color: var(--text-muted); font-size: 0.71rem; margin-top: 0.2rem;">
                   ${isEn
-                    ? 'Assumes invariant cell efficiency throughout the entire year without temperature penalties:'
-                    : 'Asume un rendimiento de instalación constante durante todo el año, sin considerar la temperatura de trabajo:'}
+          ? 'Assumes invariant cell efficiency throughout the entire year without temperature penalties:'
+          : 'Asume un rendimiento de instalación constante durante todo el año, sin considerar la temperatura de trabajo:'}
                 </div>
                 <div class="math-formula-box">
                   <div style="color: var(--text-main); text-align: center; width: 100%;">
@@ -2703,8 +2703,8 @@ export function renderPythonConsole(): HTMLElement {
                 </div>
                 <div style="color: var(--text-muted); font-size: 0.71rem; margin-top: 0.2rem;">
                   ${isEn
-                    ? 'Computes effective cell temperature Tc via TONC (NOCT) and adjusts yield with silicon power temperature coefficient γ:'
-                    : 'Calcula la temperatura de célula Tc mediante la TONC y penaliza la potencia según el coeficiente de temperatura γ del silicio:'}
+          ? 'Computes effective cell temperature Tc via TONC (NOCT) and adjusts yield with silicon power temperature coefficient γ:'
+          : 'Calcula la temperatura de célula Tc mediante la TONC y penaliza la potencia según el coeficiente de temperatura γ del silicio:'}
                 </div>
                 <div class="math-formula-box">
                   <div style="color: var(--text-main); text-align: center; width: 100%;">
@@ -2728,8 +2728,8 @@ export function renderPythonConsole(): HTMLElement {
                 </div>
                 <div style="color: var(--text-muted); font-size: 0.71rem; margin-top: 0.2rem;">
                   ${isEn
-                    ? 'Relative percentage deviation between Osterwald and Simplified models:'
-                    : 'Desviación porcentual de pérdidas o ganancias térmicas respecto a STC (25 °C):'}
+          ? 'Relative percentage deviation between Osterwald and Simplified models:'
+          : 'Desviación porcentual de pérdidas o ganancias térmicas respecto a STC (25 °C):'}
                 </div>
                 <div class="math-formula-box">
                   <div style="color: var(--text-main); text-align: center; width: 100%;">

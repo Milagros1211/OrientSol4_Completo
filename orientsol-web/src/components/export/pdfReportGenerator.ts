@@ -1845,7 +1845,8 @@ export async function generateOrientSolPDFReport(
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(6);
       doc.setTextColor(100, 116, 139);
-      const subAnn = comp === 'albedo' ? 'Rdm(0°) = 0' : `+${formatNum(((mAnn_val - m0_val) / (m0_val || 1)) * 100, 1)}% ${isEn ? 'vs horiz' : 's/ horiz'}`;
+      const diffAnn0 = ((mAnn_val - m0_val) / (m0_val || 1)) * 100;
+      const subAnn = comp === 'albedo' ? 'Rdm(0°) = 0' : `${diffAnn0 >= 0 ? '+' : ''}${formatNum(diffAnn0, 1)}% ${isEn ? 'vs horiz' : 's/ horiz'}`;
       doc.text(subAnn, op2X + 4, opBarY + 17.5);
 
       // Card 3: Monthly Optimum (12 positions)
@@ -1860,7 +1861,8 @@ export async function generateOrientSolPDFReport(
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(6);
       doc.setTextColor(100, 116, 139);
-      const subMth = comp === 'albedo' ? 'Rdm(0°) = 0' : `+${formatNum(((mMth_val - m0_val) / (m0_val || 1)) * 100, 1)}% ${isEn ? 'vs horiz' : 's/ horiz'}`;
+      const diffMth0 = ((mMth_val - m0_val) / (m0_val || 1)) * 100;
+      const subMth = comp === 'albedo' ? 'Rdm(0°) = 0' : `${diffMth0 >= 0 ? '+' : ''}${formatNum(diffMth0, 1)}% ${isEn ? 'vs horiz' : 's/ horiz'}`;
       doc.text(subMth, op3X + 4, opBarY + 17.5);
 
       // Card 4: Two-Axis Tracking
@@ -1875,7 +1877,8 @@ export async function generateOrientSolPDFReport(
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(6);
       doc.setTextColor(100, 116, 139);
-      const subDual = comp === 'albedo' ? 'Rdm(0°) = 0' : `+${formatNum(((mDual_val - m0_val) / (m0_val || 1)) * 100, 1)}% ${isEn ? 'vs horiz' : 's/ horiz'}`;
+      const diffDual0 = ((mDual_val - m0_val) / (m0_val || 1)) * 100;
+      const subDual = comp === 'albedo' ? 'Rdm(0°) = 0' : `${diffDual0 >= 0 ? '+' : ''}${formatNum(diffDual0, 1)}% ${isEn ? 'vs horiz' : 's/ horiz'}`;
       doc.text(subDual, op4X + 4, opBarY + 17.5);
 
       // 2. Table Section Title
@@ -2044,9 +2047,12 @@ export async function generateOrientSolPDFReport(
 
       // 4. Insights Box for Comparative Study
       const insCompY = curCompRowY + 7.5;
-      const gainDualVs0 = comp === 'albedo' ? '-' : `+${formatNum(((mDual_val - m0_val) / (m0_val || 1)) * 100, 1)}%`;
-      const gainDualVsAnn = `+${formatNum(((mDual_val - mAnn_val) / (mAnn_val || 1)) * 100, 1)}%`;
-      const gainMthVsAnn = `+${formatNum(((mMth_val - mAnn_val) / (mAnn_val || 1)) * 100, 1)}%`;
+      const dDual0 = ((mDual_val - m0_val) / (m0_val || 1)) * 100;
+      const dDualAnn = ((mDual_val - mAnn_val) / (mAnn_val || 1)) * 100;
+      const dMthAnn = ((mMth_val - mAnn_val) / (mAnn_val || 1)) * 100;
+      const gainDualVs0 = comp === 'albedo' ? '-' : `${dDual0 >= 0 ? '+' : ''}${formatNum(dDual0, 1)}%`;
+      const gainDualVsAnn = `${dDualAnn >= 0 ? '+' : ''}${formatNum(dDualAnn, 1)}%`;
+      const gainMthVsAnn = `${dMthAnn >= 0 ? '+' : ''}${formatNum(dMthAnn, 1)}%`;
 
       const compInsightPoints = isEn
         ? [
@@ -3037,7 +3043,7 @@ export async function generateOrientSolPDFReport(
     doc.text(`${formatInt(Math.round(surf.annualRadiationKwhM2))} kWh`, x8[3], cur8Y + 3.5);
 
     doc.setTextColor(surf.gainOverHorizontalPct > 0 ? 16 : 100, surf.gainOverHorizontalPct > 0 ? 185 : 116, surf.gainOverHorizontalPct > 0 ? 129 : 139);
-    doc.text(`+${formatNum(surf.gainOverHorizontalPct, 1)}%`, x8[4], cur8Y + 3.5);
+    doc.text(`${surf.gainOverHorizontalPct > 0 ? '+' : ''}${formatNum(surf.gainOverHorizontalPct, 1)}%`, x8[4], cur8Y + 3.5);
 
     doc.setTextColor(surf.gainOverAnnualFixedPct >= 0 ? 16 : 220, surf.gainOverAnnualFixedPct >= 0 ? 185 : 38, surf.gainOverAnnualFixedPct >= 0 ? 129 : 38);
     doc.text(`${surf.gainOverAnnualFixedPct >= 0 ? '+' : ''}${formatNum(surf.gainOverAnnualFixedPct, 1)}%`, x8[5], cur8Y + 3.5);

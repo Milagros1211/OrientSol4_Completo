@@ -77,6 +77,10 @@ export function renderTrackingPolarStudyPanel(props: TrackingStudyProps): HTMLEl
     const radSeasonalOpt = res.seasonal.monthlyDailyKwh;
     const radAzim = res.tracking.azimuthalAxis.monthlyDailyKwh;
     const radHorizTrack = res.tracking.horizontalAxis.monthlyDailyKwh;
+    const dualComps = res.tracking.dualAxis.components;
+    const radDual = dualComps
+      ? (dualComps[compActual as keyof typeof dualComps] || res.tracking.dualAxis.monthlyDailyKwh)
+      : res.tracking.dualAxis.monthlyDailyKwh;
 
     // Monthly gains (%) of Polar Tracking over each target
     const calcGains = (target: number[]) =>
@@ -87,6 +91,7 @@ export function renderTrackingPolarStudyPanel(props: TrackingStudyProps): HTMLEl
     const gainsOverSeasonal = calcGains(radSeasonalOpt);
     const gainsOverAzim = calcGains(radAzim);
     const gainsOverHorizTrack = calcGains(radHorizTrack);
+    const gainsOverDual = calcGains(radDual);
 
     // Annual means
     const meanHoriz = radHoriz.reduce((a, b) => a + b, 0) / 12;
@@ -96,6 +101,7 @@ export function renderTrackingPolarStudyPanel(props: TrackingStudyProps): HTMLEl
     const meanGainSeasonal = ((meanPolar - res.seasonal.annualMeanDailyKwh) / res.seasonal.annualMeanDailyKwh) * 100;
     const meanGainAzim = ((meanPolar - res.tracking.azimuthalAxis.annualMeanDailyKwh) / res.tracking.azimuthalAxis.annualMeanDailyKwh) * 100;
     const meanGainHorizTrack = ((meanPolar - res.tracking.horizontalAxis.annualMeanDailyKwh) / res.tracking.horizontalAxis.annualMeanDailyKwh) * 100;
+    const meanGainDual = ((meanPolar - res.tracking.dualAxis.annualMeanDailyKwh) / res.tracking.dualAxis.annualMeanDailyKwh) * 100;
 
     // SVG Diagram of 1-Axis Polar Tracking Panel (tilted axis at latitude)
     const polarDiagramSvg = `
@@ -193,7 +199,7 @@ export function renderTrackingPolarStudyPanel(props: TrackingStudyProps): HTMLEl
                   <th rowspan="2" class="th-track-h0">${compSym} (0°)</th>
                   <th rowspan="2" class="th-track-opt">${compSym}</th>
                   <th rowspan="2" class="th-track-temp">${isEn ? 'Mean Temp' : 'Tª media'}</th>
-                  <th colspan="5" class="th-track-gains-super">${isEn ? 'Gains (%)' : 'Ganancias (%)'}</th>
+                  <th colspan="6" class="th-track-gains-super">${isEn ? 'Gains (%)' : 'Ganancias (%)'}</th>
                 </tr>
                 <tr class="tracking-sub-th-row">
                   <th class="th-gain-sub">${isEn ? 'Horiz.<br/>plane' : 'Plano<br/>horiz.'}</th>
@@ -201,6 +207,7 @@ export function renderTrackingPolarStudyPanel(props: TrackingStudyProps): HTMLEl
                   <th class="th-gain-sub">${isEn ? 'Seasonal opt.<br/>tilt' : 'Inclin. ópt.<br/>estacional'}</th>
                   <th class="th-gain-sub">${isEn ? 'Azimuthal<br/>1-axis' : '1 eje<br/>azimutal'}</th>
                   <th class="th-gain-sub">${isEn ? 'Horizontal<br/>1-axis' : '1 eje<br/>horizontal'}</th>
+                  <th class="th-gain-sub">${isEn ? 'Two-axis' : '2 ejes'}</th>
                 </tr>
               </thead>
               <tbody>
@@ -218,6 +225,7 @@ export function renderTrackingPolarStudyPanel(props: TrackingStudyProps): HTMLEl
                     <td class="td-num">${formatNum(gainsOverSeasonal[i], 2)}</td>
                     <td class="td-num">${formatNum(gainsOverAzim[i], 2)}</td>
                     <td class="td-num">${formatNum(gainsOverHorizTrack[i], 2)}</td>
+                    <td class="td-num">${formatNum(gainsOverDual[i], 2)}</td>
                   </tr>
                 `).join('')}
               </tbody>
@@ -235,6 +243,7 @@ export function renderTrackingPolarStudyPanel(props: TrackingStudyProps): HTMLEl
                   <td class="td-num"><strong>${formatNum(meanGainSeasonal, 2)}</strong></td>
                   <td class="td-num"><strong>${formatNum(meanGainAzim, 2)}</strong></td>
                   <td class="td-num"><strong>${formatNum(meanGainHorizTrack, 2)}</strong></td>
+                  <td class="td-num"><strong>${formatNum(meanGainDual, 2)}</strong></td>
                 </tr>
               </tfoot>
             </table>

@@ -388,7 +388,7 @@ export function renderClimateIntegrationPanel(): HTMLElement {
           </div>
           <div class="result-stat-sub">
             <span>${t.results.gainOverHoriz}</span>
-            <strong class="text-gain">+${formatNum(res.optimalAnnual.gainOverHorizontalPct, 2)}%</strong>
+            <strong class="${res.optimalAnnual.gainOverHorizontalPct >= 0 ? 'text-gain' : 'text-danger'}">${res.optimalAnnual.gainOverHorizontalPct >= 0 ? '+' : ''}${formatNum(res.optimalAnnual.gainOverHorizontalPct, 2)}%</strong>
           </div>
           <div class="result-stat-sub">
             <span>${t.results.annualTotalRad}</span>
@@ -399,7 +399,7 @@ export function renderClimateIntegrationPanel(): HTMLElement {
         <div class="result-card">
           <div class="result-card-header">
             <h4>${t.results.seasonalTitle}</h4>
-            <span class="text-gain">+${formatNum(res.seasonal.gainOverOptimalAnnualPct, 2)}% ${t.results.vsFixed}</span>
+            <span class="${res.seasonal.gainOverOptimalAnnualPct >= 0 ? 'text-gain' : 'text-danger'}">${res.seasonal.gainOverOptimalAnnualPct >= 0 ? '+' : ''}${formatNum(res.seasonal.gainOverOptimalAnnualPct, 2)}% ${t.results.vsFixed}</span>
           </div>
           <div class="seasonal-angles-list">
             <div class="seasonal-item">

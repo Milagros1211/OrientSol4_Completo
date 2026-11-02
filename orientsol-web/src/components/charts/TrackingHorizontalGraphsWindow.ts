@@ -56,6 +56,14 @@ export function renderTrackingHorizontalGraphsWindow(props: TrackingHorizontalGr
     const radSeas = res.seasonal.monthlyDailyKwh;
     const radPolar = res.tracking.polarAxis.monthlyDailyKwh;
     const radAzim = res.tracking.azimuthalAxis.monthlyDailyKwh;
+    const getDual = (k: string) => {
+      const dComps = res.tracking.dualAxis.components;
+      if (dComps && dComps[k as keyof typeof dComps]) {
+        return dComps[k as keyof typeof dComps];
+      }
+      return res.tracking.dualAxis.monthlyDailyKwh;
+    };
+    const radDual = getDual(compKey);
 
     const allData = {
       global: { rad0: getHoriz('global'), radHz: getHorTrack('global') },
@@ -72,6 +80,7 @@ export function renderTrackingHorizontalGraphsWindow(props: TrackingHorizontalGr
     const gainsVsSeas = calcGains(radSeas);
     const gainsVsPolar = calcGains(radPolar);
     const gainsVsAzim = calcGains(radAzim);
+    const gainsVsDual = calcGains(radDual);
 
     const minVal = (arr: number[]) => (arr.length ? Math.min(...arr) : 0);
     const meanVal = (arr: number[]) => (arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0);
@@ -276,7 +285,7 @@ export function renderTrackingHorizontalGraphsWindow(props: TrackingHorizontalGr
 
     const allGainsPool = isAll
       ? [...allGainsComps.global, ...allGainsComps.beam, ...allGainsComps.diffuse]
-      : [...gainsVs0, ...gainsVsAnn, ...gainsVsSeas, ...gainsVsPolar, ...gainsVsAzim];
+      : [...gainsVs0, ...gainsVsAnn, ...gainsVsSeas, ...gainsVsPolar, ...gainsVsAzim, ...gainsVsDual];
 
     const rawMinGain = Math.min(...allGainsPool, 0);
     const rawMaxGain = Math.max(...allGainsPool, 10);
@@ -355,11 +364,11 @@ export function renderTrackingHorizontalGraphsWindow(props: TrackingHorizontalGr
         </g>
       `;
     } else {
-      const barW = Math.max(2.5, monthSlotW * 0.16);
+      const barW = Math.max(2.2, monthSlotW * 0.14);
       const gap = 1;
 
       for (let i = 0; i < 12; i++) {
-        const slotX = bPad.left + i * monthSlotW + (monthSlotW - (barW * 5 + gap * 4)) / 2;
+        const slotX = bPad.left + i * monthSlotW + (monthSlotW - (barW * 6 + gap * 5)) / 2;
 
         const series = [
           { val: gainsVs0[i], color: '#0284c7' },
@@ -367,6 +376,7 @@ export function renderTrackingHorizontalGraphsWindow(props: TrackingHorizontalGr
           { val: gainsVsSeas[i], color: '#f59e0b' },
           { val: gainsVsPolar[i], color: '#38bdf8' },
           { val: gainsVsAzim[i], color: '#8b5cf6' },
+          { val: gainsVsDual[i], color: '#14b8a6' },
         ];
 
         series.forEach((s, sIdx) => {
@@ -375,7 +385,7 @@ export function renderTrackingHorizontalGraphsWindow(props: TrackingHorizontalGr
           const y = yBottom(s.val);
           const barY = Math.min(y, yZero);
           const barH = Math.max(0.5, Math.abs(y - yZero));
-          bottomBarsHtml += `<rect x="${bx}" y="${barY}" width="${barW}" height="${barH}" fill="${s.color}" stroke="#0f172a" stroke-width="0.3" rx="1" />`;
+          bottomBarsHtml += `<rect x="${bx.toFixed(1)}" y="${barY.toFixed(1)}" width="${barW.toFixed(1)}" height="${barH.toFixed(1)}" fill="${s.color}" stroke="#0f172a" stroke-width="0.3" rx="1" />`;
         });
       }
 
@@ -392,17 +402,19 @@ export function renderTrackingHorizontalGraphsWindow(props: TrackingHorizontalGr
 
       bottomLegendHtml = `
         <g transform="translate(${bPad.left + bInnerW + 2}, ${bPad.top + 2})">
-          <rect x="0" y="0" width="92" height="96" fill="${legendBg}" stroke="${legendBorder}" rx="3" />
+          <rect x="0" y="0" width="92" height="112" fill="${legendBg}" stroke="${legendBorder}" rx="3" />
           <rect x="5" y="8" width="9" height="9" fill="${isAlbedo ? '#94a3b8' : '#0284c7'}" />
-          <text x="18" y="16" fill="${isAlbedo ? '#f59e0b' : legendText}" font-size="7.5" font-weight="${isAlbedo ? '700' : '600'}">${isAlbedo ? 'vs 0° (Indet.)' : 'vs 0° (Plano hor.)'}</text>
+          <text x="18" y="16" fill="${isAlbedo ? '#f59e0b' : legendText}" font-size="7.5" font-weight="${isAlbedo ? '700' : '600'}">${isAlbedo ? 'vs 0° (Indet.)' : (isEn ? 'vs 0° (Horiz)' : 'vs 0° (Plano hor.)')}</text>
           <rect x="5" y="24" width="9" height="9" fill="#10b981" />
-          <text x="18" y="32" fill="${legendText}" font-size="7.5" font-weight="600">vs Ópt. anu</text>
+          <text x="18" y="32" fill="${legendText}" font-size="7.5" font-weight="600">${isEn ? 'vs Ann. opt' : 'vs Ópt. anu'}</text>
           <rect x="5" y="40" width="9" height="9" fill="#f59e0b" />
-          <text x="18" y="48" fill="${legendText}" font-size="7.5" font-weight="600">vs Ópt. est</text>
+          <text x="18" y="48" fill="${legendText}" font-size="7.5" font-weight="600">${isEn ? 'vs Seas. opt' : 'vs Ópt. est'}</text>
           <rect x="5" y="56" width="9" height="9" fill="#38bdf8" />
-          <text x="18" y="64" fill="${legendText}" font-size="7.5" font-weight="600">vs Seg. pol</text>
+          <text x="18" y="64" fill="${legendText}" font-size="7.5" font-weight="600">${isEn ? 'vs Polar trk' : 'vs Seg. pol'}</text>
           <rect x="5" y="72" width="9" height="9" fill="#8b5cf6" />
-          <text x="18" y="80" fill="${legendText}" font-size="7.5" font-weight="600">vs Seg. azi</text>
+          <text x="18" y="80" fill="${legendText}" font-size="7.5" font-weight="600">${isEn ? 'vs Azim. trk' : 'vs Seg. azi'}</text>
+          <rect x="5" y="88" width="9" height="9" fill="#14b8a6" />
+          <text x="18" y="96" fill="${legendText}" font-size="7.5" font-weight="600">${isEn ? 'vs 2-axis trk' : 'vs Seg. 2 ejes'}</text>
         </g>
       `;
     }
