@@ -12752,4 +12752,158 @@ body.theme-dark .pedagogical-concept-card {
 }
 
 
+/* ==========================================================================
+   Methodological Notes: Temperature Origins & Seasonal Tilt (High Contrast)
+   ========================================================================== */
+.text-gain-pos,
+.opt-study-table .text-gain-pos {
+  color: #15803d !important;
+  font-weight: 700;
+}
+
+.text-gain-neg,
+.opt-study-table .text-gain-neg {
+  color: #b91c1c !important;
+  font-weight: 700;
+}
+
+[data-theme="dark"] .text-gain-pos,
+body.theme-dark .text-gain-pos,
+[data-theme="dark"] .opt-study-table .text-gain-pos,
+body.theme-dark .opt-study-table .text-gain-pos {
+  color: #34d399 !important;
+  font-weight: 700;
+}
+
+[data-theme="dark"] .text-gain-neg,
+body.theme-dark .text-gain-neg,
+[data-theme="dark"] .opt-study-table .text-gain-neg,
+body.theme-dark .opt-study-table .text-gain-neg {
+  color: #f87171 !important;
+  font-weight: 700;
+}
+
+.temp-methodology-note,
+.seasonal-methodology-note {
+  margin: 1.25rem 0;
+  padding: 1rem 1.25rem;
+  border-radius: 8px;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-left: 5px solid #0284c7;
+  font-size: 0.86rem;
+  line-height: 1.55;
+  color: #0f172a;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  white-space: normal !important;
+  word-break: break-word !important;
+  overflow-wrap: break-word !important;
+}
+
+.temp-methodology-header,
+.seasonal-methodology-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #0369a1;
+  margin-bottom: 0.85rem;
+  white-space: normal !important;
+  word-break: break-word !important;
+  overflow-wrap: break-word !important;
+}
+
+.temp-methodology-header svg,
+.seasonal-methodology-header svg {
+  flex-shrink: 0;
+  color: #0284c7;
+}
+
+.temp-methodology-grid,
+.seasonal-methodology-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 0.85rem 1.25rem;
+  width: 100%;
+}
+
+.temp-methodology-item,
+.seasonal-methodology-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: #1e293b;
+  white-space: normal !important;
+  word-break: break-word !important;
+  overflow-wrap: break-word !important;
+}
+
+.temp-methodology-item strong,
+.seasonal-methodology-item strong {
+  color: #0f172a;
+  font-weight: 700;
+  font-size: 0.84rem;
+  white-space: normal !important;
+  word-break: break-word !important;
+  overflow-wrap: break-word !important;
+}
+
+.temp-methodology-desc,
+.seasonal-methodology-desc {
+  color: #334155;
+  white-space: normal !important;
+  word-break: break-word !important;
+  overflow-wrap: break-word !important;
+  line-height: 1.55;
+}
+
+/* Dark Mode Overrides (WCAG AAA High Contrast) */
+[data-theme="dark"] .temp-methodology-note,
+body.theme-dark .temp-methodology-note,
+[data-theme="dark"] .seasonal-methodology-note,
+body.theme-dark .seasonal-methodology-note {
+  background: #09202c !important;
+  border-color: #1e4963 !important;
+  border-left-color: #38bdf8 !important;
+  color: #f1f5f9 !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35) !important;
+}
+
+[data-theme="dark"] .temp-methodology-header,
+body.theme-dark .temp-methodology-header,
+[data-theme="dark"] .seasonal-methodology-header,
+body.theme-dark .seasonal-methodology-header {
+  color: #38bdf8 !important;
+}
+
+[data-theme="dark"] .temp-methodology-header svg,
+body.theme-dark .temp-methodology-header svg,
+[data-theme="dark"] .seasonal-methodology-header svg,
+body.theme-dark .seasonal-methodology-header svg {
+  color: #38bdf8 !important;
+}
+
+[data-theme="dark"] .temp-methodology-item,
+body.theme-dark .temp-methodology-item,
+[data-theme="dark"] .seasonal-methodology-item,
+body.theme-dark .seasonal-methodology-item {
+  color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] .temp-methodology-item strong,
+body.theme-dark .temp-methodology-item strong,
+[data-theme="dark"] .seasonal-methodology-item strong,
+body.theme-dark .seasonal-methodology-item strong {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .temp-methodology-desc,
+body.theme-dark .temp-methodology-desc,
+[data-theme="dark"] .seasonal-methodology-desc,
+body.theme-dark .seasonal-methodology-desc {
+  color: #cbd5e1 !important;
+}
 

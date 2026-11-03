@@ -2354,6 +2354,19 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       return 'badge-fija';
     };
 
+    const tMonthly = res.temperatures.ambient.monthlyMeanC;
+    let maxMonthIdx = 6;
+    let minMonthIdx = 0;
+    if (Array.isArray(tMonthly) && tMonthly.length === 12) {
+      maxMonthIdx = tMonthly.indexOf(Math.max(...tMonthly));
+      minMonthIdx = tMonthly.indexOf(Math.min(...tMonthly));
+    }
+    const fullMonths = t.common.monthNamesFull || [];
+    const maxMonthName = fullMonths[maxMonthIdx] || (isEn ? 'July' : 'Julio');
+    const minMonthName = fullMonths[minMonthIdx] || (isEn ? 'January' : 'Enero');
+    const maxMonthVal = Array.isArray(tMonthly) ? tMonthly[maxMonthIdx] : res.temperatures.ambient.annualMaxC;
+    const minMonthVal = Array.isArray(tMonthly) ? tMonthly[minMonthIdx] : res.temperatures.ambient.annualMinC;
+
     resultsContainer.innerHTML = `
       <div class="results-header">
         <div class="results-header-left">
@@ -2387,6 +2400,52 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
           <span class="temp-stat-title">${t.results.tempCellOperating}</span>
           <div class="temp-stat-value temp-cell">${formatNum(res.temperatures.cellOperating.meanCellTempOptimalC, 1)} <small style="font-size:0.9rem">°C</small></div>
           <span class="temp-stat-sub">${isEn ? `NOCT / TONC ${formatNum(parseFloat(simTonc?.value) || 47.0, 1)}°C Model (Max: ${formatNum(res.temperatures.cellOperating.maxCellTempOptimalC, 1)}°C)` : `Modelo TONC ${formatNum(parseFloat(simTonc?.value) || 47.0, 1)}°C (Máx: ${formatNum(res.temperatures.cellOperating.maxCellTempOptimalC, 1)}°C)`}</span>
+        </div>
+      </div>
+
+      <!-- NOTA ACLARATORIA METODOLÓGICA DE TEMPERATURAS (PVGIS 5.3 / ERA5) -->
+      <div class="temp-methodology-note">
+        <div class="temp-methodology-header">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          <span>${isEn ? 'Methodological Note: Temperature Origins (PVGIS 5.3 / ERA5 & Diurnal Range Model)' : 'Fundamento Metodológico: Registro y Modelado de Temperaturas (PVGIS 5.3 / ERA5 y Derating Térmico)'}</span>
+        </div>
+        <div class="temp-methodology-grid">
+          <div class="temp-methodology-item">
+            <strong>${isEn ? 'Annual Mean (24h Climatology):' : 'Media Anual (Climatología 24h):'}</strong>
+            <span class="temp-methodology-desc">
+              ${isEn
+                ? `Calculated as the exact arithmetic mean of the 12 monthly 2m ambient temperatures (T2m) supplied by PVGIS / ERA5 (${formatNum(res.temperatures.ambient.annualMeanC, 1)} °C).`
+                : `Promedio aritmético exacto de los 12 valores mensuales de temperatura ambiente T2m procedentes de PVGIS / ERA5 (${formatNum(res.temperatures.ambient.annualMeanC, 1)} °C).`}
+            </span>
+          </div>
+          <div class="temp-methodology-item">
+            <strong>${isEn ? `Annual Peak High (${maxMonthName}):` : `Pico Máximo Estival (${maxMonthName}):`}</strong>
+            <span class="temp-methodology-desc">
+              ${isEn
+                ? `Derived from the warmest month mean (${formatNum(maxMonthVal, 1)} °C) plus half of the diurnal thermal range (ΔT = 10 °C, +5,0 °C), yielding ${formatNum(res.temperatures.ambient.annualMaxC, 1)} °C. Simulates actual noon ambient temperature during peak solar hours.`
+                : `Calculado sobre el mes más cálido (${formatNum(maxMonthVal, 1)} °C) sumando la semiamplitud térmica diurna (ΔT = 10 °C, +5,0 °C), dando ${formatNum(res.temperatures.ambient.annualMaxC, 1)} °C. Modela la temperatura ambiente al mediodía para evaluar pérdidas térmicas reales.`}
+            </span>
+          </div>
+          <div class="temp-methodology-item">
+            <strong>${isEn ? `Annual Minimum (${minMonthName}):` : `Mínima Invernal (${minMonthName}):`}</strong>
+            <span class="temp-methodology-desc">
+              ${isEn
+                ? `Computed from the coldest month mean (${formatNum(minMonthVal, 1)} °C) minus 5,0 °C, yielding ${formatNum(res.temperatures.ambient.annualMinC, 1)} °C. Represents extreme nighttime frost conditions for open-circuit voltage (Voc) sizing.`
+                : `Calculada sobre el mes más frío (${formatNum(minMonthVal, 1)} °C) restando 5,0 °C, dando ${formatNum(res.temperatures.ambient.annualMinC, 1)} °C. Modela el frío nocturno extremo para dimensionado de tensión en circuito abierto (Voc).`}
+            </span>
+          </div>
+          <div class="temp-methodology-item">
+            <strong>${isEn ? 'Operating Cell Temperature (Tc):' : 'Temperatura de Célula Operativa (Tc):'}</strong>
+            <span class="temp-methodology-desc">
+              ${isEn
+                ? `Based on the NOCT / TONC model (${formatNum(parseFloat(simTonc?.value) || 47.0, 1)} °C). Cells heat under solar irradiance up to ${formatNum(res.temperatures.cellOperating.maxCellTempOptimalC, 1)} °C in summer, driving thermal power derating (γ = -0.40%/°C).`
+                : `Calculada mediante el modelo TONC (${formatNum(parseFloat(simTonc?.value) || 47.0, 1)} °C). La célula se calienta bajo radiación solar alcanzando hasta ${formatNum(res.temperatures.cellOperating.maxCellTempOptimalC, 1)} °C en verano, determinando las pérdidas por derating (γ = -0,40%/°C).`}
+            </span>
+          </div>
         </div>
       </div>
 

@@ -382,7 +382,7 @@ export function renderOptimalSeasonalStudyPanel(props: OptimalSeasonalStudyProps
                 <th rowspan="2" class="th-season-month">${isEn ? 'Month' : 'Mes'}</th>
                 ${angles.map((ang) => `<th rowspan="2" class="th-ang-col">${compSym}<br/><span style="font-size: 0.74rem;">(${ang}°)</span></th>`).join('')}
                 <th rowspan="2" class="th-opt-angle-col">${isEn ? 'Optimal<br/>Angle (°)' : 'Ángulo<br/>óptimo (°)'}</th>
-                <th rowspan="2" class="th-opt-rad-col">${compSym}<br/>${isEn ? 'optimal' : 'óptimo'}</th>
+                <th rowspan="2" class="th-opt-rad-col" title="${isEn ? 'Daily radiation with collector fixed at seasonal optimal tilt' : 'Radiación diaria con colector fijado a la inclinación óptima trimestral'}">${compSym}<br/><span style="font-size: 0.72rem;">${isEn ? '(seasonal β)' : '(β estac.)'}</span></th>
                 <th colspan="2" class="th-gains-super-col">${isEn ? 'Gains (%)' : 'Ganancias (%)'}</th>
               </tr>
               <tr class="seasonal-sub-th-row">
@@ -397,17 +397,25 @@ export function renderOptimalSeasonalStudyPanel(props: OptimalSeasonalStudyProps
                 const pctHoriz = gainsHoriz[monthIdx];
                 const pctAnu = gainsAnnual[monthIdx];
 
-                // Optimal angle display only in central month of each season
-                let optAngleCell = '';
-                if (season === 'winter' && monthIdx === 0) {
-                  optAngleCell = `<strong class="text-season-winter" style="font-size: 1rem;">${winterDeg}</strong>`;
-                } else if (season === 'spring' && monthIdx === 3) {
-                  optAngleCell = `<strong class="text-season-spring" style="font-size: 1rem;">${springDeg}</strong>`;
-                } else if (season === 'summer' && monthIdx === 6) {
-                  optAngleCell = `<strong class="text-season-summer" style="font-size: 1rem;">${summerDeg}</strong>`;
-                } else if (season === 'autumn' && monthIdx === 9) {
-                  optAngleCell = `<strong class="text-season-autumn" style="font-size: 1rem;">${autumnDeg}</strong>`;
-                }
+                // Optimal angle display for season (central month emphasized, all rows clearly indicated)
+                const seasonDeg =
+                  season === 'winter'
+                    ? winterDeg
+                    : season === 'spring'
+                    ? springDeg
+                    : season === 'summer'
+                    ? summerDeg
+                    : autumnDeg;
+
+                const isCentralMonth =
+                  (season === 'winter' && monthIdx === 0) ||
+                  (season === 'spring' && monthIdx === 3) ||
+                  (season === 'summer' && monthIdx === 6) ||
+                  (season === 'autumn' && monthIdx === 9);
+
+                const optAngleCell = isCentralMonth
+                  ? `<strong class="text-season-${season}" style="font-size: 0.98rem;">${seasonDeg}°</strong>`
+                  : `<span class="text-season-${season}" style="font-size: 0.82rem; opacity: 0.72; font-weight: 600;">${seasonDeg}°</span>`;
 
                 // Gdm óptimo text color based on season
                 const optColorClass =
@@ -442,13 +450,51 @@ export function renderOptimalSeasonalStudyPanel(props: OptimalSeasonalStudyProps
                   <strong>${isEn ? 'MEAN' : 'MEDIA'}</strong>
                 </td>
                 ${meanRadAngles.map((v) => `<td class="td-num"><strong>${formatNum(v, 2)}</strong></td>`).join('')}
-                <td class="td-num"></td>
+                <td class="td-num" style="text-align: center; font-size: 0.78rem; font-weight: 700; color: #10b981;"><strong>${formatNum((winterDeg + springDeg + summerDeg + autumnDeg) / 4, 1)}°</strong></td>
                 <td class="td-num td-opt-val highlight-media"><strong>${formatNum(meanSeasonalOpt, 2)}</strong></td>
-                <td class="td-num td-gain-h"><strong>${isAlbedo ? '-' : formatNum(meanGainHoriz, 2)}</strong></td>
-                <td class="td-num td-gain-anu"><strong>${formatNum(meanGainAnnual, 2)}</strong></td>
+                <td class="td-num td-gain-h ${!isAlbedo && meanGainHoriz >= 0 ? 'text-gain-pos' : !isAlbedo ? 'text-gain-neg' : ''}"><strong>${isAlbedo ? '-' : formatNum(meanGainHoriz, 2)}</strong></td>
+                <td class="td-num td-gain-anu ${meanGainAnnual >= 0 ? 'text-gain-pos' : 'text-gain-neg'}"><strong>${formatNum(meanGainAnnual, 2)}</strong></td>
               </tr>
             </tfoot>
           </table>
+        </div>
+
+        <!-- Fundamento Didáctico de Optimización Estacional -->
+        <div class="seasonal-methodology-note">
+          <div class="seasonal-methodology-header">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            <span>${isEn ? 'Methodological Clarification: Seasonal Tilt Optimization vs Monthly Optimum' : 'Aclaración Metodológica: Inclinación Óptima Estacional (4 Posiciones) vs Óptimo Mensual'}</span>
+          </div>
+          <div class="seasonal-methodology-grid">
+            <div class="seasonal-methodology-item">
+              <strong>${isEn ? 'Energy Maximization (Not Simple Angle Average):' : 'Maximización de Energía (No Promedio Aritmético de Ángulos):'}</strong>
+              <div class="seasonal-methodology-desc">
+                ${isEn
+                  ? 'OrientSol does not average the 3 individual monthly angles. Instead, it solves for the single tilt angle that maximizes the total accumulated solar energy (kWh) over the entire trimester. Months with higher solar irradiance weigh more heavily, pulling the optimal angle towards their peak yield.'
+                  : 'OrientSol no promedia aritméticamente los ángulos óptimos de los 3 meses. En su lugar, busca la inclinación única que maximiza la energía total acumulada (kWh) en todo el trimestre. Los meses con mayor insolación tienen mayor peso energético y arrastran el ángulo óptimo para obtener la máxima cosecha de kWh.'}
+              </div>
+            </div>
+            <div class="seasonal-methodology-item">
+              <strong>${isEn ? 'Quarterly Fixed Compromise (4 Positions/Year):' : 'Compromiso Trimestral Fijo (4 Posiciones/Año):'}</strong>
+              <div class="seasonal-methodology-desc">
+                ${isEn
+                  ? 'The collector slope remains fixed for 3 months. Consequently, individual months may yield slightly less than their independent peak (e.g., in March or May under spring tilt of 25°). For the maximum possible yield with independent monthly tilt adjustments, refer to the Monthly Optimum Study (12 positions).'
+                  : 'El colector permanece fijado durante los 3 meses de la estación. Por ello, en meses individuales la radiación puede ser algo menor que su óptimo aislado (p. ej. en marzo o mayo con inclinación primaveral de 25°). Para obtener el máximo independiente en cada mes, consulte el estudio de Inclinación Óptima Mensual (12 posiciones).'}
+              </div>
+            </div>
+            <div class="seasonal-methodology-item">
+              <strong>${isEn ? 'Summer Shallow Angles (Near-Horizontal):' : 'Ángulos Tendidos en Verano (Casi Horizontales):'}</strong>
+              <div class="seasonal-methodology-desc">
+                ${isEn
+                  ? 'In mid-latitudes such as Madrid (40.4° N), summer days exceed 14.5 hours with solar noon altitude up to 73°. Slopes above 10° cause significant morning and late-afternoon loss when the sun rises Northeast and sets Northwest; a shallow angle (6°) captures the full wide solar arc.'
+                  : 'En latitudes medias como Madrid (40,4° N), el sol de verano tiene trayectorias de más de 14,5 horas con alturas de hasta 73°. Inclinaciones superiores a 10° generan pérdidas matinales y vespertinas al salir el sol por el Noreste y ponerse por el Noroeste; un ángulo casi plano (6°) capta el arco solar íntegro.'}
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- 5. Bottom Action Buttons matching MATLAB Figura 5.2.89 -->
