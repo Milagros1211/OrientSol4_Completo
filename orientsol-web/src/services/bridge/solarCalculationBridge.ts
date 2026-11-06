@@ -423,7 +423,7 @@ loss_map = generate_capture_loss_map(
     beta_step_deg=5,
     alpha_step_deg=7.5,
     alpha_range_deg=(-90, 90),
-    annual_opt_tilt_deg=float(opt_beta_annual),
+    annual_opt_tilt_deg=float(opt_beta),
     monthly_opt_tilts_deg=[float(v) for v in monthly_opt["optimal_tilts_deg"]],
     seasonal_optima=seasonal_opt_dict,
 )
