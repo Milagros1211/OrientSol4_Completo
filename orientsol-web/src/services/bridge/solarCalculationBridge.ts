@@ -404,6 +404,13 @@ yield_opt = calculate_energy_yield(
 )
 
 # 9. 2D Capture Loss Map (CTE DB-HE4)
+seasonal_opt_dict = {
+    "winter": {"opt_angle_deg": float(seasons["winter"]["opt_angle_deg"]), "mean_daily_kwh": float(seasons["winter"]["mean_daily_kwh"])},
+    "spring": {"opt_angle_deg": float(seasons["spring"]["opt_angle_deg"]), "mean_daily_kwh": float(seasons["spring"]["mean_daily_kwh"])},
+    "summer": {"opt_angle_deg": float(seasons["summer"]["opt_angle_deg"]), "mean_daily_kwh": float(seasons["summer"]["mean_daily_kwh"])},
+    "autumn": {"opt_angle_deg": float(seasons["autumn"]["opt_angle_deg"]), "mean_daily_kwh": float(seasons["autumn"]["mean_daily_kwh"])},
+}
+
 loss_map = generate_capture_loss_map(
     lat_deg=lat_deg,
     gdm0=gdm0,
@@ -416,6 +423,9 @@ loss_map = generate_capture_loss_map(
     beta_step_deg=5,
     alpha_step_deg=7.5,
     alpha_range_deg=(-90, 90),
+    annual_opt_tilt_deg=float(opt_beta_annual),
+    monthly_opt_tilts_deg=[float(v) for v in monthly_opt["optimal_tilts_deg"]],
+    seasonal_optima=seasonal_opt_dict,
 )
 
 # 10. Comparative Surface Optimization Engine

@@ -541,8 +541,14 @@ export async function generateOrientSolPDFReport(
     const monthsEs = ['Dic - Ene - Feb', 'Mar - Abr - May', 'Jun - Jul - Ago', 'Sep - Oct - Nov'];
     const monthsEn = ['Dec - Jan - Feb', 'Mar - Apr - May', 'Jun - Jul - Aug', 'Sep - Oct - Nov'];
     if (lossMapRes?.seasonalMaps && lossMapRes.seasonalMaps.length === 4) {
+      const seasonalTilts = [
+        res.seasonal?.winterTiltDeg ?? 59,
+        res.seasonal?.springTiltDeg ?? 25,
+        res.seasonal?.summerTiltDeg ?? 6,
+        res.seasonal?.autumnTiltDeg ?? 40,
+      ];
       return lossMapRes.seasonalMaps.map((s, i) => {
-        const bDeg = Number(s.optimalPoint.betaDeg);
+        const bDeg = seasonalTilts[i] ?? Number(s.optimalPoint.betaDeg);
         const aDeg = Math.abs(bDeg) < 0.01 ? 0 : Number(s.optimalPoint.alphaDeg);
         return {
           label: isEn ? s.seasonNameEn || namesEn[i] : s.seasonName || namesEs[i],

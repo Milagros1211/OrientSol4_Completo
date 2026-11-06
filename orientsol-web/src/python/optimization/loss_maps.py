@@ -9,7 +9,7 @@ References:
 - TablaSituacionesOptimas.png
 """
 
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 import numpy as np
 from core.constants import CHARACTERISTIC_DAYS
 from core.conversions import deg2rad
@@ -60,6 +60,9 @@ def generate_capture_loss_map(
     beta_step_deg: Union[int, float] = 5,
     alpha_step_deg: Union[int, float] = 7.5,
     alpha_range_deg: Tuple[int, int] = (-90, 90),
+    annual_opt_tilt_deg: Optional[float] = None,
+    monthly_opt_tilts_deg: Optional[List[float]] = None,
+    seasonal_optima: Optional[Dict[str, Dict[str, float]]] = None,
 ) -> Dict[str, Union[np.ndarray, List[float], float, int, Dict]]:
     """
     Computes 2D grid of annual solar irradiation and capture losses as a function of:
@@ -174,6 +177,9 @@ def generate_capture_loss_map(
 
     # Reference maximum (South-facing optimal tilt)
     opt_beta_deg, opt_alpha_deg, max_radiation = _find_optimal_beta_alpha(radiation_annual_daily, betas, alphas)
+    if annual_opt_tilt_deg is not None:
+        opt_beta_deg = float(annual_opt_tilt_deg)
+        opt_alpha_deg = 0.0 if lat_deg >= 0 else 180.0
 
     # Capture loss percentage matrix relative to the maximum:
     # Loss (%) = (1 - G / G_max) * 100
@@ -200,10 +206,13 @@ def generate_capture_loss_map(
     for m in range(12):
         m_rad = radiation_monthly[m]
         opt_beta_m, opt_alpha_m, max_rad_m = _find_optimal_beta_alpha(m_rad, betas, alphas)
+        if monthly_opt_tilts_deg is not None and m < len(monthly_opt_tilts_deg):
+            opt_beta_m = float(monthly_opt_tilts_deg[m])
+            opt_alpha_m = 0.0 if lat_deg >= 0 else 180.0
 
         loss_pct_m = np.where(
             max_rad_m > 0,
-            ((max_rad_m - m_rad) / max_rad_m) * 100.0,
+            np.maximum(0.0, ((max_rad_m - m_rad) / max_rad_m) * 100.0),
             0.0
         )
         gen_pct_m = round(float(np.sum(loss_pct_m <= 10.0) / total_cells * 100.0), 1)
@@ -268,10 +277,16 @@ def generate_capture_loss_map(
         s_months = s_def["months"]
         s_rad = np.mean(radiation_monthly[s_months, :, :], axis=0)
         opt_beta_s, opt_alpha_s, max_rad_s = _find_optimal_beta_alpha(s_rad, betas, alphas)
+        if seasonal_optima is not None and s_def["key"] in seasonal_optima:
+            s_opt_data = seasonal_optima[s_def["key"]]
+            opt_beta_s = float(s_opt_data.get("opt_angle_deg", opt_beta_s))
+            opt_alpha_s = 0.0 if lat_deg >= 0 else 180.0
+            if "mean_daily_kwh" in s_opt_data:
+                max_rad_s = max(float(max_rad_s), float(s_opt_data["mean_daily_kwh"]))
 
         loss_pct_s = np.where(
             max_rad_s > 0,
-            ((max_rad_s - s_rad) / max_rad_s) * 100.0,
+            np.maximum(0.0, ((max_rad_s - s_rad) / max_rad_s) * 100.0),
             0.0
         )
         gen_pct_s = round(float(np.sum(loss_pct_s <= 10.0) / total_cells * 100.0), 1)

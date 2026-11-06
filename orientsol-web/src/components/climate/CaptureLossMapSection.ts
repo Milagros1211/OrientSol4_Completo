@@ -176,15 +176,47 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
     let currentOptPoint = lossMap.optimalPoint;
     let currentCteZones = lossMap.cteZones;
 
-    if (mode === 'monthly' && lossMap.monthlyMaps && lossMap.monthlyMaps.length === 12) {
+    const fixedOptimalOri = res.latitude >= 0 ? 0.0 : 180.0;
+    const seasonalTilts = res.seasonal
+      ? [
+          res.seasonal.winterTiltDeg,
+          res.seasonal.springTiltDeg,
+          res.seasonal.summerTiltDeg,
+          res.seasonal.autumnTiltDeg,
+        ]
+      : [59, 25, 6, 40];
+
+    const seasonalRads = res.seasonal
+      ? [
+          res.seasonal.winterMeanDailyKwh,
+          res.seasonal.springMeanDailyKwh,
+          res.seasonal.summerMeanDailyKwh,
+          res.seasonal.autumnMeanDailyKwh,
+        ]
+      : [];
+
+    const monthlyTilts = res.monthlyOptimum12?.optimalTiltsDeg ?? [];
+    const monthlyRads = res.monthlyOptimum12?.monthlyDailyKwh ?? [];
+
+    if (mode === 'annual' && res.optimalAnnual) {
+      currentOptPoint = {
+        betaDeg: res.optimalAnnual.optimalTiltDeg,
+        alphaDeg: fixedOptimalOri,
+        maxDailyRadiationKwh: res.optimalAnnual.annualMeanDailyKwh,
+        maxAnnualRadiationKwhM2: res.optimalAnnual.annualTotalKwh,
+      };
+    } else if (mode === 'monthly' && lossMap.monthlyMaps && lossMap.monthlyMaps.length === 12) {
       const mMap: MonthlyCaptureLossMap = lossMap.monthlyMaps[selectedMonthIdx];
       currentLossMatrix = mMap.lossPercentageMatrix;
       currentRadMatrix = mMap.radiationMatrixKwhM2Day;
+      const optB = monthlyTilts[selectedMonthIdx] ?? mMap.optimalPoint.betaDeg;
+      const optA = fixedOptimalOri;
+      const maxDaily = monthlyRads[selectedMonthIdx] ?? mMap.optimalPoint.maxDailyRadiationKwh;
       currentOptPoint = {
-        betaDeg: mMap.optimalPoint.betaDeg,
-        alphaDeg: mMap.optimalPoint.alphaDeg,
-        maxDailyRadiationKwh: mMap.optimalPoint.maxDailyRadiationKwh,
-        maxAnnualRadiationKwhM2: mMap.optimalPoint.maxDailyRadiationKwh * 365,
+        betaDeg: optB,
+        alphaDeg: optA,
+        maxDailyRadiationKwh: maxDaily,
+        maxAnnualRadiationKwhM2: maxDaily * 365,
       };
       currentCteZones = mMap.cteZones;
     } else if (mode === 'seasonal') {
@@ -267,11 +299,14 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
       if (sMap) {
         currentLossMatrix = sMap.lossPercentageMatrix;
         currentRadMatrix = sMap.radiationMatrixKwhM2Day;
+        const optB = seasonalTilts[selectedSeasonIdx] ?? sMap.optimalPoint.betaDeg;
+        const optA = fixedOptimalOri;
+        const maxDaily = seasonalRads[selectedSeasonIdx] ?? sMap.optimalPoint.maxDailyRadiationKwh;
         currentOptPoint = {
-          betaDeg: sMap.optimalPoint.betaDeg,
-          alphaDeg: sMap.optimalPoint.alphaDeg,
-          maxDailyRadiationKwh: sMap.optimalPoint.maxDailyRadiationKwh,
-          maxAnnualRadiationKwhM2: sMap.optimalPoint.maxDailyRadiationKwh * 365,
+          betaDeg: optB,
+          alphaDeg: optA,
+          maxDailyRadiationKwh: maxDaily,
+          maxAnnualRadiationKwhM2: maxDaily * 365,
         };
         currentCteZones = sMap.cteZones;
       }
@@ -314,11 +349,14 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
             ${isEn ? 'Select Month for Capture Map:' : 'Seleccionar mes para el mapa de captación:'}
           </label>
           <select id="loss-map-month-select" class="form-select form-select-sm loss-map-month-dropdown" style="width: auto; min-width: 170px; font-weight: 600;">
-            ${monthNames.map((name: string, i: number) => `
+            ${monthNames.map((name: string, i: number) => {
+              const optB = monthlyTilts[i] ?? (lossMap.monthlyMaps ? lossMap.monthlyMaps[i].optimalPoint.betaDeg : 0);
+              return `
               <option value="${i}" ${i === selectedMonthIdx ? 'selected' : ''}>
-                ${i + 1}. ${name} (Inc = ${lossMap.monthlyMaps ? formatNum(Number(lossMap.monthlyMaps[i].optimalPoint.betaDeg), 1) : '0,0'}°)
+                ${i + 1}. ${name} (Inc = ${formatNum(Number(optB), 1)}°)
               </option>
-            `).join('')}
+            `;
+            }).join('')}
           </select>
           <span style="font-size: 0.76rem; color: var(--text-dim);">
             ${isEn ? 'Displays CTE losses and highlights optimum for the selected month' : 'Muestra pérdidas CTE y ángulo óptimo del mes seleccionado'}
@@ -327,10 +365,10 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
       `;
     } else if (mode === 'seasonal') {
       const seasonDefs = [
-        { nameEs: 'Invierno', nameEn: 'Winter', monthsEs: 'Dic - Ene - Feb', monthsEn: 'Dec - Jan - Feb', fallbackBeta: res.seasonal?.winterTiltDeg ?? currentOptPoint.betaDeg },
-        { nameEs: 'Primavera', nameEn: 'Spring', monthsEs: 'Mar - Abr - May', monthsEn: 'Mar - Apr - May', fallbackBeta: res.seasonal?.springTiltDeg ?? currentOptPoint.betaDeg },
-        { nameEs: 'Verano', nameEn: 'Summer', monthsEs: 'Jun - Jul - Ago', monthsEn: 'Jun - Jul - Aug', fallbackBeta: res.seasonal?.summerTiltDeg ?? currentOptPoint.betaDeg },
-        { nameEs: 'Otoño', nameEn: 'Autumn', monthsEs: 'Sep - Oct - Nov', monthsEn: 'Sep - Oct - Nov', fallbackBeta: res.seasonal?.autumnTiltDeg ?? currentOptPoint.betaDeg },
+        { nameEs: 'Invierno', nameEn: 'Winter', monthsEs: 'Dic - Ene - Feb', monthsEn: 'Dec - Jan - Feb', optBeta: seasonalTilts[0] },
+        { nameEs: 'Primavera', nameEn: 'Spring', monthsEs: 'Mar - Abr - May', monthsEn: 'Mar - Apr - May', optBeta: seasonalTilts[1] },
+        { nameEs: 'Verano', nameEn: 'Summer', monthsEs: 'Jun - Jul - Ago', monthsEn: 'Jun - Jul - Aug', optBeta: seasonalTilts[2] },
+        { nameEs: 'Otoño', nameEn: 'Autumn', monthsEs: 'Sep - Oct - Nov', monthsEn: 'Sep - Oct - Nov', optBeta: seasonalTilts[3] },
       ];
 
       selectorHtml = `
@@ -340,9 +378,8 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
           </label>
           <select id="loss-map-season-select" class="form-select form-select-sm loss-map-month-dropdown" style="width: auto; min-width: 260px; font-weight: 600;">
             ${seasonDefs.map((s, i) => {
-              const sMap = lossMap.seasonalMaps?.[i];
-              const optBeta = sMap ? sMap.optimalPoint.betaDeg : s.fallbackBeta;
-              const optAlpha = sMap ? sMap.optimalPoint.alphaDeg : 0;
+              const optBeta = s.optBeta;
+              const optAlpha = fixedOptimalOri;
               const sName = isEn ? s.nameEn : s.nameEs;
               const sMonths = isEn ? s.monthsEn : s.monthsEs;
               return `
@@ -556,7 +593,8 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
       const monthSelect = container.querySelector<HTMLSelectElement>('#loss-map-month-select');
       monthSelect?.addEventListener('change', () => {
         selectedMonthIdx = parseInt(monthSelect.value, 10) || 0;
-        const newOptBeta = lossMap.monthlyMaps ? lossMap.monthlyMaps[selectedMonthIdx].optimalPoint.betaDeg : 0;
+        const newOptBeta = monthlyTilts[selectedMonthIdx]
+          ?? (lossMap.monthlyMaps ? lossMap.monthlyMaps[selectedMonthIdx].optimalPoint.betaDeg : 0);
         hasUserSelectedPoint = false;
         if (onMonthChange) {
           onMonthChange(selectedMonthIdx, newOptBeta);
@@ -570,9 +608,8 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
       const seasonSelect = container.querySelector<HTMLSelectElement>('#loss-map-season-select');
       seasonSelect?.addEventListener('change', () => {
         selectedSeasonIdx = parseInt(seasonSelect.value, 10) || 0;
-        const newOptBeta = lossMap.seasonalMaps
-          ? lossMap.seasonalMaps[selectedSeasonIdx].optimalPoint.betaDeg
-          : 0;
+        const newOptBeta = seasonalTilts[selectedSeasonIdx]
+          ?? (lossMap.seasonalMaps ? lossMap.seasonalMaps[selectedSeasonIdx].optimalPoint.betaDeg : 0);
         hasUserSelectedPoint = false;
         if (onSeasonChange) {
           onSeasonChange(selectedSeasonIdx, newOptBeta);
