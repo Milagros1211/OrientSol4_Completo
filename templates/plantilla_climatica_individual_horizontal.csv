@@ -1,0 +1,8 @@
+# OrientSol 4.0 - Plantilla de Climatología Individual (Horizontal)
+# Localidad: Jaén
+# Latitud: 37.7796
+# Longitud: -3.7849
+# Radiación: en kWh/m²/día (ej: 2.45) o acumulada mensual en kWh/m²/mes (se convierte automáticamente)
+mes;1;2;3;4;5;6;7;8;9;10;11;12
+radiacion_media;2.45;3.31;4.68;5.82;6.95;7.92;8.10;7.25;5.54;3.95;2.75;2.18
+temp_media;9.2;10.5;13.8;16.5;20.8;26.1;29.4;28.9;24.5;19.1;13.2;10.0
