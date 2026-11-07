@@ -1,7 +1,7 @@
 {
   "name": "orientsol-suite",
   "private": true,
-  "version": "4.0.8",
+  "version": "4.0.9",
   "description": "OrientSol 3 - Plataforma Web y Desktop de Simulación Solar y Fotovoltaica",
   "scripts": {
     "dev": "npm run --prefix orientsol-web dev",

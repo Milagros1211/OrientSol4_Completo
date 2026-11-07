@@ -494,6 +494,14 @@ export function renderOptimalSeasonalStudyPanel(props: OptimalSeasonalStudyProps
                   : 'En latitudes medias como Madrid (40,4° N), el sol de verano tiene trayectorias de más de 14,5 horas con alturas de hasta 73°. Inclinaciones superiores a 10° generan pérdidas matinales y vespertinas al salir el sol por el Noreste y ponerse por el Noroeste; un ángulo casi plano (6°) capta el arco solar íntegro.'}
               </div>
             </div>
+            <div class="seasonal-methodology-item">
+              <strong>${isEn ? 'Comparison with the 2D Capture Loss Map (Heatmap):' : 'Correspondencia con el Mapa de Pérdidas 2D (Heatmap):'}</strong>
+              <div class="seasonal-methodology-desc">
+                ${isEn
+                  ? 'The seasonal study evaluates continuous 1D transposition degree-by-degree (1° to 90°, α = 0°). In the 2D capture loss map below, the continuous canvas highlights this exact canonical optimum (★, loss = 0.0%). In transition seasons (autumn/spring), the radiation curve forms a wide plateau where surrounding tilts (±5°) exhibit minimal variations (< 1% loss).'
+                  : 'La tabla estacional evalúa la transposición analítica 1D grado a grado (1° a 90°, α = 0°). En el mapa de pérdidas 2D inferior, el canvas continuo señala este óptimo canónico exacto (★, pérdida = 0,0%). En estaciones de transición (otoño/primavera), la curva forma una meseta amplia donde los ángulos contiguos (±5°) muestran pérdidas mínimas (< 1%).'}
+              </div>
+            </div>
           </div>
         </div>
 

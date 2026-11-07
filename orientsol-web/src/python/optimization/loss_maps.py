@@ -15,7 +15,7 @@ from core.constants import CHARACTERISTIC_DAYS
 from core.conversions import deg2rad
 from core.declination import matriz_declinacion
 from core.sunset_angles import angulos_salida
-from core.hour_angles import angulos2
+from core.hour_angles import angulos, angulos2
 
 DAYS_PER_MONTH = np.array([31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31], dtype=np.int32)
 
@@ -80,7 +80,8 @@ def generate_capture_loss_map(
     d0 = np.asarray(val_ddm0, dtype=np.float64)
 
     val_decli = matriz_declinacion(CHARACTERISTIC_DAYS)
-    _, ang_salida = angulos_salida(lat_rad, CHARACTERISTIC_DAYS)
+    ang_sal1, ang_salida = angulos_salida(lat_rad, CHARACTERISTIC_DAYS)
+    numero_n, matriz_angulos = angulos(ang_sal1)
     numero_n2, matriz_angulos2 = angulos2(ang_salida)
 
     # Grid axes (half step for finer resolution)
@@ -116,19 +117,23 @@ def generate_capture_loss_map(
             # Monthly daily transposed radiation accumulator
             g_daily_month = np.zeros(12, dtype=np.float64)
 
-            beta_idx = int(round(beta_deg))
             for m in range(12):
-                n_hrs = int(numero_n2[m, beta_idx])
-                delta = val_decli[m]
-                sin_delta = np.sin(delta)
-                cos_delta = np.cos(delta)
+                if beta_deg < 0.001:
+                    n_hrs = int(numero_n[m])
+                    n_pts = min(n_hrs, bh_matriz.shape[1], matriz_angulos.shape[1])
+                    omegas = matriz_angulos[m, :n_pts]
+                else:
+                    beta_k = min(max(int(round(beta_deg)) - 1, 0), 90)
+                    n_hrs = int(numero_n2[m, beta_k])
+                    n_pts = min(n_hrs, bh_matriz.shape[1], matriz_angulos2.shape[2])
+                    omegas = matriz_angulos2[m, beta_k, :n_pts]
 
-                # Vectorized hour-angle calculation for month m and tilt beta
-                n_pts = min(n_hrs, bh_matriz.shape[1], omega_rad.shape[2])
                 if n_pts == 0:
                     continue
 
-                omegas = omega_rad[m, beta_idx, :n_pts]
+                delta = val_decli[m]
+                sin_delta = np.sin(delta)
+                cos_delta = np.cos(delta)
 
                 # Direct cosine of incidence angle on inclined surface with azimuth alpha:
                 # Symmetrical terms A(omega) - even functions where cos(-omega) = cos(omega):

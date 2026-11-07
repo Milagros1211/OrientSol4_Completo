@@ -398,6 +398,37 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
 
     const nonCompliantPct = Math.max(0, Math.round((100 - currentCteZones.integrationPctCompliant) * 10) / 10);
 
+    const seasonalExplanationHtml = mode === 'seasonal' ? `
+      <!-- Scientific and Didactic Note: Seasonal Angle Comparison -->
+      <div class="seasonal-explanation-card" style="margin-top: 0.85rem; padding: 0.85rem 1rem; border-radius: var(--radius-sm); border-left: 4px solid var(--accent-cyan, #0284c7); background: var(--bg-card); border-top: 1px solid var(--border-subtle); border-right: 1px solid var(--border-subtle); border-bottom: 1px solid var(--border-subtle); box-shadow: var(--shadow-sm); word-wrap: break-word; white-space: normal;">
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem; flex-wrap: wrap;">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-cyan, #0284c7); flex-shrink: 0;">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          <strong style="font-size: 0.85rem; color: var(--text-main);">
+            ${isEn ? 'Scientific Note: Why do seasonal angles and loss percentages vary across models?' : 'Nota Didáctica y Científica: ¿Por qué varían los ángulos y las pérdidas entre el estudio estacional y el mapa?'}
+          </strong>
+        </div>
+        <p style="font-size: 0.78rem; line-height: 1.45; color: var(--text-muted, var(--text-main)); margin: 0 0 0.4rem 0;">
+          ${isEn
+            ? '<strong>1. Continuous 1D Analytical Study vs Discrete 2D Grid (5° / 7.5°):</strong> The Seasonal Study table integrates 12-month solar geometry degree-by-degree (1° to 90°, 91 continuous positions) strictly facing South (α = 0°). In contrast, the discrete audit table groups configurations in steps of 5° tilt and 7.5° azimuth.'
+            : '<strong>1. Estudio Analítico Continuo 1D vs Rejilla Discreta 2D (5° / 7,5°):</strong> La tabla de Estudio Estacional integra la geometría solar grado a grado (1° a 90°, 91 posiciones analíticas continuas) estrictamente orientada al Sur (α = 0°). Por el contrario, la matriz de auditoría agrupa el espacio angular en saltos discretos de 5° de inclinación y 7,5° de acimut.'}
+        </p>
+        <p style="font-size: 0.78rem; line-height: 1.45; color: var(--text-muted, var(--text-main)); margin: 0 0 0.4rem 0;">
+          ${isEn
+            ? '<strong>2. Radiation Plateau around Equinoxes (Autumn & Spring):</strong> During transition seasons, daily solar declination shifts rapidly across the 3 calendar months (e.g. from +2° in September to -21° in November). As a result, the seasonal average irradiation curve forms a very flat plateau: between 35°, 40°, and 45° tilt, the irradiance difference is less than 0.6% (< 0.03 kWh/m²/day).'
+            : '<strong>2. Meseta de Irradiancia en Equinoccios (Otoño y Primavera):</strong> En las estaciones de transición, la declinación solar desciende o asciende notablemente a lo largo de los 3 meses (p. ej. de +2° en septiembre a -21° en noviembre). Por ello, la curva de captación media trimestral forma una meseta extraordinariamente plana: entre 35°, 40° y 45°, la variación de radiación es inferior al 0,6% (< 0,03 kWh/m²/día).'}
+        </p>
+        <p style="font-size: 0.78rem; line-height: 1.45; color: var(--text-muted, var(--text-main)); margin: 0;">
+          ${isEn
+            ? '<strong>3. Canonical Optimum Representation (★):</strong> The continuous interactive canvas places the optimal star marker (★) at the exact seasonal peak (α = 0°), where net capture loss is 0.0%. In the discrete audit grid, neighboring cells within ±5° remain in the optimal CTE zone (< 1% loss).'
+            : '<strong>3. Punto Óptimo Canónico (★):</strong> El mapa interactivo sitúa el marcador de estrella (★) en el óptimo estacional exacto hacia el Sur (α = 0°), donde la pérdida de captación es del 0,0%. En la matriz discreta, las celdas adyacentes a ±5° se mantienen en la franja óptima del CTE con pérdidas mínimas (< 1%).'}
+        </p>
+      </div>
+    ` : '';
+
     container.innerHTML = `
       <div class="result-card-header" style="flex-wrap: wrap; gap: 0.5rem; align-items: center;">
         <div>
@@ -419,6 +450,8 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
       </div>
 
       ${selectorHtml}
+
+      ${seasonalExplanationHtml}
 
       <!-- CTE Legend Bar -->
       <div class="cte-legend-bar" style="margin-top: 0.85rem; padding: 0.75rem 1rem; background: var(--bg-card); border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
@@ -547,6 +580,11 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
           <span class="badge badge-secondary" style="font-size: 0.68rem; font-weight: 600; opacity: 0.85;">${isEn ? 'Optional / Audit view' : 'Opcional / Vista para auditoría'}</span>
         </summary>
         <div class="loss-map-container" style="margin-top: 0.6rem;">
+          <div style="font-size: 0.74rem; color: var(--text-dim); margin-bottom: 0.5rem; padding: 0.45rem 0.65rem; background: var(--bg-main, #f8fafc); border-radius: var(--radius-xs); border: 1px solid var(--border-subtle); word-wrap: break-word; white-space: normal; line-height: 1.4;">
+            ${isEn
+              ? '<strong>Audit Note:</strong> Cells are sampled in discrete steps of 5° tilt and 7.5° orientation. The star <strong>★</strong> highlights the canonical optimal configuration (loss = 0.0%). Due to the gentle radiation plateau in transition seasons, adjacent angular cells (±5°) show negligible loss variations (< 1%).'
+              : '<strong>Aviso de Auditoría:</strong> Las celdas se evalúan en saltos discretos de 5° de inclinación y 7,5° de orientación. La estrella <strong>★</strong> destaca la configuración óptima canónica (pérdida = 0,0%). Debido a la amplitud de la meseta estacional, las inclinaciones contiguas (±5°) presentan variaciones de pérdida insignificantes (< 1%).'}
+          </div>
           <table class="loss-map-matrix-table">
             <thead>
               <tr>
