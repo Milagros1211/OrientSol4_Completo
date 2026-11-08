@@ -404,6 +404,11 @@ export function openPedagogicalGuideModal(
                     ${renderTex('G_{dm}(\\beta) = B_{dm}(0)\\,R_b + D_{dm}(0)\\left( \\frac{1 + \\cos\\beta}{2} \\right) + G_{dm}(0)\\,\\rho_g\\left( \\frac{1 - \\cos\\beta}{2} \\right)', true)}
                     <div style="font-size: 0.73rem; font-weight: 700; color: #0284c7; margin: 0.4rem 0 0.2rem 0;">WMO-No. 8 Relative Percentage Deviation Audit:</div>
                     ${renderTex('\\text{Dev}(\\%) = \\frac{|G_{dm}^{\\text{OS}}(\\beta_{\\text{opt}}) - G_{dm}^{\\text{PVGIS}}(\\beta_{\\text{opt}})|}{G_{dm}^{\\text{PVGIS}}(\\beta_{\\text{opt}})} \\times 100', true)}
+                    <div style="font-size: 0.73rem; font-weight: 700; color: #059669; margin: 0.4rem 0 0.2rem 0;">Annual Statistical Error Metric — MAPE (Mean Absolute Percentage Error):</div>
+                    ${renderTex('\\text{MAPE} = \\frac{1}{12} \\sum_{m=1}^{12} \\left| \\frac{G_{dm}^{\\text{OS}}(m) - G_{dm}^{\\text{PVGIS}}(m)}{G_{dm}^{\\text{PVGIS}}(m)} \\right| \\times 100\\%', true)}
+                    <div style="font-size: 0.70rem; color: var(--text-muted); margin-top: 0.25rem; line-height: 1.45;">
+                      MAPE synthesizes overall relative accuracy across all 12 months. Values &le; 5% validate Class 1 / Secondary Standard pyranometer accuracy (WMO top tier), and &le; 10% conform to WMO-No. 8 operational networks.
+                    </div>
                   </div>`
                 : `<p style="margin: 0 0 0.5rem 0;">OrientSol descompone la radiación horizontal en directa (${renderTex('B_{dm}(0)')}) y difusa (${renderTex('D_{dm}(0)')}), las transpone a la inclinación ${renderTex('\\beta')} y las audita frente a los registros satelitales de PVGIS bajo los criterios de la Organización Meteorológica Mundial (OMM):</p>
                   <div class="math-formula-box" style="margin: 0.5rem 0; padding: 0.6rem 0.8rem; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 6px;">
@@ -413,6 +418,11 @@ export function openPedagogicalGuideModal(
                     ${renderTex('G_{dm}(\\beta) = B_{dm}(0)\\,R_b + D_{dm}(0)\\left( \\frac{1 + \\cos\\beta}{2} \\right) + G_{dm}(0)\\,\\rho_g\\left( \\frac{1 - \\cos\\beta}{2} \\right)', true)}
                     <div style="font-size: 0.73rem; font-weight: 700; color: #0284c7; margin: 0.4rem 0 0.2rem 0;">Auditoría de Desviación Porcentual Relativa OMM Nº 8:</div>
                     ${renderTex('\\text{Desv}(\\%) = \\frac{|G_{dm}^{\\text{OS}}(\\beta_{\\text{opt}}) - G_{dm}^{\\text{PVGIS}}(\\beta_{\\text{opt}})|}{G_{dm}^{\\text{PVGIS}}(\\beta_{\\text{opt}})} \\times 100', true)}
+                    <div style="font-size: 0.73rem; font-weight: 700; color: #059669; margin: 0.4rem 0 0.2rem 0;">Métrica Estadística de Error Anual — MAPE (Error Porcentual Absoluto Medio):</div>
+                    ${renderTex('\\text{MAPE} = \\frac{1}{12} \\sum_{m=1}^{12} \\left| \\frac{G_{dm}^{\\text{OS}}(m) - G_{dm}^{\\text{PVGIS}}(m)}{G_{dm}^{\\text{PVGIS}}(m)} \\right| \\times 100\\%', true)}
+                    <div style="font-size: 0.70rem; color: var(--text-muted); margin-top: 0.25rem; line-height: 1.45;">
+                      El MAPE sintetiza la precisión relativa global en los 12 meses. Valores &le; 5% acreditan precisión instrumental de Clase 1 / Estándar Secundario (máxima categoría de la OMM), y &le; 10% conformidad plena con la Norma OMM Nº 8.
+                    </div>
                   </div>`,
             },
             {

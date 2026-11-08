@@ -1749,7 +1749,7 @@ export function renderPythonConsole(): HTMLElement {
                 <strong style="color: var(--text-main); margin-left: 0.25rem;">Simulador: ${formatNum(meanG0Sim, 2)} kWh/m²·d</strong>
                 <span style="margin: 0 0.3rem;">|</span>
                 <strong style="color: #0284c7;">PVGIS: ${formatNum(meanG0Pvgis, 2)} kWh/m²·d</strong>
-                <span style="margin: 0 0.3rem;">(Δ ${meanDiffG0 >= 0 ? `+${formatNum(meanDiffG0, 2)}` : formatNum(meanDiffG0, 2)}, MAPE ${formatPercent(mapeG0, 1)})</span>
+                <span style="margin: 0 0.3rem;" title="${isEn ? 'Mean Absolute Percentage Error (MAPE): Average relative deviation across 12 months' : 'Error Porcentual Absoluto Medio (MAPE): Desviación relativa promedio en los 12 meses'}" style="cursor: help;">(Δ ${meanDiffG0 >= 0 ? `+${formatNum(meanDiffG0, 2)}` : formatNum(meanDiffG0, 2)}, <abbr style="text-decoration: underline dotted; cursor: help;">MAPE</abbr> ${formatPercent(mapeG0, 1)})</span>
               </div>
             </div>
             <!-- Month-by-month input vector preview -->
@@ -1932,7 +1932,7 @@ export function renderPythonConsole(): HTMLElement {
                       <strong class="text-pvgis-val">${formatNum(meanG0Pvgis, 2)}</strong>
                     </div>
                     <div class="${meanDiffG0 >= 0 ? 'text-diff-pos' : 'text-diff-neg'}" style="font-size: 0.58rem;">
-                      ${meanDiffG0 >= 0 ? `+${formatNum(meanDiffG0, 2)}` : formatNum(meanDiffG0, 2)} (MAPE ${formatPercent(mapeG0, 1)})
+                      ${meanDiffG0 >= 0 ? `+${formatNum(meanDiffG0, 2)}` : formatNum(meanDiffG0, 2)} <span title="${isEn ? 'Mean Absolute Percentage Error (MAPE): Average relative deviation across 12 months' : 'Error Porcentual Absoluto Medio (MAPE): Desviación relativa porcentual promedio en los 12 meses'}" style="cursor: help; text-decoration: underline dotted;">(MAPE ${formatPercent(mapeG0, 1)})</span>
                     </div>
                   </td>
 
@@ -1944,7 +1944,7 @@ export function renderPythonConsole(): HTMLElement {
                       <strong class="text-pvgis-val">${formatNum(meanBdmPvgis, 2)}</strong>
                     </div>
                     <div class="${meanDiffBdm >= 0 ? 'text-diff-pos' : 'text-diff-neg'}" style="font-size: 0.58rem;">
-                      ${meanDiffBdm >= 0 ? `+${formatNum(meanDiffBdm, 2)}` : formatNum(meanDiffBdm, 2)} (MAPE ${formatPercent(mapeBdm, 1)})
+                      ${meanDiffBdm >= 0 ? `+${formatNum(meanDiffBdm, 2)}` : formatNum(meanDiffBdm, 2)} <span title="${isEn ? 'Mean Absolute Percentage Error (MAPE): Average relative deviation across 12 months' : 'Error Porcentual Absoluto Medio (MAPE): Desviación relativa porcentual promedio en los 12 meses'}" style="cursor: help; text-decoration: underline dotted;">(MAPE ${formatPercent(mapeBdm, 1)})</span>
                     </div>
                   </td>
 
@@ -1956,7 +1956,7 @@ export function renderPythonConsole(): HTMLElement {
                       <strong class="text-pvgis-val">${formatNum(meanDdmPvgis, 2)}</strong>
                     </div>
                     <div class="${meanDiffDdm >= 0 ? 'text-diff-pos' : 'text-diff-neg'}" style="font-size: 0.58rem;">
-                      ${meanDiffDdm >= 0 ? `+${formatNum(meanDiffDdm, 2)}` : formatNum(meanDiffDdm, 2)} (MAPE ${formatPercent(mapeDdm, 1)})
+                      ${meanDiffDdm >= 0 ? `+${formatNum(meanDiffDdm, 2)}` : formatNum(meanDiffDdm, 2)} <span title="${isEn ? 'Mean Absolute Percentage Error (MAPE): Average relative deviation across 12 months' : 'Error Porcentual Absoluto Medio (MAPE): Desviación relativa porcentual promedio en los 12 meses'}" style="cursor: help; text-decoration: underline dotted;">(MAPE ${formatPercent(mapeDdm, 1)})</span>
                     </div>
                   </td>
 
@@ -1974,7 +1974,7 @@ export function renderPythonConsole(): HTMLElement {
                       <strong class="text-pvgis-val">${formatNum(meanGOptPvgis, 2)}</strong>
                     </div>
                     <div class="${meanDiffGOpt >= 0 ? 'text-diff-pos' : 'text-diff-neg'}" style="font-size: 0.58rem; font-weight: 800;">
-                      ${meanDiffGOpt >= 0 ? `+${formatNum(meanDiffGOpt, 2)}` : formatNum(meanDiffGOpt, 2)} (MAPE ${formatPercent(mapeGOpt, 1)})
+                      ${meanDiffGOpt >= 0 ? `+${formatNum(meanDiffGOpt, 2)}` : formatNum(meanDiffGOpt, 2)} <span title="${isEn ? 'Mean Absolute Percentage Error (MAPE): Average relative deviation across 12 months' : 'Error Porcentual Absoluto Medio (MAPE): Desviación relativa porcentual promedio en los 12 meses'}" style="cursor: help; text-decoration: underline dotted;">(MAPE ${formatPercent(mapeGOpt, 1)})</span>
                     </div>
                   </td>
 
@@ -2026,9 +2026,9 @@ export function renderPythonConsole(): HTMLElement {
                   1. Global Gdm(0)
                 </div>
                 <div style="font-size: 0.70rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.15rem;">
-                  <div>MAPE: <strong class="metric-val-green" style="font-size: 0.86rem;">${formatPercent(mapeG0, 2)}</strong></div>
-                  <div>MBE: <strong style="color: var(--text-main);">${mbeG0 >= 0 ? `+${formatNum(mbeG0, 3)}` : formatNum(mbeG0, 3)}</strong> kWh/m²·d</div>
-                  <div>RMSE: <strong style="color: var(--text-main);">${formatNum(rmseG0, 3)}</strong> kWh/m²·d</div>
+                  <div><abbr title="${isEn ? 'Mean Absolute Percentage Error (average relative deviation across 12 months)' : 'Error Porcentual Absoluto Medio (desviación relativa promedio en los 12 meses)'}" style="text-decoration: underline dotted; cursor: help;">MAPE</abbr>: <strong class="metric-val-green" style="font-size: 0.86rem;">${formatPercent(mapeG0, 2)}</strong></div>
+                  <div><abbr title="${isEn ? 'Mean Bias Error (systematic over/underestimation in kWh/m²·day)' : 'Error de Sesgo Medio (tendencia a sobreestimar o subestimar en kWh/m²·día)'}" style="text-decoration: underline dotted; cursor: help;">MBE</abbr>: <strong style="color: var(--text-main);">${mbeG0 >= 0 ? `+${formatNum(mbeG0, 3)}` : formatNum(mbeG0, 3)}</strong> kWh/m²·d</div>
+                  <div><abbr title="${isEn ? 'Root Mean Square Error (quadratic penalty on larger deviations in kWh/m²·day)' : 'Raíz del Error Cuadrático Medio (penaliza desviaciones grandes en kWh/m²·día)'}" style="text-decoration: underline dotted; cursor: help;">RMSE</abbr>: <strong style="color: var(--text-main);">${formatNum(rmseG0, 3)}</strong> kWh/m²·d</div>
                 </div>
               </div>
 
@@ -2038,9 +2038,9 @@ export function renderPythonConsole(): HTMLElement {
                   2. ${isEn ? 'Direct Beam Bdm(0)' : 'Directa Bdm(0)'}
                 </div>
                 <div style="font-size: 0.70rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.15rem;">
-                  <div>MAPE: <strong class="metric-val-green" style="font-size: 0.86rem;">${formatPercent(mapeBdm, 2)}</strong></div>
-                  <div>MBE: <strong style="color: var(--text-main);">${mbeBdm >= 0 ? `+${formatNum(mbeBdm, 3)}` : formatNum(mbeBdm, 3)}</strong> kWh/m²·d</div>
-                  <div>RMSE: <strong style="color: var(--text-main);">${formatNum(rmseBdm, 3)}</strong> kWh/m²·d</div>
+                  <div><abbr title="${isEn ? 'Mean Absolute Percentage Error (average relative deviation across 12 months)' : 'Error Porcentual Absoluto Medio (desviación relativa promedio en los 12 meses)'}" style="text-decoration: underline dotted; cursor: help;">MAPE</abbr>: <strong class="metric-val-green" style="font-size: 0.86rem;">${formatPercent(mapeBdm, 2)}</strong></div>
+                  <div><abbr title="${isEn ? 'Mean Bias Error (systematic over/underestimation in kWh/m²·day)' : 'Error de Sesgo Medio (tendencia a sobreestimar o subestimar en kWh/m²·día)'}" style="text-decoration: underline dotted; cursor: help;">MBE</abbr>: <strong style="color: var(--text-main);">${mbeBdm >= 0 ? `+${formatNum(mbeBdm, 3)}` : formatNum(mbeBdm, 3)}</strong> kWh/m²·d</div>
+                  <div><abbr title="${isEn ? 'Root Mean Square Error (quadratic penalty on larger deviations in kWh/m²·day)' : 'Raíz del Error Cuadrático Medio (penaliza desviaciones grandes en kWh/m²·día)'}" style="text-decoration: underline dotted; cursor: help;">RMSE</abbr>: <strong style="color: var(--text-main);">${formatNum(rmseBdm, 3)}</strong> kWh/m²·d</div>
                 </div>
               </div>
 
@@ -2050,9 +2050,9 @@ export function renderPythonConsole(): HTMLElement {
                   3. ${isEn ? 'Diffuse Ddm(0)' : 'Difusa Ddm(0)'}
                 </div>
                 <div style="font-size: 0.70rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.15rem;">
-                  <div>MAPE: <strong class="metric-val-green" style="font-size: 0.86rem;">${formatPercent(mapeDdm, 2)}</strong></div>
-                  <div>MBE: <strong style="color: var(--text-main);">${mbeDdm >= 0 ? `+${formatNum(mbeDdm, 3)}` : formatNum(mbeDdm, 3)}</strong> kWh/m²·d</div>
-                  <div>RMSE: <strong style="color: var(--text-main);">${formatNum(rmseDdm, 3)}</strong> kWh/m²·d</div>
+                  <div><abbr title="${isEn ? 'Mean Absolute Percentage Error (average relative deviation across 12 months)' : 'Error Porcentual Absoluto Medio (desviación relativa promedio en los 12 meses)'}" style="text-decoration: underline dotted; cursor: help;">MAPE</abbr>: <strong class="metric-val-green" style="font-size: 0.86rem;">${formatPercent(mapeDdm, 2)}</strong></div>
+                  <div><abbr title="${isEn ? 'Mean Bias Error (systematic over/underestimation in kWh/m²·day)' : 'Error de Sesgo Medio (tendencia a sobreestimar o subestimar en kWh/m²·día)'}" style="text-decoration: underline dotted; cursor: help;">MBE</abbr>: <strong style="color: var(--text-main);">${mbeDdm >= 0 ? `+${formatNum(mbeDdm, 3)}` : formatNum(mbeDdm, 3)}</strong> kWh/m²·d</div>
+                  <div><abbr title="${isEn ? 'Root Mean Square Error (quadratic penalty on larger deviations in kWh/m²·day)' : 'Raíz del Error Cuadrático Medio (penaliza desviaciones grandes en kWh/m²·día)'}" style="text-decoration: underline dotted; cursor: help;">RMSE</abbr>: <strong style="color: var(--text-main);">${formatNum(rmseDdm, 3)}</strong> kWh/m²·d</div>
                 </div>
               </div>
 
@@ -2062,9 +2062,9 @@ export function renderPythonConsole(): HTMLElement {
                   4. ${isEn ? 'Optimum Gdm(β_opt)' : 'Óptimo Gdm(β_opt)'}
                 </div>
                 <div style="font-size: 0.70rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.15rem;">
-                  <div>MAPE: <strong class="metric-val-green" style="font-size: 0.86rem;">${formatPercent(mapeGOpt, 2)}</strong></div>
-                  <div>MBE: <strong style="color: var(--text-main);">${mbeGOpt >= 0 ? `+${formatNum(mbeGOpt, 3)}` : formatNum(mbeGOpt, 3)}</strong> kWh/m²·d</div>
-                  <div>RMSE: <strong style="color: var(--text-main);">${formatNum(rmseGOpt, 3)}</strong> kWh/m²·d</div>
+                  <div><abbr title="${isEn ? 'Mean Absolute Percentage Error (average relative deviation across 12 months)' : 'Error Porcentual Absoluto Medio (desviación relativa promedio en los 12 meses)'}" style="text-decoration: underline dotted; cursor: help;">MAPE</abbr>: <strong class="metric-val-green" style="font-size: 0.86rem;">${formatPercent(mapeGOpt, 2)}</strong></div>
+                  <div><abbr title="${isEn ? 'Mean Bias Error (systematic over/underestimation in kWh/m²·day)' : 'Error de Sesgo Medio (tendencia a sobreestimar o subestimar en kWh/m²·día)'}" style="text-decoration: underline dotted; cursor: help;">MBE</abbr>: <strong style="color: var(--text-main);">${mbeGOpt >= 0 ? `+${formatNum(mbeGOpt, 3)}` : formatNum(mbeGOpt, 3)}</strong> kWh/m²·d</div>
+                  <div><abbr title="${isEn ? 'Root Mean Square Error (quadratic penalty on larger deviations in kWh/m²·day)' : 'Raíz del Error Cuadrático Medio (penaliza desviaciones grandes en kWh/m²·día)'}" style="text-decoration: underline dotted; cursor: help;">RMSE</abbr>: <strong style="color: var(--text-main);">${formatNum(rmseGOpt, 3)}</strong> kWh/m²·d</div>
                 </div>
               </div>
 
@@ -2077,6 +2077,70 @@ export function renderPythonConsole(): HTMLElement {
                   <div>Simulador: <strong class="metric-val-green" style="font-size: 0.82rem;">${simAnnualOptTilt}°</strong></div>
                   <div>PVGIS: <strong class="metric-val-blue" style="font-size: 0.82rem;">${optTiltPvgisOs}°</strong></div>
                   <div>Δ Error: <strong class="${Math.abs(diffTilt) <= 1 ? 'metric-val-green' : 'metric-title-5'}">${diffTilt >= 0 ? `+${diffTilt}` : diffTilt}° (${formatPercent(pctTilt, 1, true)})</strong></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- STATISTICAL METRICS PEDAGOGICAL BANNER: MAPE, MBE, RMSE -->
+            <div style="margin-top: 0.75rem; padding: 0.85rem 1rem; background: var(--bg-card); border-radius: 8px; border: 1.5px solid var(--border-subtle); box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.55rem;">
+                <div style="display: flex; align-items: center; gap: 0.45rem;">
+                  <strong style="color: var(--text-main); font-size: 0.80rem;">
+                    ${isEn ? 'Understanding Statistical Validation Metrics: MAPE, MBE & RMSE' : 'Significado de las Métricas Estadísticas de Validación: MAPE, MBE y RMSE'}
+                  </strong>
+                </div>
+                <span class="badge" style="background: rgba(2, 132, 199, 0.12); color: #0284c7; font-size: 0.68rem; font-weight: 700;">
+                  ${isEn ? 'WMO & ISO Metrological Standards' : 'Estándares Metrológicos OMM e ISO'}
+                </span>
+              </div>
+
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.65rem; font-size: 0.72rem; line-height: 1.5;">
+                <!-- MAPE Definition Card -->
+                <div style="background: var(--bg-primary, rgba(248, 250, 252, 0.75)); padding: 0.65rem 0.8rem; border-radius: 6px; border: 1px solid var(--border-subtle); border-left: 3.5px solid #059669;">
+                  <div style="font-weight: 800; color: #059669; font-size: 0.76rem; margin-bottom: 0.25rem; display: flex; align-items: center; justify-content: space-between;">
+                    <span>MAPE</span>
+                    <span style="font-size: 0.64rem; font-weight: 600; opacity: 0.85;">${isEn ? 'Mean Absolute Percentage Error' : 'Error Porcentual Absoluto Medio'}</span>
+                  </div>
+                  <div style="margin: 0.35rem 0; padding: 0.35rem 0.5rem; background: var(--bg-card); border-radius: 4px; border: 1px solid var(--border-subtle); text-align: center;">
+                    ${renderTex('\\text{MAPE} = \\frac{1}{12} \\sum_{m=1}^{12} \\left| \\frac{y_{\\text{sim}, m} - y_{\\text{ref}, m}}{y_{\\text{ref}, m}} \\right| \\times 100\\%', true)}
+                  </div>
+                  <div style="color: var(--text-muted); font-size: 0.70rem;">
+                    ${isEn
+                      ? '<strong>Physical Meaning:</strong> Measures the average relative magnitude of monthly percentage deviations between OrientSol and PVGIS, regardless of sign. <strong>&le;5%:</strong> High Precision (Secondary Standard pyranometer class); <strong>&le;10%:</strong> Fully compliant with WMO-No. 8 operational standard.'
+                      : '<strong>Significado Físico:</strong> Mide el error porcentual relativo promedio entre OrientSol y PVGIS sin compensar signos positivos y negativos. <strong>&le;5%:</strong> Alta Precisión instrumental (estándar secundario OMM); <strong>&le;10%:</strong> Totalmente conforme a la Norma OMM Nº 8.'}
+                  </div>
+                </div>
+
+                <!-- MBE Definition Card -->
+                <div style="background: var(--bg-primary, rgba(248, 250, 252, 0.75)); padding: 0.65rem 0.8rem; border-radius: 6px; border: 1px solid var(--border-subtle); border-left: 3.5px solid #0284c7;">
+                  <div style="font-weight: 800; color: #0284c7; font-size: 0.76rem; margin-bottom: 0.25rem; display: flex; align-items: center; justify-content: space-between;">
+                    <span>MBE</span>
+                    <span style="font-size: 0.64rem; font-weight: 600; opacity: 0.85;">${isEn ? 'Mean Bias Error' : 'Error de Sesgo Medio'}</span>
+                  </div>
+                  <div style="margin: 0.35rem 0; padding: 0.35rem 0.5rem; background: var(--bg-card); border-radius: 4px; border: 1px solid var(--border-subtle); text-align: center;">
+                    ${renderTex('\\text{MBE} = \\frac{1}{12} \\sum_{m=1}^{12} (y_{\\text{sim}, m} - y_{\\text{ref}, m})', true)}
+                  </div>
+                  <div style="color: var(--text-muted); font-size: 0.70rem;">
+                    ${isEn
+                      ? '<strong>Physical Meaning:</strong> Quantifies systematic overestimation (>0) or underestimation (&lt;0) across the 12 months in physical units (kWh/m²·day). A value near 0 confirms absence of structural systematic drift.'
+                      : '<strong>Significado Físico:</strong> Cuantifica si el modelo tiende a sobreestimar (>0) o subestimar (&lt;0) la radiación solar incidente a lo largo del año en unidades físicas (kWh/m²·día). Cercano a 0 confirma ausencia de sesgo sistemático.'}
+                  </div>
+                </div>
+
+                <!-- RMSE Definition Card -->
+                <div style="background: var(--bg-primary, rgba(248, 250, 252, 0.75)); padding: 0.65rem 0.8rem; border-radius: 6px; border: 1px solid var(--border-subtle); border-left: 3.5px solid #8b5cf6;">
+                  <div style="font-weight: 800; color: #8b5cf6; font-size: 0.76rem; margin-bottom: 0.25rem; display: flex; align-items: center; justify-content: space-between;">
+                    <span>RMSE</span>
+                    <span style="font-size: 0.64rem; font-weight: 600; opacity: 0.85;">${isEn ? 'Root Mean Square Error' : 'Raíz del Error Cuadrático Medio'}</span>
+                  </div>
+                  <div style="margin: 0.35rem 0; padding: 0.35rem 0.5rem; background: var(--bg-card); border-radius: 4px; border: 1px solid var(--border-subtle); text-align: center;">
+                    ${renderTex('\\text{RMSE} = \\sqrt{\\frac{1}{12} \\sum_{m=1}^{12} (y_{\\text{sim}, m} - y_{\\text{ref}, m})^2}', true)}
+                  </div>
+                  <div style="color: var(--text-muted); font-size: 0.70rem;">
+                    ${isEn
+                      ? '<strong>Physical Meaning:</strong> Penalizes large individual deviations more heavily due to quadratic squaring, measuring the residual variance and absolute fit in kWh/m²·day.'
+                      : '<strong>Significado Físico:</strong> Penaliza con mayor rigor las desviaciones mensuales grandes debido al término cuadrático, midiendo la dispersión residual del ajuste en kWh/m²·día.'}
+                  </div>
                 </div>
               </div>
             </div>
@@ -2235,10 +2299,10 @@ export function renderPythonConsole(): HTMLElement {
                   </div>
                   <div class="math-formula-box math-compact">
                     <div style="color: var(--text-main); text-align: center; width: 100%;">
-                      ${renderTex('R_b(\\beta) = \\frac{\\cos(\\phi - \\beta) \\cos\\delta \\sin\\omega\'_s + \\frac{\\pi \\omega\'_s}{180^\\circ} \\sin(\\phi - \\beta) \\sin\\delta}{\\cos\\phi \\cos\\delta \\sin\\omega_s + \\frac{\\pi \\omega_s}{180^\\circ} \\sin\\phi \\sin\\delta}', true)}
+                      ${renderTex('R_b(\\beta) = \\frac{\\cos(\\phi - \\beta) \\cos\\delta \\sin\\omega_s\' + \\frac{\\pi \\omega_s\'}{180^\\circ} \\sin(\\phi - \\beta) \\sin\\delta}{\\cos\\phi \\cos\\delta \\sin\\omega_s + \\frac{\\pi \\omega_s}{180^\\circ} \\sin\\phi \\sin\\delta}', true)}
                     </div>
                     <div style="color: var(--text-muted); text-align: center; width: 100%; border-top: 1px dashed var(--border-subtle); padding-top: 0.35rem;">
-                      ${renderTex('\\omega\'_s = \\min\\left\\{ \\omega_s , \\; \\arccos(-\\tan(\\phi - \\beta) \\tan\\delta) \\right\\}', true)}
+                      ${renderTex('\\omega_s\' = \\min\\left\\{ \\omega_s , \\; \\arccos(-\\tan(\\phi - \\beta) \\tan\\delta) \\right\\}', true)}
                     </div>
                   </div>
                 </div>
