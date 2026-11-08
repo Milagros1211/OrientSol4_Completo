@@ -1505,7 +1505,9 @@ export function renderPythonConsole(): HTMLElement {
             </tbody>
             <tfoot>
               <tr class="table-media-row verif-media-row">
-                <td style="padding: 0.4rem 0.15rem; font-size: 0.66rem; white-space: normal !important; word-break: break-word !important;"><strong>${isEn ? 'ANNUAL MEAN' : 'PROMEDIO ANUAL'}</strong></td>
+                <td style="padding: 0.4rem 0.15rem; font-size: 0.65rem; text-align: center; white-space: normal !important; word-break: keep-all !important; overflow-wrap: normal !important;">
+                  <strong style="color: var(--text-main); font-weight: 800; display: block; line-height: 1.15;">${isEn ? 'ANNUAL<br/>MEAN' : 'PROMEDIO<br/>ANUAL'}</strong>
+                </td>
                 <td class="td-num" style="padding: 0.4rem 0.15rem; font-size: 0.66rem; white-space: normal !important;"><strong>${formatNum(meanG0, 2)}</strong></td>
                 <td class="td-num" style="padding: 0.4rem 0.15rem; font-size: 0.66rem; white-space: normal !important;"><strong>${formatNum(meanBdm, 2)}</strong></td>
                 <td class="td-num" style="padding: 0.4rem 0.15rem; font-size: 0.66rem; white-space: normal !important;"><strong>${formatNum(meanDdm, 2)}</strong></td>
@@ -1788,37 +1790,37 @@ export function renderPythonConsole(): HTMLElement {
             <table class="verif-data-table" style="width: 100% !important; max-width: 100% !important; table-layout: fixed !important; border-collapse: collapse; font-size: 0.65rem; margin: 0;">
               <thead>
                 <tr>
-                  <th style="width: 6%; padding: 0.35rem 0.12rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.61rem; color: #ffffff !important;">${isEn ? 'Month' : 'Mes'}</th>
-                  <th style="width: 15%; text-align: center; padding: 0.35rem 0.12rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.61rem; color: #ffffff !important;">
+                  <th style="width: 8.5%; padding: 0.35rem 0.12rem; text-align: center; white-space: normal !important; line-height: 1.15; font-size: 0.61rem; color: #ffffff !important;">${isEn ? 'Month' : 'Mes'}</th>
+                  <th style="width: 14.5%; text-align: center; padding: 0.35rem 0.12rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.61rem; color: #ffffff !important;">
                     <div style="font-weight: 800; color: #ffffff !important;">${isEn ? 'Global G<sub>dm</sub>(0) [Input]' : 'Global G<sub>dm</sub>(0) [Entrada]'}</div>
                     <div class="verif-th-sub">Sim vs PVGIS [Δ | %]</div>
                     <div class="verif-th-unit">(kWh/m²·d)</div>
                   </th>
-                  <th style="width: 14%; text-align: center; padding: 0.35rem 0.12rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.61rem; color: #ffffff !important;">
+                  <th style="width: 13.5%; text-align: center; padding: 0.35rem 0.12rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.61rem; color: #ffffff !important;">
                     <div style="font-weight: 800; color: #ffffff !important;">${isEn ? 'Direct B<sub>dm</sub>(0)' : 'Directa B<sub>dm</sub>(0)'}</div>
                     <div class="verif-th-sub">Sim vs PVGIS [Δ | %]</div>
                     <div class="verif-th-unit">(kWh/m²·d)</div>
                   </th>
-                  <th style="width: 14%; text-align: center; padding: 0.35rem 0.12rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.61rem; color: #ffffff !important;">
+                  <th style="width: 13.5%; text-align: center; padding: 0.35rem 0.12rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.61rem; color: #ffffff !important;">
                     <div style="font-weight: 800; color: #ffffff !important;">${isEn ? 'Diffuse D<sub>dm</sub>(0)' : 'Difusa D<sub>dm</sub>(0)'}</div>
                     <div class="verif-th-sub">Sim vs PVGIS [Δ | %]</div>
                     <div class="verif-th-unit">(kWh/m²·d)</div>
                   </th>
-                  <th style="width: 9%; text-align: center; padding: 0.35rem 0.12rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.61rem; color: #ffffff !important;">
+                  <th style="width: 8.5%; text-align: center; padding: 0.35rem 0.12rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.61rem; color: #ffffff !important;">
                     <div style="font-weight: 800; color: #ffffff !important;">${isEn ? 'Tilt β<sub>opt</sub>' : 'Inclinación β<sub>opt</sub>'}</div>
                     <div class="verif-th-sub">Sim / PVGIS</div>
                     <div class="verif-th-unit">(°)</div>
                   </th>
-                  <th style="width: 15%; text-align: center; padding: 0.35rem 0.12rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.61rem; color: #ffffff !important;">
+                  <th style="width: 14.5%; text-align: center; padding: 0.35rem 0.12rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.61rem; color: #ffffff !important;">
                     <div style="font-weight: 800; color: #ffffff !important;">${isEn ? 'Optimal G<sub>dm</sub>(β<sub>opt</sub>)' : 'Óptimo G<sub>dm</sub>(β<sub>opt</sub>)'}</div>
                     <div class="verif-th-sub-mint">Sim vs PVGIS [Δ | %]</div>
                     <div class="verif-th-unit">(kWh/m²·d)</div>
                   </th>
-                  <th style="width: 14%; text-align: center; padding: 0.35rem 0.1rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.60rem; color: #ffffff !important;">
+                  <th style="width: 13.5%; text-align: center; padding: 0.35rem 0.1rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.60rem; color: #ffffff !important;">
                     <div style="font-weight: 800; color: #ffffff !important;">${isEn ? 'Gain vs Horiz (%)' : 'Ganancia s/ Horiz (%)'}</div>
                     <div class="verif-th-sub">Sim vs PVGIS [Δ]</div>
                   </th>
-                  <th style="width: 13%; text-align: center; padding: 0.35rem 0.12rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.61rem; color: #ffffff !important;" title="${isEn ? 'Validates percentage relative error in Optimal Daily Irradiation Gdm(β_opt) against PVGIS under WMO-No. 8 criteria: |Gdm_OS - Gdm_PVGIS| / Gdm_PVGIS × 100' : 'Valida el error relativo porcentual en la Irradiación Diaria Óptima Gdm(β_opt) frente a PVGIS según la Norma OMM Nº 8: |Gdm_OS - Gdm_PVGIS| / Gdm_PVGIS × 100'}">
+                  <th style="width: 13.5%; text-align: center; padding: 0.35rem 0.12rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.61rem; color: #ffffff !important;" title="${isEn ? 'Validates percentage relative error in Optimal Daily Irradiation Gdm(β_opt) against PVGIS under WMO-No. 8 criteria: |Gdm_OS - Gdm_PVGIS| / Gdm_PVGIS × 100' : 'Valida el error relativo porcentual en la Irradiación Diaria Óptima Gdm(β_opt) frente a PVGIS según la Norma OMM Nº 8: |Gdm_OS - Gdm_PVGIS| / Gdm_PVGIS × 100'}">
                     <div style="font-weight: 800; color: #ffffff !important;">${isEn ? 'WMO-No. 8<br/>Validation' : 'Validación<br/>Norma OMM Nº 8'}</div>
                     <div class="verif-th-sub-mint">[s/ G<sub>dm</sub>(&beta;<sub>opt</sub>)]</div>
                   </th>
@@ -1918,8 +1920,8 @@ export function renderPythonConsole(): HTMLElement {
               </tbody>
               <tfoot>
                 <tr class="table-media-row verif-media-row">
-                  <td style="padding: 0.4rem 0.12rem; font-size: 0.64rem; white-space: normal !important; word-break: break-word !important;">
-                    <strong style="color: var(--text-main);">${isEn ? 'ANNUAL MEAN' : 'PROMEDIO ANUAL'}</strong>
+                  <td style="padding: 0.4rem 0.15rem; font-size: 0.65rem; text-align: center; white-space: normal !important; word-break: keep-all !important; overflow-wrap: normal !important;">
+                    <strong style="color: var(--text-main); font-weight: 800; display: block; line-height: 1.15;">${isEn ? 'ANNUAL<br/>MEAN' : 'PROMEDIO<br/>ANUAL'}</strong>
                   </td>
 
                   <!-- Mean Global -->
