@@ -943,25 +943,37 @@ export function renderPythonConsole(): HTMLElement {
                 </colgroup>
                 <thead>
                   <tr>
-                    <th style="padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Interval' : 'Intervalo'}</th>
-                    <th style="color: #0284c7; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Morning (East)' : 'Hora Mañana (Este)'}</th>
-                    <th style="color: #ea580c; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Afternoon (West)' : 'Hora Tarde (Oeste)'}</th>
-                    <th style="text-align: right; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Hour Angle (±ω)' : 'Ángulo Horario (±ω)'}</th>
-                    <th style="text-align: right; color: #0284c7; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Solar Alt (α) [Identical]' : 'Altura Solar (Alt, α) [Idéntica]'}</th>
-                    <th style="text-align: right; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Azimuth Morning / Afternoon (ψ)' : 'Azimut Mañana / Tarde (Ori, ψ)'}</th>
-                    <th style="text-align: right; color: #059669; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? '2-Axis Tilt (β) [Identical]' : 'Inclinación 2-Ejes (Inc, β) [Idéntica]'}</th>
+                    <th style="padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle; color: #ffffff !important;">${isEn ? 'Interval' : 'Intervalo'}</th>
+                    <th style="padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle; color: #ffffff !important;">
+                      <div>${isEn ? 'Morning' : 'Hora Mañana'}</div>
+                      <div class="verif-th-sub">${isEn ? '(East, −)' : '(Este, −)'}</div>
+                    </th>
+                    <th style="padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle; color: #ffffff !important;">
+                      <div>${isEn ? 'Afternoon' : 'Hora Tarde'}</div>
+                      <div class="verif-th-sub" style="color: #fed7aa !important;">${isEn ? '(West, +)' : '(Oeste, +)'}</div>
+                    </th>
+                    <th style="text-align: right; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle; color: #ffffff !important;">${isEn ? 'Hour Angle (±ω)' : 'Ángulo Horario (±ω)'}</th>
+                    <th style="text-align: right; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle; color: #ffffff !important;">
+                      <div>${isEn ? 'Solar Alt (α)' : 'Altura Solar (Alt, α)'}</div>
+                      <div class="verif-th-sub">[Idéntica]</div>
+                    </th>
+                    <th style="text-align: right; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle; color: #ffffff !important;">${isEn ? 'Azimuth Morning / Afternoon (ψ)' : 'Azimut Mañana / Tarde (Ori, ψ)'}</th>
+                    <th style="text-align: right; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle; color: #ffffff !important;">
+                      <div>${isEn ? '2-Axis Tilt (β)' : 'Inclinación 2-Ejes (Inc, β)'}</div>
+                      <div class="verif-th-sub-mint">[Idéntica]</div>
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   ${pairedRows.map((row: any, i: number) => `
                     <tr style="${i === selectedIntervalIdx ? 'background: rgba(16, 185, 129, 0.12); font-weight: 700;' : ''}">
                       <td style="padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;"><strong>Int. ${row.interval}</strong></td>
-                      <td style="color: #0284c7; font-weight: 600; padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;">${row.morningHourStr}</td>
+                      <td class="text-pvgis-val" style="padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;">${row.morningHourStr}</td>
                       <td style="color: #ea580c; font-weight: 600; padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;">${row.afternoonHourStr}</td>
                       <td class="td-num" style="padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;">±${row.wMagnitudeDeg}°</td>
-                      <td class="td-num" style="color: #0284c7; font-weight: 700; padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;">${row.altDeg}</td>
+                      <td class="td-num text-pvgis-val" style="padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;">${row.altDeg}</td>
                       <td class="td-num" style="padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; font-size: 0.71rem;">${row.azimMorningDeg} / ${row.azimAfternoonDeg}</td>
-                      <td class="td-num" style="color: #059669; font-weight: 700; padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;">${row.tilt2AxisDeg}</td>
+                      <td class="td-num text-opt-val" style="padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;">${row.tilt2AxisDeg}</td>
                     </tr>
                   `).join('')}
                 </tbody>
@@ -1445,14 +1457,32 @@ export function renderPythonConsole(): HTMLElement {
           <table class="verif-data-table" style="width: 100% !important; max-width: 100% !important; table-layout: fixed !important; border-collapse: collapse; font-size: 0.67rem; margin: 0;">
             <thead>
               <tr>
-                <th style="width: 9%; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.64rem;">${isEn ? 'Month' : 'Mes'}</th>
-                <th style="width: 13%; text-align: right; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.64rem;">${isEn ? 'Gdm(0)<br/>Horiz' : 'Gdm(0)<br/>Horiz (kWh/m²·d)'}</th>
-                <th style="width: 13%; text-align: right; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.64rem;">${isEn ? 'Beam<br/>Bdm' : 'Directa<br/>Bdm (kWh/m²·d)'}</th>
-                <th style="width: 13%; text-align: right; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.64rem;">${isEn ? 'Diffuse<br/>Ddm' : 'Difusa<br/>Ddm (kWh/m²·d)'}</th>
-                <th style="width: 13%; text-align: right; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.64rem;">${isEn ? 'Optimal<br/>Tilt (°)' : 'Inclinación<br/>Óptima (°)'}</th>
-                <th style="width: 13%; text-align: right; color: #059669; font-weight: 700; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.64rem;">${isEn ? 'Gdm Opt<br/>(kWh/m²·d)' : 'Gdm Óptimo<br/>(kWh/m²·d)'}</th>
-                <th style="width: 11%; text-align: right; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.64rem;">${isEn ? 'Gain vs<br/>Horiz (%)' : 'Ganancia<br/>s/ Horiz (%)'}</th>
-                <th style="width: 15%; text-align: center; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.64rem;">${isEn ? 'Physical<br/>Validation' : 'Validación<br/>Física'}</th>
+                <th style="width: 9%; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.64rem; color: #ffffff !important;">${isEn ? 'Month' : 'Mes'}</th>
+                <th style="width: 13%; text-align: right; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.64rem; color: #ffffff !important;">
+                  <div>${isEn ? 'Gdm(0)' : 'Gdm(0)'}</div>
+                  <div class="verif-th-sub">${isEn ? 'Horiz (kWh/m²·d)' : 'Horiz (kWh/m²·d)'}</div>
+                </th>
+                <th style="width: 13%; text-align: right; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.64rem; color: #ffffff !important;">
+                  <div>${isEn ? 'Beam Bdm' : 'Directa Bdm'}</div>
+                  <div class="verif-th-sub">(kWh/m²·d)</div>
+                </th>
+                <th style="width: 13%; text-align: right; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.64rem; color: #ffffff !important;">
+                  <div>${isEn ? 'Diffuse Ddm' : 'Difusa Ddm'}</div>
+                  <div class="verif-th-sub">(kWh/m²·d)</div>
+                </th>
+                <th style="width: 13%; text-align: right; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.64rem; color: #ffffff !important;">
+                  <div>${isEn ? 'Optimal Tilt' : 'Inclinación Óptima'}</div>
+                  <div class="verif-th-sub">(°)</div>
+                </th>
+                <th style="width: 13%; text-align: right; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.64rem; color: #ffffff !important;">
+                  <div>${isEn ? 'Gdm Opt' : 'Gdm Óptimo'}</div>
+                  <div class="verif-th-sub-mint">(kWh/m²·d)</div>
+                </th>
+                <th style="width: 11%; text-align: right; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.64rem; color: #ffffff !important;">
+                  <div>${isEn ? 'Gain vs Horiz' : 'Ganancia s/ Horiz'}</div>
+                  <div class="verif-th-sub">(%)</div>
+                </th>
+                <th style="width: 15%; text-align: center; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.64rem; color: #ffffff !important;">${isEn ? 'Physical<br/>Validation' : 'Validación<br/>Física'}</th>
               </tr>
             </thead>
             <tbody>
@@ -1463,8 +1493,8 @@ export function renderPythonConsole(): HTMLElement {
                   <td class="td-num" style="padding: 0.35rem 0.15rem; font-size: 0.67rem; white-space: normal !important; word-break: break-word !important;">${formatNum(r.bdm, 2)}</td>
                   <td class="td-num" style="padding: 0.35rem 0.15rem; font-size: 0.67rem; white-space: normal !important; word-break: break-word !important;">${formatNum(r.ddm, 2)}</td>
                   <td class="td-num" style="padding: 0.35rem 0.15rem; font-size: 0.67rem; white-space: normal !important; word-break: break-word !important;">${formatAngle(r.optTilt, 1)}</td>
-                  <td class="td-num" style="padding: 0.35rem 0.15rem; font-size: 0.67rem; color: #059669; font-weight: 700; white-space: normal !important; word-break: break-word !important;">${formatNum(r.gOpt, 2)}</td>
-                  <td class="td-num" style="padding: 0.35rem 0.15rem; font-size: 0.67rem; color: ${r.gain >= 0 ? '#059669' : '#dc2626'}; font-weight: 600; white-space: normal !important; word-break: break-word !important;">${formatPercent(r.gain, 1, true)}</td>
+                  <td class="td-num text-opt-val" style="padding: 0.35rem 0.15rem; font-size: 0.67rem; white-space: normal !important; word-break: break-word !important;">${formatNum(r.gOpt, 2)}</td>
+                  <td class="td-num ${r.gain >= 0 ? 'text-diff-pos' : 'text-diff-neg'}" style="padding: 0.35rem 0.15rem; font-size: 0.67rem; white-space: normal !important; word-break: break-word !important;">${formatPercent(r.gain, 1, true)}</td>
                   <td style="padding: 0.35rem 0.15rem; text-align: center; white-space: normal !important; word-break: break-word !important;">
                     ${r.isPhysicalValid
           ? `<span class="badge-status-valid" style="font-size: 0.58rem; padding: 0.1rem 0.25rem; white-space: normal !important; word-break: break-word !important; display: inline-block; line-height: 1.1;">✓ ${isEn ? 'Verified' : 'Verificado'}</span>`
@@ -1474,14 +1504,14 @@ export function renderPythonConsole(): HTMLElement {
               `).join('')}
             </tbody>
             <tfoot>
-              <tr class="table-media-row verif-media-row" style="background: rgba(16, 185, 129, 0.05); font-weight: 700;">
-                <td style="padding: 0.4rem 0.15rem; font-size: 0.66rem; white-space: normal !important; word-break: break-word !important;"><strong>${isEn ? 'MEAN' : 'MEDIA'}</strong></td>
+              <tr class="table-media-row verif-media-row">
+                <td style="padding: 0.4rem 0.15rem; font-size: 0.66rem; white-space: normal !important; word-break: break-word !important;"><strong>${isEn ? 'ANNUAL MEAN' : 'PROMEDIO ANUAL'}</strong></td>
                 <td class="td-num" style="padding: 0.4rem 0.15rem; font-size: 0.66rem; white-space: normal !important;"><strong>${formatNum(meanG0, 2)}</strong></td>
                 <td class="td-num" style="padding: 0.4rem 0.15rem; font-size: 0.66rem; white-space: normal !important;"><strong>${formatNum(meanBdm, 2)}</strong></td>
                 <td class="td-num" style="padding: 0.4rem 0.15rem; font-size: 0.66rem; white-space: normal !important;"><strong>${formatNum(meanDdm, 2)}</strong></td>
                 <td class="td-num" style="padding: 0.4rem 0.15rem; font-size: 0.66rem; white-space: normal !important;"><strong>${formatAngle(meanTilt, 1)}</strong></td>
-                <td class="td-num" style="padding: 0.4rem 0.15rem; font-size: 0.66rem; color: #059669; font-weight: 700; white-space: normal !important;"><strong>${formatNum(meanGOpt, 2)}</strong></td>
-                <td class="td-num" style="padding: 0.4rem 0.15rem; font-size: 0.66rem; color: ${meanGain >= 0 ? '#059669' : '#dc2626'}; white-space: normal !important;"><strong>${formatPercent(meanGain, 1, true)}</strong></td>
+                <td class="td-num text-opt-val" style="padding: 0.4rem 0.15rem; font-size: 0.66rem; white-space: normal !important;"><strong>${formatNum(meanGOpt, 2)}</strong></td>
+                <td class="td-num ${meanGain >= 0 ? 'text-diff-pos' : 'text-diff-neg'}" style="padding: 0.4rem 0.15rem; font-size: 0.66rem; white-space: normal !important;"><strong>${formatPercent(meanGain, 1, true)}</strong></td>
                 <td style="padding: 0.4rem 0.15rem; text-align: center; white-space: normal !important; word-break: break-word !important;">
                   ${allRowsValid
           ? `<span class="badge-status-valid" style="font-size: 0.58rem; padding: 0.1rem 0.25rem; white-space: normal !important; display: inline-block;">✓ ${isEn ? '100% Consistent' : '100% Consistente'}</span>`
@@ -1735,12 +1765,12 @@ export function renderPythonConsole(): HTMLElement {
 
           <!-- COMPARISON DATA TABLE: ALL VARIABLES (SIMULATOR VS PVGIS SAME MOTOR) -->
           <!-- EXPLICIT WMO VALIDATION PARAMETER BANNER -->
-          <div style="padding: 0.55rem 0.95rem; background: rgba(37, 99, 235, 0.06); border-top: 1px solid rgba(37, 99, 235, 0.2); border-bottom: 1px solid rgba(37, 99, 235, 0.2); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; font-size: 0.70rem; line-height: 1.45;">
+          <div class="wmo-verif-banner">
             <div style="display: flex; align-items: flex-start; gap: 0.5rem;">
               <span style="display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; background: #2563eb; color: #ffffff; font-size: 0.68rem; font-weight: 800; flex-shrink: 0; margin-top: 0.1rem;">i</span>
               <div>
                 <span style="color: var(--text-main);">
-                  <strong style="color: #2563eb;">${isEn ? 'Parameter Evaluated by "WMO-No. 8 Validation" Column:' : 'Parámetro evaluado en la columna «Validación Norma OMM Nº 8»:'}</strong>
+                  <strong class="wmo-verif-banner-title">${isEn ? 'Parameter Evaluated by "WMO-No. 8 Validation" Column:' : 'Parámetro evaluado en la columna «Validación Norma OMM Nº 8»:'}</strong>
                   ${isEn
             ? 'Audits the monthly relative deviation of the <strong>Optimal Tilted Global Daily Irradiation G<sub>dm</sub>(β<sub>opt</sub>) [kWh/m²·d]</strong> between the OrientSol simulation and PVGIS-ERA5 satellite data: <code>|Gdm_OS(β_opt) - Gdm_PVGIS(β_opt)| / Gdm_PVGIS(β_opt) × 100</code>.'
             : 'Audita la desviación relativa mensual de la <strong>Irradiación Global Diaria sobre Plano Inclinado Óptimo G<sub>dm</sub>(β<sub>opt</sub>) [kWh/m²·d]</strong> entre la simulación OrientSol y el reanálisis satelital PVGIS-ERA5: <code>|G<sub>dm</sub><sup>OS</sup>(β<sub>opt</sub>) − G<sub>dm</sub><sup>PVGIS</sup>(β<sub>opt</sub>)| / G<sub>dm</sub><sup>PVGIS</sup>(β<sub>opt</sub>) × 100</code>.'}
@@ -1748,9 +1778,9 @@ export function renderPythonConsole(): HTMLElement {
               </div>
             </div>
             <div style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.63rem; flex-shrink: 0;">
-              <span class="badge-status-valid" style="background: rgba(16,185,129,0.15); color:#059669; padding: 0.12rem 0.38rem; border-radius: 4px; font-weight: 700;">✓ &le;5% ${isEn ? 'High Precision' : 'Alta Precisión'}</span>
-              <span class="badge-status-valid" style="background: rgba(37,99,235,0.15); color:#2563eb; padding: 0.12rem 0.38rem; border-radius: 4px; font-weight: 700;">✓ &le;10% ${isEn ? 'WMO Standard' : 'Norma OMM'}</span>
-              <span class="badge-status-valid" style="background: rgba(2,132,199,0.15); color:#0284c7; padding: 0.12rem 0.38rem; border-radius: 4px; font-weight: 700;">✓ &le;25% ${isEn ? 'Seasonal Spread' : 'Var. Estacional'}</span>
+              <span class="badge-omm-5">✓ &le;5% ${isEn ? 'High Precision' : 'Alta Precisión'}</span>
+              <span class="badge-omm-10">✓ &le;10% ${isEn ? 'WMO Standard' : 'Norma OMM'}</span>
+              <span class="badge-omm-25">✓ &le;25% ${isEn ? 'Seasonal Spread' : 'Var. Estacional'}</span>
             </div>
           </div>
 
@@ -1758,28 +1788,39 @@ export function renderPythonConsole(): HTMLElement {
             <table class="verif-data-table" style="width: 100% !important; max-width: 100% !important; table-layout: fixed !important; border-collapse: collapse; font-size: 0.65rem; margin: 0;">
               <thead>
                 <tr>
-                  <th style="width: 6%; padding: 0.35rem 0.12rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.61rem;">${isEn ? 'Month' : 'Mes'}</th>
-                  <th style="width: 15%; text-align: center; color: #0284c7; background: rgba(2, 132, 199, 0.05); padding: 0.35rem 0.12rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.61rem;">
-                    ${isEn ? 'Global Gdm(0) [Input]<br/>Sim vs PVGIS [Δ | %]<br/>(kWh/m²·d)' : 'Global Gdm(0) [Entrada]<br/>Sim vs PVGIS [Δ | %]<br/>(kWh/m²·d)'}
+                  <th style="width: 6%; padding: 0.35rem 0.12rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.61rem; color: #ffffff !important;">${isEn ? 'Month' : 'Mes'}</th>
+                  <th style="width: 15%; text-align: center; padding: 0.35rem 0.12rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.61rem; color: #ffffff !important;">
+                    <div style="font-weight: 800; color: #ffffff !important;">${isEn ? 'Global G<sub>dm</sub>(0) [Input]' : 'Global G<sub>dm</sub>(0) [Entrada]'}</div>
+                    <div class="verif-th-sub">Sim vs PVGIS [Δ | %]</div>
+                    <div class="verif-th-unit">(kWh/m²·d)</div>
                   </th>
-                  <th style="width: 14%; text-align: center; padding: 0.35rem 0.12rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.61rem;">
-                    ${isEn ? 'Direct Bdm(0)<br/>Sim vs PVGIS [Δ | %]<br/>(kWh/m²·d)' : 'Directa Bdm(0)<br/>Sim vs PVGIS [Δ | %]<br/>(kWh/m²·d)'}
+                  <th style="width: 14%; text-align: center; padding: 0.35rem 0.12rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.61rem; color: #ffffff !important;">
+                    <div style="font-weight: 800; color: #ffffff !important;">${isEn ? 'Direct B<sub>dm</sub>(0)' : 'Directa B<sub>dm</sub>(0)'}</div>
+                    <div class="verif-th-sub">Sim vs PVGIS [Δ | %]</div>
+                    <div class="verif-th-unit">(kWh/m²·d)</div>
                   </th>
-                  <th style="width: 14%; text-align: center; padding: 0.35rem 0.12rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.61rem;">
-                    ${isEn ? 'Diffuse Ddm(0)<br/>Sim vs PVGIS [Δ | %]<br/>(kWh/m²·d)' : 'Difusa Ddm(0)<br/>Sim vs PVGIS [Δ | %]<br/>(kWh/m²·d)'}
+                  <th style="width: 14%; text-align: center; padding: 0.35rem 0.12rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.61rem; color: #ffffff !important;">
+                    <div style="font-weight: 800; color: #ffffff !important;">${isEn ? 'Diffuse D<sub>dm</sub>(0)' : 'Difusa D<sub>dm</sub>(0)'}</div>
+                    <div class="verif-th-sub">Sim vs PVGIS [Δ | %]</div>
+                    <div class="verif-th-unit">(kWh/m²·d)</div>
                   </th>
-                  <th style="width: 9%; text-align: center; padding: 0.35rem 0.12rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.61rem;">
-                    ${isEn ? 'Tilt β_opt<br/>Sim / PVGIS<br/>(°)' : 'Inclinación β_opt<br/>Sim / PVGIS<br/>(°)'}
+                  <th style="width: 9%; text-align: center; padding: 0.35rem 0.12rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.61rem; color: #ffffff !important;">
+                    <div style="font-weight: 800; color: #ffffff !important;">${isEn ? 'Tilt β<sub>opt</sub>' : 'Inclinación β<sub>opt</sub>'}</div>
+                    <div class="verif-th-sub">Sim / PVGIS</div>
+                    <div class="verif-th-unit">(°)</div>
                   </th>
-                  <th style="width: 15%; text-align: center; color: #059669; background: rgba(16, 185, 129, 0.05); font-weight: 800; padding: 0.35rem 0.12rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.61rem;">
-                    ${isEn ? 'Optimal Gdm(β_opt)<br/>Sim vs PVGIS [Δ | %]<br/>(kWh/m²·d)' : 'Óptimo Gdm(β_opt)<br/>Sim vs PVGIS [Δ | %]<br/>(kWh/m²·d)'}
+                  <th style="width: 15%; text-align: center; padding: 0.35rem 0.12rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.61rem; color: #ffffff !important;">
+                    <div style="font-weight: 800; color: #ffffff !important;">${isEn ? 'Optimal G<sub>dm</sub>(β<sub>opt</sub>)' : 'Óptimo G<sub>dm</sub>(β<sub>opt</sub>)'}</div>
+                    <div class="verif-th-sub-mint">Sim vs PVGIS [Δ | %]</div>
+                    <div class="verif-th-unit">(kWh/m²·d)</div>
                   </th>
-                  <th style="width: 14%; text-align: center; padding: 0.35rem 0.1rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.60rem;">
-                    ${isEn ? 'Gain vs Horiz (%)<br/>Sim vs PVGIS [Δ]' : 'Ganancia s/ Horiz (%)<br/>Sim vs PVGIS [Δ]'}
+                  <th style="width: 14%; text-align: center; padding: 0.35rem 0.1rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.60rem; color: #ffffff !important;">
+                    <div style="font-weight: 800; color: #ffffff !important;">${isEn ? 'Gain vs Horiz (%)' : 'Ganancia s/ Horiz (%)'}</div>
+                    <div class="verif-th-sub">Sim vs PVGIS [Δ]</div>
                   </th>
-                  <th style="width: 13%; text-align: center; padding: 0.35rem 0.12rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.61rem;" title="${isEn ? 'Validates percentage relative error in Optimal Daily Irradiation Gdm(β_opt) against PVGIS under WMO-No. 8 criteria: |Gdm_OS - Gdm_PVGIS| / Gdm_PVGIS × 100' : 'Valida el error relativo porcentual en la Irradiación Diaria Óptima Gdm(β_opt) frente a PVGIS según la Norma OMM Nº 8: |Gdm_OS - Gdm_PVGIS| / Gdm_PVGIS × 100'}">
-                    <div style="font-weight: 800; color: #2563eb;">${isEn ? 'WMO-No. 8<br/>Validation' : 'Validación<br/>Norma OMM Nº 8'}</div>
-                    <div style="font-size: 0.54rem; color: #059669; font-weight: 700; margin-top: 0.1rem; line-height: 1;">[s/ G<sub>dm</sub>(&beta;<sub>opt</sub>)]</div>
+                  <th style="width: 13%; text-align: center; padding: 0.35rem 0.12rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.61rem; color: #ffffff !important;" title="${isEn ? 'Validates percentage relative error in Optimal Daily Irradiation Gdm(β_opt) against PVGIS under WMO-No. 8 criteria: |Gdm_OS - Gdm_PVGIS| / Gdm_PVGIS × 100' : 'Valida el error relativo porcentual en la Irradiación Diaria Óptima Gdm(β_opt) frente a PVGIS según la Norma OMM Nº 8: |Gdm_OS - Gdm_PVGIS| / Gdm_PVGIS × 100'}">
+                    <div style="font-weight: 800; color: #ffffff !important;">${isEn ? 'WMO-No. 8<br/>Validation' : 'Validación<br/>Norma OMM Nº 8'}</div>
+                    <div class="verif-th-sub-mint">[s/ G<sub>dm</sub>(&beta;<sub>opt</sub>)]</div>
                   </th>
                 </tr>
               </thead>
@@ -1787,13 +1828,13 @@ export function renderPythonConsole(): HTMLElement {
                 ${pvgisRows.map((r) => {
               let ratingBadge = '';
               if (r.absDiffOptPct <= 5.0) {
-                ratingBadge = `<span class="badge-status-valid" style="background: rgba(16,185,129,0.12); color:#059669; border: 1px solid rgba(16,185,129,0.3); font-size: 0.58rem; padding: 0.1rem 0.2rem; border-radius: 4px; display: inline-block; white-space: normal !important; word-break: break-word !important; line-height: 1.1;" title="${isEn ? 'Gdm(β_opt) deviation <= 5%: High precision WMO Class 1 / Secondary Standard pyranometer' : 'Desviación en Gdm(β_opt) <= 5%: Conforme OMM Alta Precisión (Estándar Secundario)'}">✓ OMM (&lt;5%)</span>`;
+                ratingBadge = `<span class="badge-omm-5" title="${isEn ? 'Gdm(β_opt) deviation <= 5%: High precision WMO Class 1 / Secondary Standard pyranometer' : 'Desviación en Gdm(β_opt) <= 5%: Conforme OMM Alta Precisión (Estándar Secundario)'}">✓ OMM (&lt;5%)</span>`;
               } else if (r.absDiffOptPct <= 10.0) {
-                ratingBadge = `<span class="badge-status-valid" style="background: rgba(37,99,235,0.12); color:#2563eb; border: 1px solid rgba(37,99,235,0.3); font-size: 0.58rem; padding: 0.1rem 0.2rem; border-radius: 4px; display: inline-block; white-space: normal !important; word-break: break-word !important; line-height: 1.1;" title="${isEn ? 'Gdm(β_opt) deviation <= 10%: WMO-No. 8 Standard (First Class operational pyranometer network)' : 'Desviación en Gdm(β_opt) <= 10%: Norma OMM Nº 8 Estándar (Red operacional Primera Clase)'}">✓ OMM (&lt;10%)</span>`;
+                ratingBadge = `<span class="badge-omm-10" title="${isEn ? 'Gdm(β_opt) deviation <= 10%: WMO-No. 8 Standard (First Class operational pyranometer network)' : 'Desviación en Gdm(β_opt) <= 10%: Norma OMM Nº 8 Estándar (Red operacional Primera Clase)'}">✓ OMM (&lt;10%)</span>`;
               } else if (r.absDiffOptPct <= 25.0) {
-                ratingBadge = `<span class="badge-status-valid" style="background: rgba(2,132,199,0.12); color:#0284c7; border: 1px solid rgba(2,132,199,0.3); font-size: 0.58rem; padding: 0.1rem 0.2rem; border-radius: 4px; display: inline-block; white-space: normal !important; word-break: break-word !important; line-height: 1.1;" title="${isEn ? 'Gdm(β_opt) deviation <= 25%: Admissible seasonal transition variability (spring/autumn interannual cloudiness)' : 'Desviación en Gdm(β_opt) <= 25%: Variabilidad estacional admisible OMM (meses de transición y nubosidad interanual)'}">✓ Var. Estacional</span>`;
+                ratingBadge = `<span class="badge-omm-25" title="${isEn ? 'Gdm(β_opt) deviation <= 25%: Admissible seasonal transition variability (spring/autumn interannual cloudiness)' : 'Desviación en Gdm(β_opt) <= 25%: Variabilidad estacional admisible OMM (meses de transición y nubosidad interanual)'}">✓ Var. Estacional</span>`;
               } else {
-                ratingBadge = `<span class="badge-status-warn" style="background: rgba(217,119,6,0.12); color:#d97706; border: 1px solid rgba(217,119,6,0.3); font-size: 0.58rem; padding: 0.1rem 0.2rem; border-radius: 4px; display: inline-block; white-space: normal !important; word-break: break-word !important; line-height: 1.1;" title="${isEn ? 'Gdm(β_opt) deviation > 25%: Exceeds standard meteorological uncertainty' : 'Desviación en Gdm(β_opt) > 25%: Supera la tolerancia meteorológica estándar'}">&gt;25% OMM</span>`;
+                ratingBadge = `<span class="badge-omm-warn" title="${isEn ? 'Gdm(β_opt) deviation > 25%: Exceeds standard meteorological uncertainty' : 'Desviación en Gdm(β_opt) > 25%: Supera la tolerancia meteorológica estándar'}">&gt;25% OMM</span>`;
               }
 
               return `
@@ -1807,9 +1848,9 @@ export function renderPythonConsole(): HTMLElement {
                         <div>
                           <strong style="color: var(--text-main);">${formatNum(r.g0Sim, 2)}</strong>
                           <span style="color: var(--text-muted); font-size: 0.56rem;">vs</span>
-                          <strong style="color: #0284c7;">${formatNum(r.g0Pvgis, 2)}</strong>
+                          <strong class="text-pvgis-val">${formatNum(r.g0Pvgis, 2)}</strong>
                         </div>
-                        <div style="font-size: 0.58rem; color: ${r.diffG0 >= 0 ? '#059669' : '#dc2626'}; font-weight: 700;">
+                        <div class="${r.diffG0 >= 0 ? 'text-diff-pos' : 'text-diff-neg'}" style="font-size: 0.58rem;">
                           ${r.diffG0 >= 0 ? `+${formatNum(r.diffG0, 2)}` : formatNum(r.diffG0, 2)} (${formatPercent(r.pctG0, 1, true)})
                         </div>
                       </td>
@@ -1819,9 +1860,9 @@ export function renderPythonConsole(): HTMLElement {
                         <div>
                           <span style="color: var(--text-main); font-weight: 700;">${formatNum(r.bdmSim, 2)}</span>
                           <span style="color: var(--text-muted); font-size: 0.56rem;">vs</span>
-                          <span style="color: #0284c7; font-weight: 700;">${formatNum(r.bdmPvgis, 2)}</span>
+                          <span class="text-pvgis-val">${formatNum(r.bdmPvgis, 2)}</span>
                         </div>
-                        <div style="font-size: 0.58rem; color: ${r.diffBdm >= 0 ? '#059669' : '#dc2626'}; font-weight: 700;">
+                        <div class="${r.diffBdm >= 0 ? 'text-diff-pos' : 'text-diff-neg'}" style="font-size: 0.58rem;">
                           ${r.diffBdm >= 0 ? `+${formatNum(r.diffBdm, 2)}` : formatNum(r.diffBdm, 2)} (${formatPercent(r.pctBdm, 1, true)})
                         </div>
                       </td>
@@ -1831,26 +1872,26 @@ export function renderPythonConsole(): HTMLElement {
                         <div>
                           <span style="color: var(--text-main); font-weight: 700;">${formatNum(r.ddmSim, 2)}</span>
                           <span style="color: var(--text-muted); font-size: 0.56rem;">vs</span>
-                          <span style="color: #0284c7; font-weight: 700;">${formatNum(r.ddmPvgis, 2)}</span>
+                          <span class="text-pvgis-val">${formatNum(r.ddmPvgis, 2)}</span>
                         </div>
-                        <div style="font-size: 0.58rem; color: ${r.diffDdm >= 0 ? '#059669' : '#dc2626'}; font-weight: 700;">
+                        <div class="${r.diffDdm >= 0 ? 'text-diff-pos' : 'text-diff-neg'}" style="font-size: 0.58rem;">
                           ${r.diffDdm >= 0 ? `+${formatNum(r.diffDdm, 2)}` : formatNum(r.diffDdm, 2)} (${formatPercent(r.pctDdm, 1, true)})
                         </div>
                       </td>
 
                       <!-- Tilt -->
                       <td style="padding: 0.35rem 0.12rem; font-size: 0.65rem; text-align: center; font-weight: 700; white-space: normal !important; word-break: break-word !important;">
-                        <span style="color: #059669;">${simAnnualOptTilt}°</span> / <span style="color: #0284c7;">${optTiltPvgisOs}°</span>
+                        <span class="text-opt-val">${simAnnualOptTilt}°</span> / <span class="text-pvgis-val">${optTiltPvgisOs}°</span>
                       </td>
 
                       <!-- Optimal Plane Radiation -->
                       <td class="td-num" style="padding: 0.35rem 0.12rem; font-size: 0.64rem; text-align: center; background: rgba(16,185,129,0.04); white-space: normal !important; word-break: break-word !important; line-height: 1.2;">
                         <div>
-                          <strong style="color: #059669;">${formatNum(r.gOptSim, 2)}</strong>
+                          <strong class="text-opt-val">${formatNum(r.gOptSim, 2)}</strong>
                           <span style="color: var(--text-muted); font-size: 0.56rem;">vs</span>
-                          <strong style="color: #0284c7;">${formatNum(r.gOptPvgis, 2)}</strong>
+                          <strong class="text-pvgis-val">${formatNum(r.gOptPvgis, 2)}</strong>
                         </div>
-                        <div style="font-size: 0.58rem; color: ${r.diffGOpt >= 0 ? '#059669' : '#dc2626'}; font-weight: 800;">
+                        <div class="${r.diffGOpt >= 0 ? 'text-diff-pos' : 'text-diff-neg'}" style="font-size: 0.58rem; font-weight: 800;">
                           ${r.diffGOpt >= 0 ? `+${formatNum(r.diffGOpt, 2)}` : formatNum(r.diffGOpt, 2)} (${formatPercent(r.pctGOpt, 1, true)})
                         </div>
                       </td>
@@ -1858,9 +1899,9 @@ export function renderPythonConsole(): HTMLElement {
                       <!-- Gain over Horizontal -->
                       <td class="td-num" style="padding: 0.35rem 0.1rem; font-size: 0.62rem; text-align: center; white-space: normal !important; word-break: break-word !important; line-height: 1.2;">
                         <div>
-                          <span style="color: #059669; font-weight: 700;">${formatPercent(r.gainSim, 1, true)}</span>
+                          <span class="text-opt-val">${formatPercent(r.gainSim, 1, true)}</span>
                           <span style="color: var(--text-muted); font-size: 0.54rem;">vs</span>
-                          <span style="color: #0284c7; font-weight: 700;">${formatPercent(r.gainPvgis, 1, true)}</span>
+                          <span class="text-pvgis-val">${formatPercent(r.gainPvgis, 1, true)}</span>
                         </div>
                         <div style="font-size: 0.58rem; color: var(--text-dim); font-weight: 600;">
                           Δ ${r.diffGain >= 0 ? `+${formatNum(r.diffGain, 1)}` : formatNum(r.diffGain, 1)} p.p.
@@ -1876,9 +1917,9 @@ export function renderPythonConsole(): HTMLElement {
             }).join('')}
               </tbody>
               <tfoot>
-                <tr class="table-media-row verif-media-row" style="background: rgba(2, 132, 199, 0.05); font-weight: 700;">
+                <tr class="table-media-row verif-media-row">
                   <td style="padding: 0.4rem 0.12rem; font-size: 0.64rem; white-space: normal !important; word-break: break-word !important;">
-                    <strong>${isEn ? 'ANNUAL' : 'MEDIA'}</strong>
+                    <strong style="color: var(--text-main);">${isEn ? 'ANNUAL MEAN' : 'PROMEDIO ANUAL'}</strong>
                   </td>
 
                   <!-- Mean Global -->
@@ -1886,9 +1927,9 @@ export function renderPythonConsole(): HTMLElement {
                     <div>
                       <strong style="color: var(--text-main);">${formatNum(meanG0Sim, 2)}</strong>
                       <span style="color: var(--text-muted); font-size: 0.56rem;">vs</span>
-                      <strong style="color: #0284c7;">${formatNum(meanG0Pvgis, 2)}</strong>
+                      <strong class="text-pvgis-val">${formatNum(meanG0Pvgis, 2)}</strong>
                     </div>
-                    <div style="font-size: 0.58rem; color: ${meanDiffG0 >= 0 ? '#059669' : '#dc2626'};">
+                    <div class="${meanDiffG0 >= 0 ? 'text-diff-pos' : 'text-diff-neg'}" style="font-size: 0.58rem;">
                       ${meanDiffG0 >= 0 ? `+${formatNum(meanDiffG0, 2)}` : formatNum(meanDiffG0, 2)} (MAPE ${formatPercent(mapeG0, 1)})
                     </div>
                   </td>
@@ -1898,9 +1939,9 @@ export function renderPythonConsole(): HTMLElement {
                     <div>
                       <strong style="color: var(--text-main);">${formatNum(meanBdmSim, 2)}</strong>
                       <span style="color: var(--text-muted); font-size: 0.56rem;">vs</span>
-                      <strong style="color: #0284c7;">${formatNum(meanBdmPvgis, 2)}</strong>
+                      <strong class="text-pvgis-val">${formatNum(meanBdmPvgis, 2)}</strong>
                     </div>
-                    <div style="font-size: 0.58rem; color: ${meanDiffBdm >= 0 ? '#059669' : '#dc2626'};">
+                    <div class="${meanDiffBdm >= 0 ? 'text-diff-pos' : 'text-diff-neg'}" style="font-size: 0.58rem;">
                       ${meanDiffBdm >= 0 ? `+${formatNum(meanDiffBdm, 2)}` : formatNum(meanDiffBdm, 2)} (MAPE ${formatPercent(mapeBdm, 1)})
                     </div>
                   </td>
@@ -1910,27 +1951,27 @@ export function renderPythonConsole(): HTMLElement {
                     <div>
                       <strong style="color: var(--text-main);">${formatNum(meanDdmSim, 2)}</strong>
                       <span style="color: var(--text-muted); font-size: 0.56rem;">vs</span>
-                      <strong style="color: #0284c7;">${formatNum(meanDdmPvgis, 2)}</strong>
+                      <strong class="text-pvgis-val">${formatNum(meanDdmPvgis, 2)}</strong>
                     </div>
-                    <div style="font-size: 0.58rem; color: ${meanDiffDdm >= 0 ? '#059669' : '#dc2626'};">
+                    <div class="${meanDiffDdm >= 0 ? 'text-diff-pos' : 'text-diff-neg'}" style="font-size: 0.58rem;">
                       ${meanDiffDdm >= 0 ? `+${formatNum(meanDiffDdm, 2)}` : formatNum(meanDiffDdm, 2)} (MAPE ${formatPercent(mapeDdm, 1)})
                     </div>
                   </td>
 
                   <!-- Mean Tilt -->
                   <td style="padding: 0.4rem 0.12rem; font-size: 0.64rem; text-align: center; white-space: normal !important; word-break: break-word !important;">
-                    <strong style="color: #059669;">${simAnnualOptTilt}°</strong> / <strong style="color: #0284c7;">${optTiltPvgisOs}°</strong>
+                    <strong class="text-opt-val">${simAnnualOptTilt}°</strong> / <strong class="text-pvgis-val">${optTiltPvgisOs}°</strong>
                     <div style="font-size: 0.58rem; color: var(--text-muted);">Δ ${diffTilt >= 0 ? `+${diffTilt}` : diffTilt}°</div>
                   </td>
 
                   <!-- Mean Optimal -->
                   <td class="td-num" style="padding: 0.4rem 0.12rem; font-size: 0.64rem; text-align: center; background: rgba(16,185,129,0.06); white-space: normal !important; line-height: 1.2;">
                     <div>
-                      <strong style="color: #059669;">${formatNum(meanGOptSim, 2)}</strong>
+                      <strong class="text-opt-val">${formatNum(meanGOptSim, 2)}</strong>
                       <span style="color: var(--text-muted); font-size: 0.56rem;">vs</span>
-                      <strong style="color: #0284c7;">${formatNum(meanGOptPvgis, 2)}</strong>
+                      <strong class="text-pvgis-val">${formatNum(meanGOptPvgis, 2)}</strong>
                     </div>
-                    <div style="font-size: 0.58rem; color: ${meanDiffGOpt >= 0 ? '#059669' : '#dc2626'}; font-weight: 800;">
+                    <div class="${meanDiffGOpt >= 0 ? 'text-diff-pos' : 'text-diff-neg'}" style="font-size: 0.58rem; font-weight: 800;">
                       ${meanDiffGOpt >= 0 ? `+${formatNum(meanDiffGOpt, 2)}` : formatNum(meanDiffGOpt, 2)} (MAPE ${formatPercent(mapeGOpt, 1)})
                     </div>
                   </td>
@@ -1938,9 +1979,9 @@ export function renderPythonConsole(): HTMLElement {
                   <!-- Mean Gain -->
                   <td class="td-num" style="padding: 0.4rem 0.1rem; font-size: 0.63rem; text-align: center; white-space: normal !important; line-height: 1.2;">
                     <div>
-                      <strong style="color: #059669;">${formatPercent(meanGainSim, 1, true)}</strong>
+                      <strong class="text-opt-val">${formatPercent(meanGainSim, 1, true)}</strong>
                       <span style="color: var(--text-muted); font-size: 0.54rem;">vs</span>
-                      <strong style="color: #0284c7;">${formatPercent(meanGainPvgis, 1, true)}</strong>
+                      <strong class="text-pvgis-val">${formatPercent(meanGainPvgis, 1, true)}</strong>
                     </div>
                     <div style="font-size: 0.58rem; color: var(--text-dim);">
                       Δ ${meanDiffGain >= 0 ? `+${formatNum(meanDiffGain, 1)}` : formatNum(meanDiffGain, 1)} p.p.
@@ -1950,12 +1991,12 @@ export function renderPythonConsole(): HTMLElement {
                   <!-- WMO badge -->
                   <td style="padding: 0.4rem 0.12rem; text-align: center; white-space: normal !important; word-break: break-word !important;">
                     ${mapeG0 <= 5.0
-            ? `<span class="badge-status-valid" style="background: rgba(16,185,129,0.15); color:#059669; font-weight: 700; font-size: 0.58rem; padding: 0.1rem 0.25rem;" title="${isEn ? 'Global Mean <= 5% (High Precision OMM Class 1)' : 'Media Global <= 5% (OMM Alta Precisión Clase 1)'}">✓ OMM (&lt;5%)</span>`
+            ? `<span class="badge-omm-5" title="${isEn ? 'Global Mean <= 5% (High Precision OMM Class 1)' : 'Media Global <= 5% (OMM Alta Precisión Clase 1)'}">✓ OMM (&lt;5%)</span>`
             : (mapeG0 <= 10.0
-              ? `<span class="badge-status-valid" style="background: rgba(37,99,235,0.15); color:#2563eb; font-weight: 700; font-size: 0.58rem; padding: 0.1rem 0.25rem;" title="${isEn ? 'Global Mean <= 10% (OMM-No. 8 Standard)' : 'Media Global <= 10% (Norma OMM Nº 8 Estándar)'}">✓ OMM (&lt;10%)</span>`
+              ? `<span class="badge-omm-10" title="${isEn ? 'Global Mean <= 10% (OMM-No. 8 Standard)' : 'Media Global <= 10% (Norma OMM Nº 8 Estándar)'}">✓ OMM (&lt;10%)</span>`
               : (mapeG0 <= 25.0
-                ? `<span class="badge-status-valid" style="background: rgba(2,132,199,0.15); color:#0284c7; font-weight: 700; font-size: 0.58rem; padding: 0.1rem 0.25rem;" title="${isEn ? 'Global Mean <= 25% (Seasonal Transition Spread)' : 'Media Global <= 25% (Variabilidad Estacional OMM)'}">✓ Var. Estacional</span>`
-                : `<span class="badge-status-warn" style="background: rgba(217,119,6,0.15); color:#d97706; font-weight: 700; font-size: 0.58rem; padding: 0.1rem 0.25rem;">&gt;25% OMM</span>`))}
+                ? `<span class="badge-omm-25" title="${isEn ? 'Global Mean <= 25% (Seasonal Transition Spread)' : 'Media Global <= 25% (Variabilidad Estacional OMM)'}">✓ Var. Estacional</span>`
+                : `<span class="badge-omm-warn">&gt;25% OMM</span>`))}
                   </td>
                 </tr>
               </tfoot>
@@ -1978,62 +2019,62 @@ export function renderPythonConsole(): HTMLElement {
 
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 0.7rem; margin-top: 0.6rem;">
               <!-- Variable 1: Global Horizontal -->
-              <div style="background: var(--bg-card); padding: 0.6rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-subtle);">
-                <div style="font-weight: 700; color: #0284c7; font-size: 0.73rem; margin-bottom: 0.25rem;">
+              <div class="verif-metric-card">
+                <div class="metric-title-1">
                   1. Global Gdm(0)
                 </div>
                 <div style="font-size: 0.70rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.15rem;">
-                  <div>MAPE: <strong style="color: #059669; font-size: 0.86rem;">${formatPercent(mapeG0, 2)}</strong></div>
+                  <div>MAPE: <strong class="metric-val-green" style="font-size: 0.86rem;">${formatPercent(mapeG0, 2)}</strong></div>
                   <div>MBE: <strong style="color: var(--text-main);">${mbeG0 >= 0 ? `+${formatNum(mbeG0, 3)}` : formatNum(mbeG0, 3)}</strong> kWh/m²·d</div>
                   <div>RMSE: <strong style="color: var(--text-main);">${formatNum(rmseG0, 3)}</strong> kWh/m²·d</div>
                 </div>
               </div>
 
               <!-- Variable 2: Direct Beam -->
-              <div style="background: var(--bg-card); padding: 0.6rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-subtle);">
-                <div style="font-weight: 700; color: #2563eb; font-size: 0.73rem; margin-bottom: 0.25rem;">
+              <div class="verif-metric-card">
+                <div class="metric-title-2">
                   2. ${isEn ? 'Direct Beam Bdm(0)' : 'Directa Bdm(0)'}
                 </div>
                 <div style="font-size: 0.70rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.15rem;">
-                  <div>MAPE: <strong style="color: #059669; font-size: 0.86rem;">${formatPercent(mapeBdm, 2)}</strong></div>
+                  <div>MAPE: <strong class="metric-val-green" style="font-size: 0.86rem;">${formatPercent(mapeBdm, 2)}</strong></div>
                   <div>MBE: <strong style="color: var(--text-main);">${mbeBdm >= 0 ? `+${formatNum(mbeBdm, 3)}` : formatNum(mbeBdm, 3)}</strong> kWh/m²·d</div>
                   <div>RMSE: <strong style="color: var(--text-main);">${formatNum(rmseBdm, 3)}</strong> kWh/m²·d</div>
                 </div>
               </div>
 
               <!-- Variable 3: Diffuse -->
-              <div style="background: var(--bg-card); padding: 0.6rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-subtle);">
-                <div style="font-weight: 700; color: #7c3aed; font-size: 0.73rem; margin-bottom: 0.25rem;">
+              <div class="verif-metric-card">
+                <div class="metric-title-3">
                   3. ${isEn ? 'Diffuse Ddm(0)' : 'Difusa Ddm(0)'}
                 </div>
                 <div style="font-size: 0.70rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.15rem;">
-                  <div>MAPE: <strong style="color: #059669; font-size: 0.86rem;">${formatPercent(mapeDdm, 2)}</strong></div>
+                  <div>MAPE: <strong class="metric-val-green" style="font-size: 0.86rem;">${formatPercent(mapeDdm, 2)}</strong></div>
                   <div>MBE: <strong style="color: var(--text-main);">${mbeDdm >= 0 ? `+${formatNum(mbeDdm, 3)}` : formatNum(mbeDdm, 3)}</strong> kWh/m²·d</div>
                   <div>RMSE: <strong style="color: var(--text-main);">${formatNum(rmseDdm, 3)}</strong> kWh/m²·d</div>
                 </div>
               </div>
 
               <!-- Variable 4: Optimal Plane -->
-              <div style="background: var(--bg-card); padding: 0.6rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-subtle);">
-                <div style="font-weight: 700; color: #059669; font-size: 0.73rem; margin-bottom: 0.25rem;">
+              <div class="verif-metric-card">
+                <div class="metric-title-4">
                   4. ${isEn ? 'Optimum Gdm(β_opt)' : 'Óptimo Gdm(β_opt)'}
                 </div>
                 <div style="font-size: 0.70rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.15rem;">
-                  <div>MAPE: <strong style="color: #059669; font-size: 0.86rem;">${formatPercent(mapeGOpt, 2)}</strong></div>
+                  <div>MAPE: <strong class="metric-val-green" style="font-size: 0.86rem;">${formatPercent(mapeGOpt, 2)}</strong></div>
                   <div>MBE: <strong style="color: var(--text-main);">${mbeGOpt >= 0 ? `+${formatNum(mbeGOpt, 3)}` : formatNum(mbeGOpt, 3)}</strong> kWh/m²·d</div>
                   <div>RMSE: <strong style="color: var(--text-main);">${formatNum(rmseGOpt, 3)}</strong> kWh/m²·d</div>
                 </div>
               </div>
 
               <!-- Variable 5: Optimal Tilt -->
-              <div style="background: var(--bg-card); padding: 0.6rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-subtle);">
-                <div style="font-weight: 700; color: #d97706; font-size: 0.73rem; margin-bottom: 0.25rem;">
+              <div class="verif-metric-card">
+                <div class="metric-title-5">
                   5. ${isEn ? 'Optimal Tilt β_opt' : 'Inclinación β_opt'}
                 </div>
                 <div style="font-size: 0.70rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.15rem;">
-                  <div>Simulador: <strong style="color: #059669; font-size: 0.82rem;">${simAnnualOptTilt}°</strong></div>
-                  <div>PVGIS: <strong style="color: #0284c7; font-size: 0.82rem;">${optTiltPvgisOs}°</strong></div>
-                  <div>Δ Error: <strong style="color: ${Math.abs(diffTilt) <= 1 ? '#059669' : '#d97706'};">${diffTilt >= 0 ? `+${diffTilt}` : diffTilt}° (${formatPercent(pctTilt, 1, true)})</strong></div>
+                  <div>Simulador: <strong class="metric-val-green" style="font-size: 0.82rem;">${simAnnualOptTilt}°</strong></div>
+                  <div>PVGIS: <strong class="metric-val-blue" style="font-size: 0.82rem;">${optTiltPvgisOs}°</strong></div>
+                  <div>Δ Error: <strong class="${Math.abs(diffTilt) <= 1 ? 'metric-val-green' : 'metric-title-5'}">${diffTilt >= 0 ? `+${diffTilt}` : diffTilt}° (${formatPercent(pctTilt, 1, true)})</strong></div>
                 </div>
               </div>
             </div>
@@ -2071,13 +2112,13 @@ export function renderPythonConsole(): HTMLElement {
             ` : ''}
 
             <!-- WMO Calibration Legend & Defense Justification -->
-            <div style="margin-top: 0.75rem; padding: 0.75rem 0.85rem; background: rgba(37, 99, 235, 0.04); border-radius: 6px; border: 1px solid rgba(37, 99, 235, 0.18);">
+            <div class="wmo-verif-banner" style="margin-top: 0.75rem; border-radius: 6px; border: 1px solid var(--border-subtle); display: block;">
               <div style="font-weight: 700; color: var(--text-main); margin-bottom: 0.4rem; font-size: 0.76rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.4rem;">
                 <span>
-                  <strong style="color: #2563eb;">${isEn ? 'WMO-No. 8 Standard Metrological Criteria' : 'Criterios Metrológicos de Validación Norma OMM Nº 8'}</strong>
+                  <strong class="wmo-verif-banner-title">${isEn ? 'WMO-No. 8 Standard Metrological Criteria' : 'Criterios Metrológicos de Validación Norma OMM Nº 8'}</strong>
                   <span style="font-weight: 600; color: var(--text-muted); font-size: 0.72rem;">${isEn ? '(Evaluated on Optimal Plane Irradiation Gdm(β_opt))' : '(Evaluación directa sobre Irradiación en Plano Óptimo G<sub>dm</sub>(β<sub>opt</sub>))'}</span>
                 </span>
-                <span style="font-size: 0.68rem; color: #059669; background: rgba(16, 185, 129, 0.12); padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 700;">
+                <span class="badge-omm-5">
                   ${isEn ? 'World Meteorological Organization Guide No. 8' : 'Guía de Instrumentos y Métodos de Observación OMM Nº 8'}
                 </span>
               </div>
@@ -2089,10 +2130,10 @@ export function renderPythonConsole(): HTMLElement {
               </div>
 
               <ul style="margin: 0; padding-left: 1.2rem; font-size: 0.72rem; color: var(--text-muted); line-height: 1.55;">
-                <li><strong style="color: #059669;">≤ 5% (${isEn ? 'WMO Class 1 / High Precision' : 'Conforme OMM Alta Precisión'}):</strong> ${isEn ? 'Deviation in G<sub>dm</sub>(β<sub>opt</sub>) ≤ 5%. Concordance within Secondary Standard precision pyranometers (highest meteorological class).' : 'Desviación relativa en G<sub>dm</sub>(β<sub>opt</sub>) ≤ 5%. Concordancia dentro del margen de piranómetros de estándar secundario (máxima precisión instrumental de la OMM).'}</li>
-                <li><strong style="color: #2563eb;">≤ 10% (${isEn ? 'WMO-No. 8 Standard' : 'Norma OMM Nº 8 Estándar'}):</strong> ${isEn ? 'Deviation in G<sub>dm</sub>(β<sub>opt</sub>) ≤ 10%. Complies with operational First Class pyranometer network admissible uncertainty (±10%).' : 'Desviación relativa en G<sub>dm</sub>(β<sub>opt</sub>) ≤ 10%. Cumple con la incertidumbre admisible para redes operacionales de piranómetros de Primera Clase según la Norma OMM Nº 8 (±10%).'}</li>
-                <li><strong style="color: #0284c7;">≤ 25% (${isEn ? 'Seasonal Spread' : 'Var. Estacional OMM'}):</strong> ${isEn ? 'Deviation in G<sub>dm</sub>(β<sub>opt</sub>) between 10% and 25%. Admissible seasonal transition variability (e.g. spring/autumn). Reflects natural interannual cloudiness dispersion (P50/P90) between ground sensors and PVGIS satellite reanalysis grids (±8% to ±12%).' : 'Desviación en G<sub>dm</sub>(β<sub>opt</sub>) entre 10% y 25%. Variabilidad admisible en meses de transición estacional (primavera/otoño). Responde a la dispersión interanual natural de nubosidad (P50/P90) entre estaciones terrestres y mallas satelitales PVGIS (±8% a ±12%).'}</li>
-                <li><strong style="color: #d97706;">> 25% (${isEn ? 'Atypical Deviation' : 'Desviación Atípica'}):</strong> ${isEn ? 'Deviation in G<sub>dm</sub>(β<sub>opt</sub>) > 25%. Flagged only if exceeding international meteorological tolerances.' : 'Desviación en G<sub>dm</sub>(β<sub>opt</sub>) > 25%. Señalizado únicamente si excede las tolerancias meteorológicas internacionales.'}</li>
+                <li><strong class="metric-title-4">≤ 5% (${isEn ? 'WMO Class 1 / High Precision' : 'Conforme OMM Alta Precisión'}):</strong> ${isEn ? 'Deviation in G<sub>dm</sub>(β<sub>opt</sub>) ≤ 5%. Concordance within Secondary Standard precision pyranometers (highest meteorological class).' : 'Desviación relativa en G<sub>dm</sub>(β<sub>opt</sub>) ≤ 5%. Concordancia dentro del margen de piranómetros de estándar secundario (máxima precisión instrumental de la OMM).'}</li>
+                <li><strong class="metric-title-2">≤ 10% (${isEn ? 'WMO-No. 8 Standard' : 'Norma OMM Nº 8 Estándar'}):</strong> ${isEn ? 'Deviation in G<sub>dm</sub>(β<sub>opt</sub>) ≤ 10%. Complies with operational First Class pyranometer network admissible uncertainty (±10%).' : 'Desviación relativa en G<sub>dm</sub>(β<sub>opt</sub>) ≤ 10%. Cumple con la incertidumbre admisible para redes operacionales de piranómetros de Primera Clase según la Norma OMM Nº 8 (±10%).'}</li>
+                <li><strong class="metric-title-1">≤ 25% (${isEn ? 'Seasonal Spread' : 'Var. Estacional OMM'}):</strong> ${isEn ? 'Deviation in G<sub>dm</sub>(β<sub>opt</sub>) between 10% and 25%. Admissible seasonal transition variability (e.g. spring/autumn). Reflects natural interannual cloudiness dispersion (P50/P90) between ground sensors and PVGIS satellite reanalysis grids (±8% to ±12%).' : 'Desviación en G<sub>dm</sub>(β<sub>opt</sub>) entre 10% y 25%. Variabilidad admisible en meses de transición estacional (primavera/otoño). Responde a la dispersión interanual natural de nubosidad (P50/P90) entre estaciones terrestres y mallas satelitales PVGIS (±8% a ±12%).'}</li>
+                <li><strong class="metric-title-5">> 25% (${isEn ? 'Atypical Deviation' : 'Desviación Atípica'}):</strong> ${isEn ? 'Deviation in G<sub>dm</sub>(β<sub>opt</sub>) > 25%. Flagged only if exceeding international meteorological tolerances.' : 'Desviación en G<sub>dm</sub>(β<sub>opt</sub>) > 25%. Señalizado únicamente si excede las tolerancias meteorológicas internacionales.'}</li>
               </ul>
               <p style="margin-top: 0.5rem; margin-bottom: 0; font-size: 0.72rem; color: var(--text-dim);">
                 ${isEn

@@ -12925,3 +12925,249 @@ body.theme-dark .seasonal-methodology-desc {
   color: #cbd5e1 !important;
 }
 
+/* ==========================================================================
+   HIGH CONTRAST AUDIT: LIGHT / DARK THEME TABLE STYLES (WCAG AAA > 7:1)
+   Verification & Validation Tabs (Solar Geometry, PVGIS, Tracking, Energy)
+   ========================================================================== */
+
+/* Table Header Universal High Contrast Rule: Always pure white text */
+.verif-data-table th,
+.verif-data-table thead th {
+  color: #ffffff !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45) !important;
+}
+
+[data-theme="light"] .verif-data-table th,
+body.theme-light .verif-data-table th {
+  background: #1e40af !important;
+  color: #ffffff !important;
+  border-bottom: 2px solid #1d4ed8 !important;
+}
+
+[data-theme="dark"] .verif-data-table th,
+body.theme-dark .verif-data-table th {
+  background: #0b1f36 !important;
+  color: #ffffff !important;
+  border-bottom: 2px solid #38bdf8 !important;
+}
+
+/* Sub-labels in Headers: High-contrast ice cyan and light mint */
+.verif-th-sub {
+  color: #bae6fd !important;
+  font-size: 0.58rem;
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.verif-th-sub-mint {
+  color: #a7f3d0 !important;
+  font-size: 0.58rem;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.verif-th-unit {
+  color: #e0f2fe !important;
+  font-size: 0.54rem;
+  font-weight: 500;
+}
+
+/* Theme Adaptive Numeric Highlight Classes */
+.text-pvgis-val {
+  color: #0369a1 !important;
+  font-weight: 700;
+}
+[data-theme="dark"] .text-pvgis-val,
+body.theme-dark .text-pvgis-val {
+  color: #38bdf8 !important;
+  font-weight: 700;
+}
+
+.text-diff-pos {
+  color: #15803d !important;
+  font-weight: 700;
+}
+[data-theme="dark"] .text-diff-pos,
+body.theme-dark .text-diff-pos {
+  color: #34d399 !important;
+  font-weight: 700;
+}
+
+.text-diff-neg {
+  color: #b91c1c !important;
+  font-weight: 700;
+}
+[data-theme="dark"] .text-diff-neg,
+body.theme-dark .text-diff-neg {
+  color: #f87171 !important;
+  font-weight: 700;
+}
+
+.text-opt-val {
+  color: #047857 !important;
+  font-weight: 700;
+}
+[data-theme="dark"] .text-opt-val,
+body.theme-dark .text-opt-val {
+  color: #34d399 !important;
+  font-weight: 700;
+}
+
+/* WMO-No. 8 Validation Badges (High Contrast Light & Dark) */
+.badge-omm-5 {
+  display: inline-block;
+  white-space: normal !important;
+  word-break: break-word !important;
+  font-size: 0.58rem;
+  padding: 0.12rem 0.35rem;
+  border-radius: 4px;
+  line-height: 1.15;
+  font-weight: 700;
+  background: #ecfdf5 !important;
+  color: #047857 !important;
+  border: 1px solid #6ee7b7 !important;
+}
+[data-theme="dark"] .badge-omm-5,
+body.theme-dark .badge-omm-5 {
+  background: rgba(52, 211, 153, 0.20) !important;
+  color: #34d399 !important;
+  border: 1px solid rgba(52, 211, 153, 0.55) !important;
+}
+
+.badge-omm-10 {
+  display: inline-block;
+  white-space: normal !important;
+  word-break: break-word !important;
+  font-size: 0.58rem;
+  padding: 0.12rem 0.35rem;
+  border-radius: 4px;
+  line-height: 1.15;
+  font-weight: 700;
+  background: #eff6ff !important;
+  color: #1d4ed8 !important;
+  border: 1px solid #93c5fd !important;
+}
+[data-theme="dark"] .badge-omm-10,
+body.theme-dark .badge-omm-10 {
+  background: rgba(96, 165, 250, 0.20) !important;
+  color: #60a5fa !important;
+  border: 1px solid rgba(96, 165, 250, 0.55) !important;
+}
+
+.badge-omm-25 {
+  display: inline-block;
+  white-space: normal !important;
+  word-break: break-word !important;
+  font-size: 0.58rem;
+  padding: 0.12rem 0.35rem;
+  border-radius: 4px;
+  line-height: 1.15;
+  font-weight: 700;
+  background: #f0f9ff !important;
+  color: #0284c7 !important;
+  border: 1px solid #7dd3fc !important;
+}
+[data-theme="dark"] .badge-omm-25,
+body.theme-dark .badge-omm-25 {
+  background: rgba(56, 189, 248, 0.20) !important;
+  color: #38bdf8 !important;
+  border: 1px solid rgba(56, 189, 248, 0.55) !important;
+}
+
+.badge-omm-warn {
+  display: inline-block;
+  white-space: normal !important;
+  word-break: break-word !important;
+  font-size: 0.58rem;
+  padding: 0.12rem 0.35rem;
+  border-radius: 4px;
+  line-height: 1.15;
+  font-weight: 700;
+  background: #fffbeb !important;
+  color: #b45309 !important;
+  border: 1px solid #fcd34d !important;
+}
+[data-theme="dark"] .badge-omm-warn,
+body.theme-dark .badge-omm-warn {
+  background: rgba(251, 191, 36, 0.20) !important;
+  color: #fbbf24 !important;
+  border: 1px solid rgba(251, 191, 36, 0.55) !important;
+}
+
+/* WMO Banner */
+.wmo-verif-banner {
+  padding: 0.55rem 0.95rem;
+  background: #f0f7ff;
+  border-top: 1px solid #bfdbfe;
+  border-bottom: 1px solid #bfdbfe;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.70rem;
+  line-height: 1.45;
+}
+[data-theme="dark"] .wmo-verif-banner,
+body.theme-dark .wmo-verif-banner {
+  background: #09202c !important;
+  border-color: #1a4258 !important;
+}
+
+.wmo-verif-banner-title {
+  color: #1d4ed8;
+  font-weight: 700;
+}
+[data-theme="dark"] .wmo-verif-banner-title,
+body.theme-dark .wmo-verif-banner-title {
+  color: #60a5fa !important;
+}
+
+/* Verification Table Footer Rows */
+.verif-media-row {
+  font-weight: 700;
+  border-top: 2px solid #0284c7;
+  border-bottom: 2px solid #0284c7;
+  background: #f1f5f9;
+}
+[data-theme="dark"] .verif-media-row,
+body.theme-dark .verif-media-row {
+  background: #0c202d !important;
+  border-top: 2px solid #38bdf8 !important;
+  border-bottom: 2px solid #38bdf8 !important;
+}
+
+/* Statistical Error Metric Cards */
+.verif-metric-card {
+  background: var(--bg-card);
+  padding: 0.65rem 0.8rem;
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+[data-theme="dark"] .verif-metric-card,
+body.theme-dark .verif-metric-card {
+  background: #0d2330 !important;
+  border-color: #1a4258 !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35) !important;
+}
+
+.metric-title-1 { color: #0284c7; font-weight: 700; font-size: 0.74rem; margin-bottom: 0.25rem; }
+.metric-title-2 { color: #2563eb; font-weight: 700; font-size: 0.74rem; margin-bottom: 0.25rem; }
+.metric-title-3 { color: #7c3aed; font-weight: 700; font-size: 0.74rem; margin-bottom: 0.25rem; }
+.metric-title-4 { color: #059669; font-weight: 700; font-size: 0.74rem; margin-bottom: 0.25rem; }
+.metric-title-5 { color: #d97706; font-weight: 700; font-size: 0.74rem; margin-bottom: 0.25rem; }
+
+[data-theme="dark"] .metric-title-1, body.theme-dark .metric-title-1 { color: #38bdf8 !important; }
+[data-theme="dark"] .metric-title-2, body.theme-dark .metric-title-2 { color: #60a5fa !important; }
+[data-theme="dark"] .metric-title-3, body.theme-dark .metric-title-3 { color: #a78bfa !important; }
+[data-theme="dark"] .metric-title-4, body.theme-dark .metric-title-4 { color: #34d399 !important; }
+[data-theme="dark"] .metric-title-5, body.theme-dark .metric-title-5 { color: #fbbf24 !important; }
+
+.metric-val-green { color: #059669; font-weight: 700; }
+[data-theme="dark"] .metric-val-green, body.theme-dark .metric-val-green { color: #34d399 !important; }
+
+.metric-val-blue { color: #0284c7; font-weight: 700; }
+[data-theme="dark"] .metric-val-blue, body.theme-dark .metric-val-blue { color: #38bdf8 !important; }
+
+
