@@ -803,9 +803,15 @@ export function renderPythonConsole(): HTMLElement {
           <div class="verif-table-title-bar" style="flex-wrap: wrap; gap: 0.5rem; justify-content: space-between; align-items: center;">
             <div style="display: flex; align-items: center; gap: 0.5rem;">
               <span class="verif-table-title">
-                ${isEn ? 'Solar Hourly Angles Breakdown & Morning / Afternoon Symmetry' : 'Desglose Horario de Ángulos Solares y Simetría Mañana / Tarde'}
+                ${hourlyViewMode === 'paired'
+                  ? (isEn ? 'Solar Hourly Breakdown & Morning / Afternoon Symmetry' : 'Desglose Horario de Ángulos Solares y Simetría Mañana / Tarde')
+                  : (isEn ? 'Solar Daytime Hourly Trajectory & 2-Axis Tracking' : 'Trayectoria Solar Horaria y Orientación 2-Ejes')}
               </span>
-              <span class="badge badge-success" style="font-size: 0.75rem;">${pairedRows.length} ${isEn ? 'symmetric pairs' : 'pares simétricos'}</span>
+              <span class="badge badge-success" style="font-size: 0.75rem;">
+                ${hourlyViewMode === 'paired'
+                  ? `${pairedRows.length} ${isEn ? 'symmetric pairs' : 'pares simétricos'}`
+                  : `${chronologicalRows.length} ${isEn ? 'hourly positions' : 'posiciones horarias'}`}
+              </span>
             </div>
 
             <!-- View Mode Switcher -->
@@ -824,15 +830,15 @@ export function renderPythonConsole(): HTMLElement {
             <span style="font-size: 1rem; color: var(--accent-cyan, #0284c7);">ℹ</span>
             <div>
               <strong>${hourlyViewMode === 'paired'
-                ? (isEn ? '¿What is verified in Paired View? — Universal Solar Symmetry (Morning / Afternoon):' : '¿Qué valida la Vista Emparejada? — Simetría Solar Universal (Mañana / Tarde):')
-                : (isEn ? '¿What is verified in Full Timeline? — 2-Axis Tracking Kinematics & Daylight Horizon Check:' : '¿Qué valida la Línea Temporal Completa? — Cinemática de Seguimiento 2-Ejes y Horizonte:')}</strong><br/>
+                ? (isEn ? 'Universal Solar Symmetry (Morning / Afternoon):' : 'Simetría Solar Universal (Mañana / Tarde):')
+                : (isEn ? 'Solar Celestial Trajectory & 2-Axis Tracking Kinematics:' : 'Cinemática de Trayectoria Solar y Colector a 2 Ejes:')}</strong><br/>
               ${hourlyViewMode === 'paired'
                 ? (isEn
-                  ? 'Verifies the astronomical reflection law across solar noon (12:00 h). At equidistant hours (±ω), the <strong>Solar Altitude (α) is identical (Δα = 0.00°)</strong>, the <strong>2-Axis Tracker Tilt (β = 90° - α) is identical</strong>, and the <strong>Azimuth (ψ)</strong> has equal magnitude with opposite signs (- East morning vs. + West afternoon).'
-                  : 'Valida la ley astronómica de reflexión especular respecto al mediodía solar (12:00 h). Para cada par horario equidistante (±ω), la <strong>Altura Solar (α) es idéntica (Δα = 0,00°)</strong>, la <strong>Inclinación del Seguidor 2-Ejes (β = 90° - α) es idéntica</strong> y el <strong>Azimut (ψ)</strong> tiene idéntica magnitud con signos opuestos (- Este por la mañana vs. + Oeste por la tarde).')
+                  ? 'Verifies the astronomical reflection law across solar noon (12:00 h). At equidistant hours (±ω), the <strong>Solar Altitude (α) is identical</strong>, the <strong>2-Axis Tracker Tilt (β = 90° - α) is identical</strong>, and the <strong>Azimuth (ψ)</strong> has equal magnitude with opposite signs (- East morning vs. + West afternoon).'
+                  : 'El mediodía solar (12:00 h) actúa como eje de simetría de la Tierra: para cualquier hora matinal (-ω) y vespertina (+ω) equidistante, la <strong>Altura Solar (α) es idéntica</strong>, la <strong>Inclinación del seguidor 2-ejes (β = 90° - α) es idéntica</strong> y el <strong>Azimut (ψ)</strong> se refleja con signo inverso (- Este por la mañana vs. + Oeste por la tarde).')
                 : (isEn
-                  ? 'Verifies two key physical constraints for each hour: <strong>1) Daylight Condition:</strong> Sun is strictly above horizon (α > 0°). <strong>2) 2-Axis Tracking Law:</strong> Collector tilt strictly satisfies β = θz = 90° - α (or β + α = 90.00°), ensuring normal solar incidence (θ = 0.00°, cos θ = 1.00) throughout the entire day.'
-                  : 'Valida dos condiciones físicas fundamentales hora a hora: <strong>1) Condición de Radiación Diurna:</strong> El sol se sitúa por encima del horizonte físico real (α > 0°). <strong>2) Cinemática de Orientación del Seguidor 2-Ejes:</strong> La inclinación calculada satisface rigurosamente β = θz = 90° - α (o β + α = 90,00°), garantizando incidencia perpendicular constante (θ = 0,00°, cos θ = 1,00) para máxima captación directa (Bdm). A las 12:00 h se comprueba la culminación máxima diaria (cenit solar).')}
+                  ? 'Displays the hour-by-hour solar position from sunrise to sunset. To maintain direct solar beam perpendicularity (normal incidence θ = 0.00° throughout the day), the 2-axis tracker tilt continuously matches the solar zenith distance: <strong>β = 90° - α</strong>.'
+                  : 'Muestra la posición del Sol hora a hora entre la salida y la puesta. Para mantener perpendicularidad perfecta respecto al rayo solar directo (incidencia normal θ = 0,00° durante todo el recorrido diurno), la inclinación del seguidor a 2 ejes coincide en todo instante con la distancia cenital: <strong>β = 90° - α</strong>.')}
             </div>
           </div>
 
@@ -927,13 +933,12 @@ export function renderPythonConsole(): HTMLElement {
               <!-- PAIRED SYMMETRY TABLE: Morning vs Afternoon side-by-side -->
               <table class="verif-data-table table-no-scroll" style="width: 100% !important; max-width: 100% !important; table-layout: fixed !important; border-collapse: collapse; font-size: 0.74rem; margin: 0;">
                 <colgroup>
-                  <col style="width: 8%;">
-                  <col style="width: 12%;">
-                  <col style="width: 12%;">
-                  <col style="width: 11%;">
-                  <col style="width: 13%;">
+                  <col style="width: 10%;">
+                  <col style="width: 14%;">
+                  <col style="width: 14%;">
+                  <col style="width: 14%;">
+                  <col style="width: 16%;">
                   <col style="width: 18%;">
-                  <col style="width: 12%;">
                   <col style="width: 14%;">
                 </colgroup>
                 <thead>
@@ -942,10 +947,9 @@ export function renderPythonConsole(): HTMLElement {
                     <th style="color: #0284c7; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Morning (East)' : 'Hora Mañana (Este)'}</th>
                     <th style="color: #ea580c; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Afternoon (West)' : 'Hora Tarde (Oeste)'}</th>
                     <th style="text-align: right; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Hour Angle (±ω)' : 'Ángulo Horario (±ω)'}</th>
-                    <th style="text-align: right; color: #0284c7; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Solar Alt (Identical)' : 'Altura Solar (Alt, α)'}</th>
-                    <th style="text-align: right; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Azimuth Morning / Afternoon' : 'Azimut Mañana / Tarde (Ori, ψ)'}</th>
-                    <th style="text-align: right; color: #059669; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? '2-Axis Tilt (Identical)' : 'Inclinación 2-Ejes (Inc, β)'}</th>
-                    <th style="text-align: center; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Symmetry Check (±ω)' : 'Verificación de Simetría (±ω)'}</th>
+                    <th style="text-align: right; color: #0284c7; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Solar Alt (α) [Identical]' : 'Altura Solar (Alt, α) [Idéntica]'}</th>
+                    <th style="text-align: right; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Azimuth Morning / Afternoon (ψ)' : 'Azimut Mañana / Tarde (Ori, ψ)'}</th>
+                    <th style="text-align: right; color: #059669; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? '2-Axis Tilt (β) [Identical]' : 'Inclinación 2-Ejes (Inc, β) [Idéntica]'}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -958,7 +962,6 @@ export function renderPythonConsole(): HTMLElement {
                       <td class="td-num" style="color: #0284c7; font-weight: 700; padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;">${row.altDeg}</td>
                       <td class="td-num" style="padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; font-size: 0.71rem;">${row.azimMorningDeg} / ${row.azimAfternoonDeg}</td>
                       <td class="td-num" style="color: #059669; font-weight: 700; padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;">${row.tilt2AxisDeg}</td>
-                      <td style="text-align: center; padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;"><span class="badge-status-valid" style="font-size: 0.68rem; padding: 0.15rem 0.35rem; display: inline-block;">✓ Δα = 0,0° | |ψ| idéntico</span></td>
                     </tr>
                   `).join('')}
                 </tbody>
@@ -967,13 +970,12 @@ export function renderPythonConsole(): HTMLElement {
               <!-- CHRONOLOGICAL TIMELINE TABLE: From Sunrise to Sunset -->
               <table class="verif-data-table table-no-scroll" style="width: 100% !important; max-width: 100% !important; table-layout: fixed !important; border-collapse: collapse; font-size: 0.74rem; margin: 0;">
                 <colgroup>
-                  <col style="width: 11%;">
-                  <col style="width: 10%;">
-                  <col style="width: 11%;">
+                  <col style="width: 14%;">
+                  <col style="width: 12%;">
                   <col style="width: 14%;">
                   <col style="width: 18%;">
-                  <col style="width: 15%;">
-                  <col style="width: 21%;">
+                  <col style="width: 22%;">
+                  <col style="width: 20%;">
                 </colgroup>
                 <thead>
                   <tr>
@@ -982,8 +984,7 @@ export function renderPythonConsole(): HTMLElement {
                     <th style="text-align: right; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Hour Angle (ω)' : 'Ángulo Horario (ω)'}</th>
                     <th style="text-align: right; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Solar Altitude (Alt, α)' : 'Altura Solar (Alt, α)'}</th>
                     <th style="text-align: right; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Solar Azimuth (Ori, ψ)' : 'Azimut Solar (Ori, ψ)'}</th>
-                    <th style="text-align: right; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? '2-Axis Tilt (Inc, β)' : 'Inclinación 2-Ejes (Inc, β)'}</th>
-                    <th style="text-align: center; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Kinematic Check (β = 90° - α)' : 'Validación Cinemática (β = 90° - α)'}</th>
+                    <th style="text-align: right; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? '2-Axis Tilt (Inc, β = 90° - α)' : 'Inclinación Seguidor 2-Ejes (Inc, β = 90° - α)'}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -995,11 +996,6 @@ export function renderPythonConsole(): HTMLElement {
                       <td class="td-num" style="color: #0284c7; font-weight: 700; padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;">${row.altDeg}</td>
                       <td class="td-num" style="padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;">${row.azimDeg}</td>
                       <td class="td-num" style="color: #059669; font-weight: 700; padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;">${row.tilt2AxisDeg}</td>
-                      <td style="text-align: center; padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;">
-                        <span class="${row.isNoon ? 'badge badge-primary' : 'badge-status-valid'}" style="font-size: 0.66rem; padding: 0.15rem 0.35rem; display: inline-block;" title="α > 0° (diurno) y β = 90° - α (incidencia normal θ = 0°)">
-                          ${row.isNoon ? (isEn ? '★ Peak Zenith | θ = 0°' : '★ Cenit Máx | θ = 0° (β+α=90°)') : (isEn ? '✓ Day (α>0°) | θ = 0° (β+α=90°)' : '✓ Diurno (α>0°) | θ = 0° (β+α=90°)')}
-                        </span>
-                      </td>
                     </tr>
                   `).join('')}
                 </tbody>
