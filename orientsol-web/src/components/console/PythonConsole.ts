@@ -1110,12 +1110,11 @@ export function renderPythonConsole(): HTMLElement {
         };
       });
 
-      const avgDec = baselineRows.reduce((acc, r) => acc + r.mDec, 0) / 12;
-      const avgW = baselineRows.reduce((acc, r) => acc + r.wDeg, 0) / 12;
-      const avgSunHours = baselineRows.reduce((acc, r) => acc + r.sunHours, 0) / 12;
-      const avgNoonH = baselineRows.reduce((acc, r) => acc + r.noonH, 0) / 12;
-      const avgNoonAz = baselineRows.reduce((acc, r) => acc + r.noonAz, 0) / 12;
       const avgNoonT = baselineRows.reduce((acc, r) => acc + r.noonT, 0) / 12;
+
+      const selectedMonthData = baselineRows[stateMonth - 1] || baselineRows[6];
+      const maxElevRow = baselineRows.reduce((prev, curr) => (curr.noonH > prev.noonH ? curr : prev), baselineRows[0]);
+      const minElevRow = baselineRows.reduce((prev, curr) => (curr.noonH < prev.noonH ? curr : prev), baselineRows[0]);
 
       return `
         <div class="verif-table-card">
@@ -1126,56 +1125,97 @@ export function renderPythonConsole(): HTMLElement {
           ? `12-Month Baseline (Klein Characteristic Days, Lat ${formatAngle(stateLat, 2)}, Active Month: ${months[stateMonth - 1]})`
           : `Línea Base 12 Meses (Días Intermedios de Klein, Latitud ${formatAngle(stateLat, 2)}, Mes Consultado: ${months[stateMonth - 1]})`}
               </span>
-              <span class="badge-status-valid">✓ ${isEn ? 'Calculation coefficients' : 'Coeficientes de cálculo'}</span>
+              <span class="badge badge-success" style="font-size: 0.75rem;">12 ${isEn ? 'monthly days' : 'días característicos'}</span>
             </div>
             <button type="button" class="btn btn-xs btn-primary btn-goto-pvgis" style="font-size: 0.72rem; padding: 0.2rem 0.6rem; background: #0284c7; color: #fff; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 0.35rem;">
               ${isEn ? 'Go to Tab 3: PVGIS Validation ➔' : 'Ir a Pestaña 3: Validación PVGIS ➔'}
             </button>
           </div>
 
-          <div class="verif-table-wrap">
-            <table class="verif-data-table">
+          <!-- Educational Callout Explaining the 12-Month Baseline and Klein Method -->
+          <div style="padding: 0.75rem 1rem; background: rgba(2, 132, 199, 0.05); border-bottom: 1px solid var(--border-subtle); font-size: 0.75rem; color: var(--text-dim); line-height: 1.45; display: flex; align-items: flex-start; gap: 0.5rem;">
+            <span style="font-size: 1rem; color: var(--accent-cyan, #0284c7);">ℹ</span>
+            <div>
+              <strong>${isEn ? '¿What is evaluated in the 12-Month Baseline? — Klein (1977) Intermediate Days & Annual Cycle:' : '¿Qué evalúa la Línea Base de 12 Meses? — Días Medios de Klein (1977) y Ciclo Anual:'}</strong><br/>
+              ${isEn
+          ? 'Instead of calculating all 365 days, the international Klein method designates 1 characteristic day nm per month whose extraterrestrial daily irradiation G₀d matches the integrated monthly average with <0.5% error. Across the year, three fundamental astronomical laws are verified: <strong>1) Fotoperiod Balance:</strong> Mean daily daylight hours S₀ converge to exactly 12.00 h. <strong>2) Solstice Extremes:</strong> Maximum solar altitude in June vs. minimum in December. <strong>3) Polar Latitude Anchor:</strong> Mean noon tracker tilt converges exactly to the site latitude (β ≈ φ = ' + formatAngle(stateLat, 2) + ').'
+          : 'En lugar de calcular los 365 días del año uno a uno, el estándar de Klein designa 1 día intermedio característico nm por mes cuya irradiación extraterrestre diaria G₀d reproduce la media mensual con un error < 0,5%. A lo largo del ciclo anual se validan 3 leyes astronómicas fundamentales: <strong>1) Balance de fotoperiodo:</strong> La media anual de horas teóricas de sol S₀ converge exactamente a 12,00 h. <strong>2) Extremos de solsticio:</strong> Máxima elevación en junio vs. mínima en diciembre. <strong>3) Convergencia Polar a la Latitud:</strong> La inclinación media cenital del colector al mediodía converge exactamente a la Latitud geográfica del lugar (β ≈ φ = ' + formatAngle(stateLat, 2) + ').'}
+            </div>
+          </div>
+
+          <!-- Focused Annual Milestones HUD Cards -->
+          <div style="padding: 0.85rem 1rem; background: rgba(2, 132, 199, 0.04); border-bottom: 1px solid var(--border-subtle); display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem;">
+            <div style="background: var(--bg-card); padding: 0.6rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-subtle);">
+              <span style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">${isEn ? 'Active Month (Klein)' : 'Mes Consultado (Klein)'}</span>
+              <div style="font-size: 0.95rem; font-weight: 800; color: var(--text-main); font-family: var(--font-mono); margin-top: 0.15rem;">
+                ${selectedMonthData.month} (n = ${selectedMonthData.dayNum})
+              </div>
+              <div style="font-size: 0.72rem; color: var(--text-dim);">δ: ${selectedMonthData.mDec > 0 ? `+${formatAngle(selectedMonthData.mDec, 1)}` : formatAngle(selectedMonthData.mDec, 1)} | S₀: ${formatNum(selectedMonthData.sunHours, 2)} h</div>
+            </div>
+
+            <div style="background: var(--bg-card); padding: 0.6rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-subtle);">
+              <span style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">${isEn ? 'Summer Solstice (Peak)' : 'Solsticio Estival (Pico)'}</span>
+              <div style="font-size: 0.95rem; font-weight: 800; color: #0284c7; font-family: var(--font-mono); margin-top: 0.15rem;">
+                ${maxElevRow.month} — γs = ${formatAngle(maxElevRow.noonH, 1)}
+              </div>
+              <div style="font-size: 0.72rem; color: #059669;">✓ Inclinación mínima: β = ${formatAngle(maxElevRow.noonT, 1)}</div>
+            </div>
+
+            <div style="background: var(--bg-card); padding: 0.6rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-subtle);">
+              <span style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">${isEn ? 'Winter Solstice (Lowest)' : 'Solsticio Invernal (Mínimo)'}</span>
+              <div style="font-size: 0.95rem; font-weight: 800; color: #d97706; font-family: var(--font-mono); margin-top: 0.15rem;">
+                ${minElevRow.month} — γs = ${formatAngle(minElevRow.noonH, 1)}
+              </div>
+              <div style="font-size: 0.72rem; color: var(--text-dim);">✓ Inclinación máxima: β = ${formatAngle(minElevRow.noonT, 1)}</div>
+            </div>
+
+            <div style="background: var(--bg-card); padding: 0.6rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-subtle);">
+              <span style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">${isEn ? 'Polar Latitude Convergence' : 'Convergencia a Latitud'}</span>
+              <div style="font-size: 0.95rem; font-weight: 800; color: #059669; font-family: var(--font-mono); margin-top: 0.15rem;">
+                β medio = ${formatAngle(avgNoonT, 1)}  (φ = ${formatAngle(stateLat, 2)})
+              </div>
+              <div style="font-size: 0.72rem; color: #059669;">✓ Inclinación media mediodía ≈ Latitud</div>
+            </div>
+          </div>
+
+          <div class="verif-table-wrap no-scroll" style="overflow-x: hidden !important; width: 100% !important; max-width: 100% !important; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);">
+            <table class="verif-data-table table-no-scroll" style="width: 100% !important; max-width: 100% !important; table-layout: fixed !important; border-collapse: collapse; font-size: 0.74rem; margin: 0;">
+              <colgroup>
+                <col style="width: 13%;">
+                <col style="width: 11%;">
+                <col style="width: 13%;">
+                <col style="width: 13%;">
+                <col style="width: 12%;">
+                <col style="width: 13%;">
+                <col style="width: 11%;">
+                <col style="width: 14%;">
+              </colgroup>
               <thead>
                 <tr>
-                  <th>${isEn ? 'Month' : 'Mes'}</th>
-                  <th style="text-align: right;">${isEn ? 'Klein Day (n)' : 'Día Klein (n)'}</th>
-                  <th style="text-align: right;">${isEn ? 'Declination (δ)' : 'Declinación (δ)'}</th>
-                  <th style="text-align: right;">${isEn ? 'Sunset Angle (ωs)' : 'Ángulo Puesta (ωs)'}</th>
-                  <th style="text-align: right;">${isEn ? 'Sun Hours (S0)' : 'Horas de Sol (S0)'}</th>
-                  <th style="text-align: right;">${isEn ? 'Noon Alt (γs)' : 'Altura Mediodía (γs)'}</th>
-                  <th style="text-align: right;">${isEn ? 'Noon Azimuth' : 'Azimut Mediodía'}</th>
-                  <th style="text-align: right;">${isEn ? '2-Axis Tilt' : 'Inclinación 2-Ejes'}</th>
-                  <th style="text-align: center;">${isEn ? 'Status' : 'Estado'}</th>
+                  <th style="padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Month' : 'Mes'}</th>
+                  <th style="text-align: right; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Klein Day (n)' : 'Día Klein (n)'}</th>
+                  <th style="text-align: right; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Declination (δ)' : 'Declinación (δ)'}</th>
+                  <th style="text-align: right; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Sunset Angle (ωs)' : 'Ángulo Puesta (ωs)'}</th>
+                  <th style="text-align: right; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Sun Hours (S0)' : 'Horas de Sol (S0)'}</th>
+                  <th style="text-align: right; color: #0284c7; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Noon Alt (γs)' : 'Altura Mediodía (γs)'}</th>
+                  <th style="text-align: right; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Noon Azimuth' : 'Azimut Mediodía'}</th>
+                  <th style="text-align: right; color: #059669; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? '2-Axis Tilt (β)' : 'Inclinación 2-Ejes (β)'}</th>
                 </tr>
               </thead>
               <tbody>
                 ${baselineRows.map((r) => `
                   <tr style="${r.isSelectedMonth ? 'background: rgba(16, 185, 129, 0.12); font-weight: 700;' : ''}">
-                    <td><strong>${r.month} ${r.isSelectedMonth ? (isEn ? '★ (Selected)' : '★ (Consultado)') : ''}</strong></td>
-                    <td class="td-num">n = ${r.dayNum}</td>
-                    <td class="td-num">${r.mDec > 0 ? `+${formatAngle(r.mDec, 2)}` : formatAngle(r.mDec, 2)}</td>
-                    <td class="td-num">${formatAngle(r.wDeg, 2)}</td>
-                    <td class="td-num">${formatNum(r.sunHours, 2)} h</td>
-                    <td class="td-num">${formatAngle(r.noonH, 2)}</td>
-                    <td class="td-num">${formatAngle(r.noonAz, 1)}</td>
-                    <td class="td-num">${formatAngle(r.noonT, 1)}</td>
-                    <td style="text-align: center;"><span class="badge-status-valid">✓ OK</span></td>
+                    <td style="padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;"><strong>${r.month} ${r.isSelectedMonth ? (isEn ? '★ (Selected)' : '★ (Consultado)') : ''}</strong></td>
+                    <td class="td-num" style="padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;">n = ${r.dayNum}</td>
+                    <td class="td-num" style="padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;">${r.mDec > 0 ? `+${formatAngle(r.mDec, 2)}` : formatAngle(r.mDec, 2)}</td>
+                    <td class="td-num" style="padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;">${formatAngle(r.wDeg, 2)}</td>
+                    <td class="td-num" style="padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;">${formatNum(r.sunHours, 2)} h</td>
+                    <td class="td-num" style="color: #0284c7; font-weight: 700; padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;">${formatAngle(r.noonH, 2)}</td>
+                    <td class="td-num" style="padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;">${formatAngle(r.noonAz, 1)}</td>
+                    <td class="td-num" style="color: #059669; font-weight: 700; padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;">${formatAngle(r.noonT, 1)}</td>
                   </tr>
                 `).join('')}
               </tbody>
-              <tfoot>
-                <tr class="table-media-row verif-media-row">
-                  <td><strong>${isEn ? 'MEAN' : 'MEDIA'}</strong></td>
-                  <td class="td-num">-</td>
-                  <td class="td-num"><strong>${avgDec > 0 ? `+${formatAngle(avgDec, 2)}` : formatAngle(avgDec, 2)}</strong></td>
-                  <td class="td-num"><strong>${formatAngle(avgW, 2)}</strong></td>
-                  <td class="td-num"><strong>${formatNum(avgSunHours, 2)} h</strong></td>
-                  <td class="td-num"><strong>${formatAngle(avgNoonH, 2)}</strong></td>
-                  <td class="td-num"><strong>${formatAngle(avgNoonAz, 1)}</strong></td>
-                  <td class="td-num"><strong>${formatAngle(avgNoonT, 1)}</strong></td>
-                  <td style="text-align: center;"><span class="badge-status-valid">✓ 100% OK</span></td>
-                </tr>
-              </tfoot>
             </table>
           </div>
         </div>
