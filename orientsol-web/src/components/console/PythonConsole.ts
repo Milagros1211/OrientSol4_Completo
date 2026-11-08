@@ -716,6 +716,12 @@ export function renderPythonConsole(): HTMLElement {
       months,
     } = params;
 
+    const fmtHour = (h: number) => {
+      const hrs = Math.floor(h);
+      const mins = Math.round((h % 1) * 60);
+      return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')} h`;
+    };
+
     if (activeTab === 'geometry') {
       return `
         <div class="verif-table-card">
@@ -813,79 +819,122 @@ export function renderPythonConsole(): HTMLElement {
             </div>
           </div>
 
-          <!-- Educational Callout Explaining the Physical Symmetry -->
+          <!-- Educational Callout Explaining the Physical Symmetry / Tracking Kinematics -->
           <div style="padding: 0.75rem 1rem; background: rgba(2, 132, 199, 0.05); border-bottom: 1px solid var(--border-subtle); font-size: 0.75rem; color: var(--text-dim); line-height: 1.45; display: flex; align-items: flex-start; gap: 0.5rem;">
             <span style="font-size: 1rem; color: var(--accent-cyan, #0284c7);">ℹ</span>
             <div>
-              <strong>${isEn ? 'Universal Solar Symmetry (Morning / Afternoon):' : 'Simetría Solar Universal (Mañana / Tarde):'}</strong><br/>
-              ${isEn
-          ? 'The sun rises in the morning, reaches its daily peak at <strong>12:00 h solar noon</strong>, and descends in the afternoon along an inverse trajectory. Solar noon acts as an astronomical mirror: at hours equidistant from noon (e.g. 11:00 h vs. 13:00 h), the <strong>Solar Altitude (α) is identical</strong>, the <strong>2-Axis Tilt (β = 90° - α) is identical</strong>, and the <strong>Azimuth (ψ)</strong> has the exact same angular magnitude with opposite direction (- East in the morning vs. + West in the afternoon). <strong style="color: var(--text-main);">Does this happen regardless of location? YES:</strong> it is a universal astronomical law valid for any latitude on Earth, resulting from the constant rotational speed of the planet around its polar axis.'
-          : 'El sol sube por la mañana, alcanza su punto más alto a las <strong>12:00 h solar (mediodía)</strong> y baja por la tarde recorriendo el camino inverso. El mediodía actúa como un espejo: a horas equidistantes (ej. 11:00 h vs. 13:00 h), la <strong>Altura Solar (α) es idéntica</strong>, la <strong>Inclinación 2-ejes (β = 90° - α) es idéntica</strong> y el <strong>Azimut (ψ)</strong> tiene idéntica apertura pero signo opuesto (- Este por la mañana vs. + Oeste por la tarde). <strong style="color: var(--text-main);">¿Ocurre indistintamente del emplazamiento? SÍ:</strong> es una ley astronómica universal que se cumple en cualquier latitud de la Tierra debido a la rotación axial constante del planeta.'}
+              <strong>${hourlyViewMode === 'paired'
+                ? (isEn ? '¿What is verified in Paired View? — Universal Solar Symmetry (Morning / Afternoon):' : '¿Qué valida la Vista Emparejada? — Simetría Solar Universal (Mañana / Tarde):')
+                : (isEn ? '¿What is verified in Full Timeline? — 2-Axis Tracking Kinematics & Daylight Horizon Check:' : '¿Qué valida la Línea Temporal Completa? — Cinemática de Seguimiento 2-Ejes y Horizonte:')}</strong><br/>
+              ${hourlyViewMode === 'paired'
+                ? (isEn
+                  ? 'Verifies the astronomical reflection law across solar noon (12:00 h). At equidistant hours (±ω), the <strong>Solar Altitude (α) is identical (Δα = 0.00°)</strong>, the <strong>2-Axis Tracker Tilt (β = 90° - α) is identical</strong>, and the <strong>Azimuth (ψ)</strong> has equal magnitude with opposite signs (- East morning vs. + West afternoon).'
+                  : 'Valida la ley astronómica de reflexión especular respecto al mediodía solar (12:00 h). Para cada par horario equidistante (±ω), la <strong>Altura Solar (α) es idéntica (Δα = 0,00°)</strong>, la <strong>Inclinación del Seguidor 2-Ejes (β = 90° - α) es idéntica</strong> y el <strong>Azimut (ψ)</strong> tiene idéntica magnitud con signos opuestos (- Este por la mañana vs. + Oeste por la tarde).')
+                : (isEn
+                  ? 'Verifies two key physical constraints for each hour: <strong>1) Daylight Condition:</strong> Sun is strictly above horizon (α > 0°). <strong>2) 2-Axis Tracking Law:</strong> Collector tilt strictly satisfies β = θz = 90° - α (or β + α = 90.00°), ensuring normal solar incidence (θ = 0.00°, cos θ = 1.00) throughout the entire day.'
+                  : 'Valida dos condiciones físicas fundamentales hora a hora: <strong>1) Condición de Radiación Diurna:</strong> El sol se sitúa por encima del horizonte físico real (α > 0°). <strong>2) Cinemática de Orientación del Seguidor 2-Ejes:</strong> La inclinación calculada satisface rigurosamente β = θz = 90° - α (o β + α = 90,00°), garantizando incidencia perpendicular constante (θ = 0,00°, cos θ = 1,00) para máxima captación directa (Bdm). A las 12:00 h se comprueba la culminación máxima diaria (cenit solar).')}
             </div>
           </div>
 
-          <!-- Interval Quick Selector Chips -->
-          <div style="padding: 0.65rem 0.85rem; background: var(--bg-card); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
-            <span style="font-size: 0.74rem; font-weight: 700; color: var(--text-dim); margin-right: 0.2rem;">
-              ${isEn ? 'Inspect Interval Pair:' : 'Inspeccionar Par de Intervalo:'}
-            </span>
-            ${pairedRows.map((row: any, i: number) => `
-              <button type="button" class="preset-chip verif-interval-chip ${i === selectedIntervalIdx ? 'active' : ''}" data-interval-idx="${i}" style="font-size: 0.72rem; padding: 0.2rem 0.55rem; ${i === selectedIntervalIdx ? 'background: #059669; color: #fff; border-color: #10b981; font-weight: 700;' : ''}">
-                Int. ${row.interval} (${row.morningHourStr} ↔ ${row.afternoonHourStr})
-              </button>
-            `).join('')}
-          </div>
+          ${hourlyViewMode === 'paired' ? `
+            <!-- Interval Quick Selector Chips (Only relevant for Paired View) -->
+            <div style="padding: 0.65rem 0.85rem; background: var(--bg-card); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
+              <span style="font-size: 0.74rem; font-weight: 700; color: var(--text-dim); margin-right: 0.2rem;">
+                ${isEn ? 'Inspect Interval Pair:' : 'Inspeccionar Par de Intervalo:'}
+              </span>
+              ${pairedRows.map((row: any, i: number) => `
+                <button type="button" class="preset-chip verif-interval-chip ${i === selectedIntervalIdx ? 'active' : ''}" data-interval-idx="${i}" style="font-size: 0.72rem; padding: 0.2rem 0.55rem; ${i === selectedIntervalIdx ? 'background: #059669; color: #fff; border-color: #10b981; font-weight: 700;' : ''}">
+                  Int. ${row.interval} (${row.morningHourStr} ↔ ${row.afternoonHourStr})
+                </button>
+              `).join('')}
+            </div>
 
-          ${activeInterval ? `
-            <!-- Focused Interval Card with Explicit Morning vs Afternoon Comparison -->
-            <div style="padding: 0.85rem 1rem; background: rgba(5, 150, 105, 0.04); border-bottom: 1px solid var(--border-subtle); display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem;">
+            ${activeInterval ? `
+              <!-- Focused Interval Card with Explicit Morning vs Afternoon Comparison -->
+              <div style="padding: 0.85rem 1rem; background: rgba(5, 150, 105, 0.04); border-bottom: 1px solid var(--border-subtle); display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem;">
+                <div style="background: var(--bg-card); padding: 0.6rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-subtle);">
+                  <span style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">${isEn ? 'Symmetric Pair' : 'Par Horario Simétrico'}</span>
+                  <div style="font-size: 0.95rem; font-weight: 800; color: var(--text-main); font-family: var(--font-mono); margin-top: 0.15rem;">
+                    ${activeInterval.morningHourStr} ↔ ${activeInterval.afternoonHourStr}
+                  </div>
+                  <div style="font-size: 0.72rem; color: var(--text-dim);">Ángulo horario: ω = ±${activeInterval.wMagnitudeDeg}°</div>
+                </div>
+
+                <div style="background: var(--bg-card); padding: 0.6rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-subtle);">
+                  <span style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">${isEn ? 'Solar Altitude (Identical)' : 'Altura Solar α (Idéntica)'}</span>
+                  <div style="font-size: 0.95rem; font-weight: 800; color: #0284c7; font-family: var(--font-mono); margin-top: 0.15rem;">
+                    ${activeInterval.altDeg}
+                  </div>
+                  <div style="font-size: 0.72rem; color: #059669;">✓ Elevación idéntica en mañana y tarde (Δα = 0,00°)</div>
+                </div>
+
+                <div style="background: var(--bg-card); padding: 0.6rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-subtle);">
+                  <span style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">${isEn ? 'Solar Azimuth (Symmetric)' : 'Azimut Solar ψ (Reflejado)'}</span>
+                  <div style="font-size: 0.92rem; font-weight: 800; color: #d97706; font-family: var(--font-mono); margin-top: 0.15rem;">
+                    ${activeInterval.azimMorningDeg} / ${activeInterval.azimAfternoonDeg}
+                  </div>
+                  <div style="font-size: 0.72rem; color: var(--text-dim);">Mañana: Este (-) | Tarde: Oeste (+)</div>
+                </div>
+
+                <div style="background: var(--bg-card); padding: 0.6rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-subtle);">
+                  <span style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">${isEn ? '2-Axis Tilt (Identical)' : 'Inclinación 2-Ejes β (Idéntica)'}</span>
+                  <div style="font-size: 0.95rem; font-weight: 800; color: #059669; font-family: var(--font-mono); margin-top: 0.15rem;">
+                    ${activeInterval.tilt2AxisDeg}
+                  </div>
+                  <div style="font-size: 0.72rem; color: #059669;">✓ Cenit solar = 90° - α (Incidencia normal θ = 0°)</div>
+                </div>
+              </div>
+            ` : ''}
+          ` : `
+            <!-- Focused Solar Day Milestones Card (For Chronological View) -->
+            <div style="padding: 0.85rem 1rem; background: rgba(2, 132, 199, 0.04); border-bottom: 1px solid var(--border-subtle); display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem;">
               <div style="background: var(--bg-card); padding: 0.6rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-subtle);">
-                <span style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">${isEn ? 'Symmetric Pair' : 'Par Horario Simétrico'}</span>
+                <span style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">${isEn ? 'Sunrise (Theoretical)' : 'Amanecer Teórico'}</span>
                 <div style="font-size: 0.95rem; font-weight: 800; color: var(--text-main); font-family: var(--font-mono); margin-top: 0.15rem;">
-                  ${activeInterval.morningHourStr} ↔ ${activeInterval.afternoonHourStr}
+                  ${fmtHour(Math.max(0, 12 - sunsetDeg / 15))}
                 </div>
-                <div style="font-size: 0.72rem; color: var(--text-dim);">Ángulo horario: ω = ±${activeInterval.wMagnitudeDeg}°</div>
+                <div style="font-size: 0.72rem; color: var(--text-dim);">Ángulo de puesta: ωs = ±${formatNum(sunsetDeg, 1)}°</div>
               </div>
 
               <div style="background: var(--bg-card); padding: 0.6rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-subtle);">
-                <span style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">${isEn ? 'Solar Altitude (Identical)' : 'Altura Solar α (Idéntica)'}</span>
+                <span style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">${isEn ? 'Solar Noon Peak' : 'Cenit Mediodía Solar'}</span>
                 <div style="font-size: 0.95rem; font-weight: 800; color: #0284c7; font-family: var(--font-mono); margin-top: 0.15rem;">
-                  ${activeInterval.altDeg}
+                  12:00 h — α = ${formatAngle(noonAltDeg, 2)}
                 </div>
-                <div style="font-size: 0.72rem; color: #059669;">✓ Elevación idéntica en mañana y tarde</div>
+                <div style="font-size: 0.72rem; color: #059669;">✓ Culminación diaria (ψ = 0,0° ${stateLat >= 0 ? (isEn ? 'South' : 'Sur') : (isEn ? 'North' : 'Norte')})</div>
               </div>
 
               <div style="background: var(--bg-card); padding: 0.6rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-subtle);">
-                <span style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">${isEn ? 'Solar Azimuth (Symmetric)' : 'Azimut Solar ψ (Reflejado)'}</span>
-                <div style="font-size: 0.92rem; font-weight: 800; color: #d97706; font-family: var(--font-mono); margin-top: 0.15rem;">
-                  ${activeInterval.azimMorningDeg} / ${activeInterval.azimAfternoonDeg}
+                <span style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">${isEn ? 'Sunset & Day Length' : 'Atardecer y Horas de Sol'}</span>
+                <div style="font-size: 0.95rem; font-weight: 800; color: #d97706; font-family: var(--font-mono); margin-top: 0.15rem;">
+                  ${fmtHour(Math.min(24, 12 + sunsetDeg / 15))} (S₀: ${formatNum(dayLengthHours, 2)} h)
                 </div>
-                <div style="font-size: 0.72rem; color: var(--text-dim);">Mañana: Este (-) | Tarde: Oeste (+)</div>
+                <div style="font-size: 0.72rem; color: var(--text-dim);">Ventana diurna real: α > 0°</div>
               </div>
 
               <div style="background: var(--bg-card); padding: 0.6rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-subtle);">
-                <span style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">${isEn ? '2-Axis Tilt (Identical)' : 'Inclinación 2-Ejes β (Idéntica)'}</span>
+                <span style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">${isEn ? '2-Axis Tracking Law' : 'Ley Seguidor 2-Ejes'}</span>
                 <div style="font-size: 0.95rem; font-weight: 800; color: #059669; font-family: var(--font-mono); margin-top: 0.15rem;">
-                  ${activeInterval.tilt2AxisDeg}
+                  β = 90° - α  (θ = 0,00°)
                 </div>
-                <div style="font-size: 0.72rem; color: #059669;">✓ Cenit solar = 90° - α</div>
+                <div style="font-size: 0.72rem; color: #059669;">✓ Incidencia normal permanente (cos θ = 1,00)</div>
               </div>
             </div>
-          ` : ''}
+          `}
 
           <div class="verif-table-wrap no-scroll" style="overflow-x: hidden !important; width: 100% !important; max-width: 100% !important; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);">
             ${hourlyViewMode === 'paired' ? `
               <!-- PAIRED SYMMETRY TABLE: Morning vs Afternoon side-by-side -->
               <table class="verif-data-table table-no-scroll" style="width: 100% !important; max-width: 100% !important; table-layout: fixed !important; border-collapse: collapse; font-size: 0.74rem; margin: 0;">
                 <colgroup>
-                  <col style="width: 9%;">
+                  <col style="width: 8%;">
                   <col style="width: 12%;">
                   <col style="width: 12%;">
                   <col style="width: 11%;">
-                  <col style="width: 14%;">
-                  <col style="width: 20%;">
+                  <col style="width: 13%;">
+                  <col style="width: 18%;">
                   <col style="width: 12%;">
-                  <col style="width: 10%;">
+                  <col style="width: 14%;">
                 </colgroup>
                 <thead>
                   <tr>
@@ -896,7 +945,7 @@ export function renderPythonConsole(): HTMLElement {
                     <th style="text-align: right; color: #0284c7; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Solar Alt (Identical)' : 'Altura Solar (Alt, α)'}</th>
                     <th style="text-align: right; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Azimuth Morning / Afternoon' : 'Azimut Mañana / Tarde (Ori, ψ)'}</th>
                     <th style="text-align: right; color: #059669; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? '2-Axis Tilt (Identical)' : 'Inclinación 2-Ejes (Inc, β)'}</th>
-                    <th style="text-align: center; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Status' : 'Simetría'}</th>
+                    <th style="text-align: center; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Symmetry Check (±ω)' : 'Verificación de Simetría (±ω)'}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -909,7 +958,7 @@ export function renderPythonConsole(): HTMLElement {
                       <td class="td-num" style="color: #0284c7; font-weight: 700; padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;">${row.altDeg}</td>
                       <td class="td-num" style="padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; font-size: 0.71rem;">${row.azimMorningDeg} / ${row.azimAfternoonDeg}</td>
                       <td class="td-num" style="color: #059669; font-weight: 700; padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;">${row.tilt2AxisDeg}</td>
-                      <td style="text-align: center; padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;"><span class="badge-status-valid" style="font-size: 0.68rem; padding: 0.15rem 0.35rem;">✓ Simétrico</span></td>
+                      <td style="text-align: center; padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;"><span class="badge-status-valid" style="font-size: 0.68rem; padding: 0.15rem 0.35rem; display: inline-block;">✓ Δα = 0,0° | |ψ| idéntico</span></td>
                     </tr>
                   `).join('')}
                 </tbody>
@@ -918,13 +967,13 @@ export function renderPythonConsole(): HTMLElement {
               <!-- CHRONOLOGICAL TIMELINE TABLE: From Sunrise to Sunset -->
               <table class="verif-data-table table-no-scroll" style="width: 100% !important; max-width: 100% !important; table-layout: fixed !important; border-collapse: collapse; font-size: 0.74rem; margin: 0;">
                 <colgroup>
+                  <col style="width: 11%;">
+                  <col style="width: 10%;">
+                  <col style="width: 11%;">
                   <col style="width: 14%;">
-                  <col style="width: 12%;">
-                  <col style="width: 13%;">
-                  <col style="width: 17%;">
-                  <col style="width: 17%;">
+                  <col style="width: 18%;">
                   <col style="width: 15%;">
-                  <col style="width: 12%;">
+                  <col style="width: 21%;">
                 </colgroup>
                 <thead>
                   <tr>
@@ -934,7 +983,7 @@ export function renderPythonConsole(): HTMLElement {
                     <th style="text-align: right; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Solar Altitude (Alt, α)' : 'Altura Solar (Alt, α)'}</th>
                     <th style="text-align: right; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Solar Azimuth (Ori, ψ)' : 'Azimut Solar (Ori, ψ)'}</th>
                     <th style="text-align: right; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? '2-Axis Tilt (Inc, β)' : 'Inclinación 2-Ejes (Inc, β)'}</th>
-                    <th style="text-align: center; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Status' : 'Estado'}</th>
+                    <th style="text-align: center; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Kinematic Check (β = 90° - α)' : 'Validación Cinemática (β = 90° - α)'}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -946,7 +995,11 @@ export function renderPythonConsole(): HTMLElement {
                       <td class="td-num" style="color: #0284c7; font-weight: 700; padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;">${row.altDeg}</td>
                       <td class="td-num" style="padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;">${row.azimDeg}</td>
                       <td class="td-num" style="color: #059669; font-weight: 700; padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;">${row.tilt2AxisDeg}</td>
-                      <td style="text-align: center; padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;"><span class="badge-status-valid" style="font-size: 0.68rem; padding: 0.15rem 0.35rem;">${row.isNoon ? (isEn ? '★ Central Axis' : '★ Eje Central') : (isEn ? '✓ Validated' : '✓ Validado')}</span></td>
+                      <td style="text-align: center; padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;">
+                        <span class="${row.isNoon ? 'badge badge-primary' : 'badge-status-valid'}" style="font-size: 0.66rem; padding: 0.15rem 0.35rem; display: inline-block;" title="α > 0° (diurno) y β = 90° - α (incidencia normal θ = 0°)">
+                          ${row.isNoon ? (isEn ? '★ Peak Zenith | θ = 0°' : '★ Cenit Máx | θ = 0° (β+α=90°)') : (isEn ? '✓ Day (α>0°) | θ = 0° (β+α=90°)' : '✓ Diurno (α>0°) | θ = 0° (β+α=90°)')}
+                        </span>
+                      </td>
                     </tr>
                   `).join('')}
                 </tbody>
