@@ -2539,10 +2539,6 @@ export function renderPythonConsole(): HTMLElement {
         },
       ];
 
-      const meanRad = trackingRows.reduce((acc, r) => acc + r.rad, 0) / trackingRows.length;
-      const meanGainH = trackingRows.reduce((acc, r) => acc + r.gainH, 0) / trackingRows.length;
-      const meanGainOpt = trackingRows.reduce((acc, r) => acc + r.gainOpt, 0) / trackingRows.length;
-
       return `
         <div class="verif-table-card">
           <div class="verif-table-title-bar" style="flex-wrap: wrap; gap: 0.5rem; justify-content: space-between; align-items: center;">
@@ -2563,6 +2559,23 @@ export function renderPythonConsole(): HTMLElement {
               <button type="button" id="btn-trk-day" class="btn btn-xs ${!isAnnualView ? 'btn-primary' : 'btn-secondary'}" style="font-size: 0.72rem; padding: 0.2rem 0.55rem; ${!isAnnualView ? 'background: #059669; color: #fff; border-color: #10b981;' : ''}">
                 ${isEn ? `Consulted Day (${stateDay} ${months[mIdx]})` : `Día Consultado (${stateDay} ${months[mIdx]})`}
               </button>
+            </div>
+          </div>
+
+          <!-- DYNAMIC EXPLANATION BANNER: WHAT DOES THIS TRACKING TAB EVALUATE -->
+          <div class="wmo-verif-banner" style="border-radius: 0; border-left: none; border-right: none;">
+            <div style="display: flex; align-items: flex-start; gap: 0.55rem;">
+              <span style="display: inline-flex; align-items: center; justify-content: center; width: 19px; height: 19px; border-radius: 50%; background: #059669; color: #ffffff; font-size: 0.70rem; font-weight: 800; flex-shrink: 0; margin-top: 0.1rem;">i</span>
+              <div>
+                <span style="color: var(--text-main);">
+                  <strong class="wmo-verif-banner-title" style="display: block; margin-bottom: 0.15rem; font-size: 0.74rem; color: #059669;">
+                    ${isEn ? 'What does this Tracking & Seasonal Topologies Comparison evaluate?' : '¿Qué evalúa esta Comparativa de Topologías de Seguimiento y Ajuste Estacional?'}
+                  </strong>
+                  ${isEn
+            ? 'Audits and ranks the 6 solar capture geometries against the horizontal baseline and fixed optimal orientation. It models physical gains across <strong>Fixed Optimal</strong>, <strong>Seasonal 4-Position Tilt</strong> (+3% to +5% extra), <strong>Single-Axis Polar Tracking</strong> (+35% to +45%), <strong>Single-Axis Azimuthal Tracking</strong> (+30% to +40%), <strong>Single-Axis Horizontal N-S Tracking</strong> (+25% to +35%), and the theoretical thermodynamic ceiling of <strong>Continuous Two-Axis Tracking</strong> (+45% to +50%), verifying mathematical consistency across all models.'
+            : 'Audita y compara las 6 geometrías mecánicas de captación solar frente al plano horizontal de referencia y a la instalación fija anual óptima. Cuantifica el aporte de la <strong>Inclinación Fija Óptima</strong>, el <strong>Ajuste Estacional en 4 Posiciones</strong> (+3% a +5% adicional), el <strong>Seguimiento a un Eje Polar</strong> (+35% a +45%), <strong>Seguimiento a un Eje Azimutal</strong> (+30% a +40%), <strong>Seguimiento a un Eje Horizontal N-S</strong> (+25% a +35%) y el límite termodinámico del <strong>Seguimiento Continuo a Dos Ejes</strong> (+45% a +50%), verificando la consistencia física y la ley de rendimientos mecánicos.'}
+                </span>
+              </div>
             </div>
           </div>
 
@@ -2588,41 +2601,69 @@ export function renderPythonConsole(): HTMLElement {
             ` : ''}
           </div>
 
-          <div class="verif-table-wrap">
-            <table class="verif-data-table">
+          <div class="verif-table-wrap no-scroll" style="overflow-x: hidden !important; width: 100% !important; max-width: 100% !important;">
+            <table class="verif-data-table table-no-scroll" style="width: 100% !important; max-width: 100% !important; table-layout: fixed !important; border-collapse: collapse; font-size: 0.74rem; margin: 0;">
+              <colgroup>
+                <col style="width: 26%;">
+                <col style="width: 16%;">
+                <col style="width: 14%;">
+                <col style="width: 16%;">
+                <col style="width: 14%;">
+                <col style="width: 14%;">
+              </colgroup>
               <thead>
                 <tr>
-                  <th>${isEn ? 'Capture Topology' : 'Topología de Captación'}</th>
-                  <th>${isEn ? 'Tilt (Inc)' : 'Inclinación (Inc)'}</th>
-                  <th>${isEn ? 'Orientation (Ori)' : 'Orientación (Ori)'}</th>
-                  <th style="text-align: right;">${isAnnualView ? (isEn ? 'Mean Resource (kWh/m²·d)' : 'Recurso Medio (kWh/m²·d)') : (isEn ? `Daily Resource ${months[mIdx]} (kWh/m²·d)` : `Recurso Día ${stateDay} ${months[mIdx]} (kWh/m²·d)`)}</th>
-                  <th style="text-align: right;">${isEn ? 'Gain vs Horiz (%)' : 'Ganancia s/ Horiz (%)'}</th>
-                  <th style="text-align: right;">${isEn ? 'Gain vs Fixed Opt (%)' : 'Ganancia s/ Fijo Ópt (%)'}</th>
-                  <th style="text-align: center;">${isEn ? 'Algorithm Status' : 'Estado Algoritmo'}</th>
+                  <th style="padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle; color: #ffffff !important;">${isEn ? 'Capture Topology' : 'Topología de Captación'}</th>
+                  <th style="padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle; color: #ffffff !important;">
+                    <div>${isEn ? 'Tilt (Inc)' : 'Inclinación (Inc)'}</div>
+                    <div class="verif-th-sub">[β, °]</div>
+                  </th>
+                  <th style="padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle; color: #ffffff !important;">
+                    <div>${isEn ? 'Orientation (Ori)' : 'Orientación (Ori)'}</div>
+                    <div class="verif-th-sub">[α / ψ, °]</div>
+                  </th>
+                  <th style="text-align: right; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle; color: #ffffff !important;">
+                    <div>${isAnnualView ? (isEn ? 'Mean Resource' : 'Recurso Medio') : (isEn ? `Daily Resource` : `Recurso Día ${stateDay}`)}</div>
+                    <div class="verif-th-sub-mint">(kWh/m²·d)</div>
+                  </th>
+                  <th style="text-align: right; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle; color: #ffffff !important;">
+                    <div>${isEn ? 'Gain vs Horiz' : 'Ganancia s/ Horiz'}</div>
+                    <div class="verif-th-sub">(%)</div>
+                  </th>
+                  <th style="text-align: right; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle; color: #ffffff !important;">
+                    <div>${isEn ? 'Gain vs Fixed Opt' : 'Ganancia s/ Fijo Ópt'}</div>
+                    <div class="verif-th-sub">(%)</div>
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 ${trackingRows.map((r) => `
                   <tr>
-                    <td><strong>${r.name}</strong></td>
-                    <td><code>${r.inc}</code></td>
-                    <td><code>${r.ori}</code></td>
-                    <td class="td-num"><strong>${formatNum(r.rad, 2)}</strong></td>
-                    <td class="td-num ${r.gainH >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">${r.gainH >= 0 ? `+${formatPercent(r.gainH, 1)}` : formatPercent(r.gainH, 1)}</td>
-                    <td class="td-num ${r.gainOpt >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">${r.gainOpt >= 0 ? `+${formatPercent(r.gainOpt, 1)}` : formatPercent(r.gainOpt, 1)}</td>
-                    <td style="text-align: center;"><span class="badge-status-valid">${r.status}</span></td>
+                    <td style="padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;"><strong>${r.name}</strong></td>
+                    <td style="padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;"><code>${r.inc}</code></td>
+                    <td style="padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;"><code>${r.ori}</code></td>
+                    <td class="td-num" style="padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;"><strong class="text-opt-val">${formatNum(r.rad, 2)}</strong></td>
+                    <td class="td-num ${r.gainH >= 0 ? 'text-diff-pos' : 'text-diff-neg'}" style="padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;">${r.gainH >= 0 ? `+${formatPercent(r.gainH, 1)}` : formatPercent(r.gainH, 1)}</td>
+                    <td class="td-num ${r.gainOpt >= 0 ? 'text-diff-pos' : 'text-diff-neg'}" style="padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;">${r.gainOpt >= 0 ? `+${formatPercent(r.gainOpt, 1)}` : formatPercent(r.gainOpt, 1)}</td>
                   </tr>
                 `).join('')}
               </tbody>
               <tfoot>
                 <tr class="table-media-row verif-media-row">
-                  <td><strong>${isEn ? 'MEAN' : 'MEDIA'}</strong></td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td class="td-num"><strong>${formatNum(meanRad, 2)}</strong></td>
-                  <td class="td-num ${meanGainH >= 0 ? 'text-gain-pos' : 'text-gain-neg'}"><strong>${meanGainH >= 0 ? `+${formatPercent(meanGainH, 1)}` : formatPercent(meanGainH, 1)}</strong></td>
-                  <td class="td-num ${meanGainOpt >= 0 ? 'text-gain-pos' : 'text-gain-neg'}"><strong>${meanGainOpt >= 0 ? `+${formatPercent(meanGainOpt, 1)}` : formatPercent(meanGainOpt, 1)}</strong></td>
-                  <td style="text-align: center;"><span class="badge-status-valid">✓ 100% OK</span></td>
+                  <td style="padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;">
+                    <strong style="color: var(--text-main);">${isEn ? 'CAPTURE RANGE (MIN → MAX)' : 'RANGO DE GANANCIA (MÍN → MÁX)'}</strong>
+                  </td>
+                  <td style="padding: 0.45rem 0.35rem; white-space: normal !important; font-size: 0.65rem; color: var(--text-muted);">0° → 90°</td>
+                  <td style="padding: 0.45rem 0.35rem; white-space: normal !important; font-size: 0.65rem; color: var(--text-muted);">${stateLat >= 0 ? '0° (Sur)' : '180° (Norte)'}</td>
+                  <td class="td-num" style="padding: 0.45rem 0.35rem; white-space: normal !important;">
+                    <strong class="text-opt-val">${formatNum(rHoriz, 2)} → ${formatNum(rDual, 2)}</strong>
+                  </td>
+                  <td class="td-num text-diff-pos" style="padding: 0.45rem 0.35rem; white-space: normal !important;">
+                    <strong>0% → +${formatPercent(calcGH(rDual), 1)}</strong>
+                  </td>
+                  <td class="td-num text-diff-pos" style="padding: 0.45rem 0.35rem; white-space: normal !important;">
+                    <strong>${formatPercent(calcGO(rHoriz), 1)} → +${formatPercent(calcGO(rDual), 1)}</strong>
+                  </td>
                 </tr>
               </tfoot>
             </table>
@@ -2749,7 +2790,17 @@ export function renderPythonConsole(): HTMLElement {
       const meanTc = energyRows.reduce((acc, r) => acc + r.tc, 0) / 12;
       const meanEOster = energyRows.reduce((acc, r) => acc + r.eOster, 0) / 12;
       const meanESimp = energyRows.reduce((acc, r) => acc + r.eSimp, 0) / 12;
-      const meanThLoss = energyRows.reduce((acc, r) => acc + r.thLoss, 0) / 12;
+
+      // Annual Totals and Net Thermal Derate
+      const totalEOster = energyRows.reduce((acc, r) => acc + r.eOster, 0);
+      const totalESimp = energyRows.reduce((acc, r) => acc + r.eSimp, 0);
+      const totalLostKwh = totalESimp - totalEOster;
+      const annualNetThermalLossPct = totalESimp > 0 ? -((totalLostKwh / totalESimp) * 100) : 0;
+      const specificYieldKwhPerKwp = peakKw > 0 ? Math.round(totalEOster / peakKw) : 0;
+
+      // Extreme Months: Hottest (worst thermal derate) and Coolest (best thermal gain)
+      const maxTcRow = [...energyRows].sort((a, b) => b.tc - a.tc)[0];
+      const minTcRow = [...energyRows].sort((a, b) => a.tc - b.tc)[0];
 
       return `
         <div class="verif-table-card">
@@ -2759,51 +2810,158 @@ export function renderPythonConsole(): HTMLElement {
           ? `PV Energy Yield & Osterwald Cell Thermal Derating (Emplacement Lat: ${formatAngle(stateLat, 2)}, Active Month: ${months[mIdx]})`
           : `Balance de Energía FV y Modelo Térmico Osterwald (Emplazamiento Lat: ${formatAngle(stateLat, 2)}, Mes Consultado: ${months[mIdx]})`}
             </span>
-            <span class="badge-status-valid">✓ Osterwald (TONC = ${formatNum(toncVal, 1)} °C, Pn = ${formatNum(peakKw, 1)} kWp)</span>
+            <span class="badge-status-valid">✓ Osterwald (TONC = ${formatNum(toncVal, 1)} °C, Pn = ${formatNum(peakKw, 1)} kWp, PR = ${formatPercent(prVal * 100, 0)})</span>
           </div>
 
-          <div class="verif-table-wrap">
-            <table class="verif-data-table">
+          <!-- DYNAMIC EXPLANATION BANNER: WHAT DOES THIS BALANCE EVALUATE -->
+          <div class="wmo-verif-banner" style="border-radius: 0; border-left: none; border-right: none;">
+            <div style="display: flex; align-items: flex-start; gap: 0.55rem;">
+              <span style="display: inline-flex; align-items: center; justify-content: center; width: 19px; height: 19px; border-radius: 50%; background: #2563eb; color: #ffffff; font-size: 0.70rem; font-weight: 800; flex-shrink: 0; margin-top: 0.1rem;">i</span>
+              <div>
+                <span style="color: var(--text-main);">
+                  <strong class="wmo-verif-banner-title" style="display: block; margin-bottom: 0.15rem; font-size: 0.74rem;">
+                    ${isEn ? 'What does this Photovoltaic Energy Balance & Thermal Model evaluate?' : '¿Qué evalúa este Balance de Energía Fotovoltaica y Modelo Térmico?'}
+                  </strong>
+                  ${isEn
+            ? 'Audits real operating PV generation comparing the <strong>Simplified Model</strong> (which assumes cell efficiency remains frozen at Standard Test Conditions, STC 25 °C, with fixed PR) against the realistic <strong>Osterwald Thermal Derating Model (IEC 61215)</strong>. It computes monthly daytime operating cell temperature (<strong>Tc</strong>) driven by ambient climate, effective solar irradiance, and nominal operating temperature (TONC = 47 °C). Through crystalline silicon\'s thermal coefficient (γ = −0.40%/°C), it quantifies summer open-circuit voltage drop (losses exceeding −13% in July at Tc > 58 °C) and winter operating cold gains (+2.5% in winter at Tc < 25 °C).'
+            : 'Audita el impacto térmico en la generación fotovoltaica comparando la producción teórica nominal (<strong>Modelo Simplificado</strong>, que asume rendimiento invariable a 25 °C STC con PR constante) frente a la producción real en operación (<strong>Modelo Térmico de Osterwald, Norma IEC 61215</strong>). Modela la temperatura de trabajo de la célula (<strong>Tc</strong>) a partir de la temperatura ambiente, la irradiancia solar incidente y la TONC (47 °C). Mediante el coeficiente térmico del silicio (γ = −0,40%/°C), cuantifica la caída de tensión estival (pérdidas de hasta −13% en julio cuando Tc supera 58 °C) y la bonificación por bajas temperaturas en invierno (+2,5% en invierno al trabajar Tc < 25 °C).'}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ANNUAL KPI METRIC SUMMARY HUD (OSTERWALD YIELD & THERMAL BALANCE) -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 0.65rem; padding: 0.75rem 1rem; background: var(--bg-card); border-bottom: 1px solid var(--border-subtle);">
+            <!-- Card 1: Producción Real Anual Osterwald -->
+            <div class="verif-metric-card" style="padding: 0.55rem 0.75rem;">
+              <div class="metric-title-4">${isEn ? '1. Real Annual Yield (Osterwald)' : '1. Generación Real Anual (Osterwald)'}</div>
+              <div style="font-size: 1.1rem; font-weight: 800; color: #059669;">
+                ${formatInt(totalEOster)} kWh/año
+              </div>
+              <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 0.15rem;">
+                ${isEn ? 'Specific yield:' : 'Rendimiento específico:'} <strong style="color: var(--text-main);">${formatInt(specificYieldKwhPerKwp)} kWh/kWp·año</strong>
+              </div>
+            </div>
+
+            <!-- Card 2: Balance Térmico Neto Anual -->
+            <div class="verif-metric-card" style="padding: 0.55rem 0.75rem;">
+              <div class="metric-title-2">${isEn ? '2. Net Annual Thermal Loss' : '2. Pérdida Térmica Neta Anual'}</div>
+              <div style="font-size: 1.1rem; font-weight: 800; color: ${annualNetThermalLossPct >= 0 ? '#059669' : '#dc2626'};">
+                ${annualNetThermalLossPct >= 0 ? `+${formatPercent(annualNetThermalLossPct, 2)}` : formatPercent(annualNetThermalLossPct, 2)}
+              </div>
+              <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 0.15rem;">
+                ${isEn ? 'Thermal penalty vs STC:' : 'Penalización térmica anual:'} <strong style="color: #dc2626;">-${formatInt(totalLostKwh)} kWh vs STC</strong>
+              </div>
+            </div>
+
+            <!-- Card 3: Mes Más Crítico por Calor -->
+            <div class="verif-metric-card" style="padding: 0.55rem 0.75rem;">
+              <div class="metric-title-5">${isEn ? '3. Hottest Critical Month' : '3. Mes Más Crítico por Calor'}</div>
+              <div style="font-size: 1.1rem; font-weight: 800; color: #d97706;">
+                ${maxTcRow.month} (Tc = ${formatNum(maxTcRow.tc, 1)} °C)
+              </div>
+              <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 0.15rem;">
+                ${isEn ? 'Peak summer derate:' : 'Penalización estival máxima:'} <strong class="text-diff-neg">${formatPercent(maxTcRow.thLoss, 2)}</strong>
+              </div>
+            </div>
+
+            <!-- Card 4: Mes Óptimo por Frío Invernal -->
+            <div class="verif-metric-card" style="padding: 0.55rem 0.75rem;">
+              <div class="metric-title-1">${isEn ? '4. Coolest Winter Boost' : '4. Mes de Mayor Ganancia Invernal'}</div>
+              <div style="font-size: 1.1rem; font-weight: 800; color: #0284c7;">
+                ${minTcRow.month} (Tc = ${formatNum(minTcRow.tc, 1)} °C)
+              </div>
+              <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 0.15rem;">
+                ${isEn ? 'Efficiency gain vs STC:' : 'Ganancia por frío vs STC:'} <strong class="text-diff-pos">+${formatPercent(minTcRow.thLoss, 2)}</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="verif-table-wrap no-scroll" style="overflow-x: hidden !important; width: 100% !important; max-width: 100% !important;">
+            <table class="verif-data-table table-no-scroll" style="width: 100% !important; max-width: 100% !important; table-layout: fixed !important; border-collapse: collapse; font-size: 0.74rem; margin: 0;">
+              <colgroup>
+                <col style="width: 14%;">
+                <col style="width: 16%;">
+                <col style="width: 17%;">
+                <col style="width: 18%;">
+                <col style="width: 18%;">
+                <col style="width: 17%;">
+              </colgroup>
               <thead>
                 <tr>
-                  <th>${isEn ? 'Month' : 'Mes'}</th>
-                  <th style="text-align: right;">${isEn ? 'Ambient Temp (°C)' : 'Temp. Ambiente (°C)'}</th>
-                  <th style="text-align: right;">${isEn ? 'Cell Temp Tc (°C)' : 'Temp. Célula Tc (°C)'}</th>
-                  <th style="text-align: right;">${isEn ? 'Osterwald Yield (kWh)' : 'Producción Osterwald (kWh)'}</th>
-                  <th style="text-align: right;">${isEn ? 'Simplified Yield (kWh)' : 'Producción Simplificada (kWh)'}</th>
-                  <th style="text-align: right;">${isEn ? 'Thermal Losses (%)' : 'Pérdidas Térmicas (%)'}</th>
-                  <th style="text-align: center;">${isEn ? 'Status' : 'Estado'}</th>
+                  <th style="padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle; color: #ffffff !important;">
+                    ${isEn ? 'Month' : 'Mes'}
+                  </th>
+                  <th style="text-align: right; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle; color: #ffffff !important;">
+                    <div>${isEn ? 'Ambient Temp' : 'Temp. Ambiente'}</div>
+                    <div class="verif-th-sub">(Tamb, °C)</div>
+                  </th>
+                  <th style="text-align: right; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle; color: #ffffff !important;">
+                    <div>${isEn ? 'Cell Temp Tc' : 'Temp. Célula Tc'}</div>
+                    <div class="verif-th-sub">[Osterwald, °C]</div>
+                  </th>
+                  <th style="text-align: right; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle; color: #ffffff !important;">
+                    <div>${isEn ? 'Osterwald Yield' : 'Producción Osterwald'}</div>
+                    <div class="verif-th-sub-mint">[Real, kWh]</div>
+                  </th>
+                  <th style="text-align: right; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle; color: #ffffff !important;">
+                    <div>${isEn ? 'Simplified Yield' : 'Producción Simplificada'}</div>
+                    <div class="verif-th-sub">[STC 25°C, kWh]</div>
+                  </th>
+                  <th style="text-align: right; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle; color: #ffffff !important;">
+                    <div>${isEn ? 'Thermal Impact' : 'Pérdidas Térmicas'}</div>
+                    <div class="verif-th-sub">[Δ vs STC, %]</div>
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 ${energyRows.map((r) => `
                   <tr style="${r.isSelectedMonth ? 'background: rgba(16, 185, 129, 0.12); font-weight: 700;' : ''}">
-                    <td><strong>${r.month} ${r.isSelectedMonth ? (isEn ? '★ (Selected)' : '★ (Consultado)') : ''}</strong></td>
-                    <td class="td-num">${formatNum(r.tAmb, 1)} °C</td>
-                    <td class="td-num" style="color: ${r.tc > 45 ? '#dc2626' : '#2563eb'}; font-weight: 700;">${formatNum(r.tc, 1)} °C</td>
-                    <td class="td-num"><strong>${formatInt(r.eOster)} kWh</strong></td>
-                    <td class="td-num">${formatInt(r.eSimp)} kWh</td>
-                    <td class="td-num ${r.thLoss >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">${r.thLoss >= 0 ? `+${formatPercent(r.thLoss, 2)}` : formatPercent(r.thLoss, 2)}</td>
-                    <td style="text-align: center;">
-                      ${r.eOster > 0 && r.tc >= (r.tAmb - 2) && r.thLoss <= 5
-              ? `<span class="badge-status-valid">✓ ${isEn ? 'Consistent' : 'Coherente'}</span>`
-              : `<span class="badge-status-warn">${isEn ? 'Review' : 'Revisar'}</span>`}
+                    <td style="padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;">
+                      <strong>${r.month} ${r.isSelectedMonth ? (isEn ? '★ (Selected)' : '★ (Consultado)') : ''}</strong>
+                    </td>
+                    <td class="td-num" style="padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;">
+                      ${formatNum(r.tAmb, 1)} °C
+                    </td>
+                    <td class="td-num" style="padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; font-weight: 700; color: ${r.tc > 45 ? '#dc2626' : (r.tc < 25 ? '#0284c7' : '#059669')};">
+                      ${formatNum(r.tc, 1)} °C
+                    </td>
+                    <td class="td-num" style="padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;">
+                      <strong class="text-opt-val">${formatInt(r.eOster)} kWh</strong>
+                    </td>
+                    <td class="td-num" style="padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;">
+                      <span class="text-pvgis-val">${formatInt(r.eSimp)} kWh</span>
+                    </td>
+                    <td class="td-num ${r.thLoss >= 0 ? 'text-diff-pos' : 'text-diff-neg'}" style="padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; font-weight: 700;">
+                      ${r.thLoss >= 0 ? `+${formatPercent(r.thLoss, 2)}` : formatPercent(r.thLoss, 2)}
                     </td>
                   </tr>
                 `).join('')}
               </tbody>
               <tfoot>
                 <tr class="table-media-row verif-media-row">
-                  <td><strong>${isEn ? 'MEAN' : 'MEDIA'}</strong></td>
-                  <td class="td-num"><strong>${formatNum(meanTAmb, 1)} °C</strong></td>
-                  <td class="td-num" style="color: #2563eb; font-weight: 700;"><strong>${formatNum(meanTc, 1)} °C</strong></td>
-                  <td class="td-num"><strong>${formatInt(Math.round(meanEOster))} kWh</strong></td>
-                  <td class="td-num"><strong>${formatInt(Math.round(meanESimp))} kWh</strong></td>
-                  <td class="td-num ${meanThLoss >= 0 ? 'text-gain-pos' : 'text-gain-neg'}"><strong>${meanThLoss >= 0 ? `+${formatPercent(meanThLoss, 2)}` : formatPercent(meanThLoss, 2)}</strong></td>
-                  <td style="text-align: center;">
-                    ${energyRows.every(r => r.eOster > 0 && r.tc >= (r.tAmb - 2))
-          ? `<span class="badge-status-valid">✓ ${isEn ? '100% Consistent' : '100% Coherente'}</span>`
-          : `<span class="badge-status-warn">${isEn ? 'Review' : 'Revisar'}</span>`}
+                  <td style="padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;">
+                    <strong style="color: var(--text-main);">${isEn ? 'TOTAL / ANNUAL BALANCE' : 'BALANCE ANUAL TOTAL'}</strong>
+                  </td>
+                  <td class="td-num" style="padding: 0.45rem 0.35rem; white-space: normal !important;">
+                    <strong>${formatNum(meanTAmb, 1)} °C</strong>
+                    <div style="font-size: 0.58rem; color: var(--text-muted);">${isEn ? 'annual mean' : 'media anual'}</div>
+                  </td>
+                  <td class="td-num" style="padding: 0.45rem 0.35rem; white-space: normal !important; font-weight: 700; color: ${meanTc > 35 ? '#d97706' : '#059669'};">
+                    <strong>${formatNum(meanTc, 1)} °C</strong>
+                    <div style="font-size: 0.58rem; color: var(--text-muted);">${isEn ? 'annual mean' : 'media anual'}</div>
+                  </td>
+                  <td class="td-num" style="padding: 0.45rem 0.35rem; white-space: normal !important;">
+                    <strong class="text-opt-val" style="font-size: 0.82rem;">${formatInt(totalEOster)} kWh</strong>
+                    <div style="font-size: 0.58rem; color: var(--text-muted);">${formatInt(Math.round(meanEOster))} kWh/mes</div>
+                  </td>
+                  <td class="td-num" style="padding: 0.45rem 0.35rem; white-space: normal !important;">
+                    <strong class="text-pvgis-val" style="font-size: 0.82rem;">${formatInt(totalESimp)} kWh</strong>
+                    <div style="font-size: 0.58rem; color: var(--text-muted);">${formatInt(Math.round(meanESimp))} kWh/mes</div>
+                  </td>
+                  <td class="td-num ${annualNetThermalLossPct >= 0 ? 'text-diff-pos' : 'text-diff-neg'}" style="padding: 0.45rem 0.35rem; white-space: normal !important; font-weight: 800;">
+                    <strong>${annualNetThermalLossPct >= 0 ? `+${formatPercent(annualNetThermalLossPct, 2)}` : formatPercent(annualNetThermalLossPct, 2)}</strong>
+                    <div style="font-size: 0.58rem;">-${formatInt(totalLostKwh)} kWh vs STC</div>
                   </td>
                 </tr>
               </tfoot>
