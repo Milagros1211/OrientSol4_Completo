@@ -1,7 +1,7 @@
 {
   "name": "orientsol-web",
   "private": true,
-  "version": "4.1.5",
+  "version": "4.1.6",
   "description": "OrientSol 4.0 - Software Avanzado de Cálculo Solar Fotovoltaico y Térmico",
   "author": "OrientSol Team",
   "type": "module",

@@ -332,86 +332,146 @@ export function openPedagogicalGuideModal(
       case 'verification':
         return {
           title: isEn
-            ? 'Pedagogical Guide: Scientific Verification & Mathematical Engines'
-            : 'Guía Didáctica: Verificación Científica y Motores Matemáticos',
+            ? `Pedagogical Guide: Scientific Verification & Mathematical Engines (${renderTex('\\text{OMM} \\; \\text{N}^\\circ \\; 8')})`
+            : `Guía Didáctica: Verificación Científica y Motores Matemáticos (${renderTex('\\text{OMM} \\; \\text{N}^\\circ \\; 8')})`,
           subtitle: isEn
-            ? 'Theoretical validation procedure, analytical equations, temporal symmetry, and WMO-No. 8 calibration'
-            : 'Procedimiento de validación teórica, ecuaciones analíticas, simetría temporal y calibración OMM / PVGIS',
+            ? 'Theoretical validation procedure, analytical equations, temporal symmetry, tracking kinematics, and WMO/PVGIS calibration'
+            : 'Procedimiento de validación teórica, ecuaciones analíticas, simetría temporal, cinemática de seguimiento y calibración OMM / PVGIS',
           badge: isEn ? 'Scientific Engine Validation' : 'Validación Científica & OMM',
           sections: [
             {
               heading: isEn
-                ? `1. Solar Celestial Sphere & Temporal Mirror Symmetry`
-                : `1. Trigonometría de la Esfera Celeste y Ley Física de Simetría Temporal`,
+                ? `1. Solar Celestial Sphere & Astronomical Temporal Symmetry (${renderTex('\\alpha_s')}, ${renderTex('\\psi_s')})`
+                : `1. Trigonometría de la Esfera Celeste y Ley Física de Simetría Temporal (${renderTex('\\alpha_s')}, ${renderTex('\\psi_s')})`,
               content: isEn
-                ? `<p style="margin: 0 0 0.5rem 0;">OrientSol computes the astronomical solar vector at every hour of the day. The position of the Sun is defined by its Solar Altitude (${renderTex('\\alpha_s')}) and Solar Azimuth (${renderTex('\\psi_s')}) relative to the local meridian:</p>
+                ? `<p style="margin: 0 0 0.5rem 0;">OrientSol computes the astronomical solar vector at every hour of the day using spherical celestial trigonometry based on latitude (${renderTex('\\phi')}), solar declination (${renderTex('\\delta')}), and solar hour angle (${renderTex('\\omega')}). The position of the Sun is defined by its Solar Altitude (${renderTex('\\alpha_s')}) and Solar Azimuth (${renderTex('\\psi_s')}):</p>
                   <div class="math-formula-box" style="margin: 0.5rem 0; padding: 0.6rem 0.8rem; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 6px;">
-                    <div style="font-size: 0.73rem; font-weight: 700; color: #0284c7; margin-bottom: 0.2rem;">Hourly Solar Altitude & Solar Azimuth:</div>
+                    <div style="font-size: 0.73rem; font-weight: 700; color: #0284c7; margin-bottom: 0.2rem;">Hourly Solar Altitude, Solar Azimuth & 2-Axis Tilt:</div>
                     ${renderTex('\\sin\\alpha_s = \\sin\\phi\\sin\\delta + \\cos\\phi\\cos\\delta\\cos\\omega', true)}
                     ${renderTex('\\cos\\psi_s = \\frac{\\sin\\alpha_s\\sin\\phi - \\sin\\delta}{\\cos\\alpha_s\\cos\\phi}', true)}
+                    ${renderTex('\\beta_{2\\text{-ejes}} = 90^\\circ - \\alpha_s, \\quad \\gamma_{c} = \\psi_s', true)}
                   </div>
-                  <p style="margin: 0.4rem 0 0 0; line-height: 1.5;"><strong>Universal Law of Solar Symmetry:</strong> Solar noon (12:00 h, ${renderTex('\\omega = 0^\\circ')}) behaves as a perfect astronomical mirror. At hours equidistant from noon (${renderTex('12 - \\Delta t')} vs. ${renderTex('12 + \\Delta t')}), the solar altitude ${renderTex('\\alpha_s')} and dual-axis collector tilt ${renderTex('\\beta = 90^\\circ - \\alpha_s')} are identical, while the azimuth ${renderTex('\\psi_s')} has the exact same angular magnitude with opposite direction (- East in the morning vs. + West in the afternoon).</p>`
-                : `<p style="margin: 0 0 0.5rem 0;">OrientSol modela el vector solar instantáneo en cada hora del día mediante trigonometría esférica astronómica. La posición del Sol se define por su Altura Solar (${renderTex('\\alpha_s')}) y su Azimut Solar (${renderTex('\\psi_s')}):</p>
+                  <p style="margin: 0.4rem 0 0 0; line-height: 1.5;"><strong>Universal Law of Astronomical Symmetry:</strong> Solar noon (${renderTex('12{:}00\\text{ h}')}, ${renderTex('\\omega = 0^\\circ')}) acts as an exact astronomical mirror. At hours equidistant from noon (${renderTex('12 - \\Delta t')} vs. ${renderTex('12 + \\Delta t')}):</p>
+                  <div class="math-formula-box" style="margin: 0.35rem 0; padding: 0.5rem 0.8rem; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 6px;">
+                    ${renderTex('\\omega(12 - \\Delta t) = -\\omega(12 + \\Delta t)', true)}
+                    ${renderTex('\\alpha_s(12 - \\Delta t) = \\alpha_s(12 + \\Delta t) \\implies \\beta(12 - \\Delta t) = \\beta(12 + \\Delta t)', true)}
+                    ${renderTex('\\psi_s(12 - \\Delta t) = -\\psi_s(12 + \\Delta t) \\quad (-\\text{East morning} \\iff +\\text{West afternoon})', true)}
+                  </div>`
+                : `<p style="margin: 0 0 0.5rem 0;">OrientSol modela el vector solar instantáneo en cada hora del día mediante trigonometría esférica astronómica en función de la latitud (${renderTex('\\phi')}), declinación solar (${renderTex('\\delta')}) y ángulo horario (${renderTex('\\omega')}). La posición del Sol se define por su Altura Solar (${renderTex('\\alpha_s')}) y su Azimut Solar (${renderTex('\\psi_s')}):</p>
                   <div class="math-formula-box" style="margin: 0.5rem 0; padding: 0.6rem 0.8rem; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 6px;">
-                    <div style="font-size: 0.73rem; font-weight: 700; color: #0284c7; margin-bottom: 0.2rem;">Altura Solar Horaria y Azimut Solar:</div>
+                    <div style="font-size: 0.73rem; font-weight: 700; color: #0284c7; margin-bottom: 0.2rem;">Altura Solar Horaria, Azimut Solar e Inclinación a 2 Ejes:</div>
                     ${renderTex('\\sin\\alpha_s = \\sin\\phi\\sin\\delta + \\cos\\phi\\cos\\delta\\cos\\omega', true)}
                     ${renderTex('\\cos\\psi_s = \\frac{\\sin\\alpha_s\\sin\\phi - \\sin\\delta}{\\cos\\alpha_s\\cos\\phi}', true)}
+                    ${renderTex('\\beta_{2\\text{-ejes}} = 90^\\circ - \\alpha_s, \\quad \\gamma_{c} = \\psi_s', true)}
                   </div>
-                  <p style="margin: 0.4rem 0 0 0; line-height: 1.5;"><strong>Ley Universal de Simetría Solar:</strong> El mediodía solar (12:00 h, ${renderTex('\\omega = 0^\\circ')}) actúa como un espejo astronómico exacto. A horas equidistantes del mediodía (${renderTex('12 - \\Delta t')} vs. ${renderTex('12 + \\Delta t')}), la altura solar ${renderTex('\\alpha_s')} y la inclinación del seguidor a 2 ejes ${renderTex('\\beta = 90^\\circ - \\alpha_s')} son rigurosamente idénticas, y el azimut ${renderTex('\\psi_s')} tiene la misma apertura angular con signo reflejado (- Este por la mañana vs. + Oeste por la tarde).</p>`,
+                  <p style="margin: 0.4rem 0 0 0; line-height: 1.5;"><strong>Ley Universal de Simetría Solar:</strong> El mediodía solar (${renderTex('12{:}00\\text{ h}')}, ${renderTex('\\omega = 0^\\circ')}) actúa como un espejo astronómico exacto. A horas equidistantes del mediodía (${renderTex('12 - \\Delta t')} vs. ${renderTex('12 + \\Delta t')}):</p>
+                  <div class="math-formula-box" style="margin: 0.35rem 0; padding: 0.5rem 0.8rem; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 6px;">
+                    ${renderTex('\\omega(12 - \\Delta t) = -\\omega(12 + \\Delta t)', true)}
+                    ${renderTex('\\alpha_s(12 - \\Delta t) = \\alpha_s(12 + \\Delta t) \\implies \\beta(12 - \\Delta t) = \\beta(12 + \\Delta t)', true)}
+                    ${renderTex('\\psi_s(12 - \\Delta t) = -\\psi_s(12 + \\Delta t) \\quad (-\\text{Este mañana} \\iff +\\text{Oeste tarde})', true)}
+                  </div>`,
             },
             {
               heading: isEn
-                ? `2. Klein (1977) Characteristic Intermediate Days (12-Month Baseline)`
-                : `2. Metodología de Días Medios de Klein (1977) y Línea Base de 12 Meses`,
+                ? `2. Klein (1977) Characteristic Intermediate Days (${renderTex('n_m')}) & 12-Month Baseline`
+                : `2. Metodología de Días Medios de Klein (1977) (${renderTex('n_m')}) y Línea Base de 12 Meses`,
               content: isEn
-                ? `<p style="margin: 0 0 0.5rem 0;">Simulating 8,760 hours individually across 365 days is computationally heavy. S. A. Klein (1977) proved that computing the solar geometry on one specific characteristic day (${renderTex('n_m')}) per month accurately reproduces the integrated monthly extraterrestrial radiation (${renderTex('\\overline{G}_{0d}')}) with under 0.5% error:</p>
+                ? `<p style="margin: 0 0 0.5rem 0;">Simulating 8,760 hours individually across 365 days is computationally heavy. S. A. Klein (1977) proved that computing the solar geometry on one specific characteristic day (${renderTex('n_m')}) per month accurately reproduces the integrated monthly extraterrestrial radiation (${renderTex('\\overline{G}_{0d}')}) with under ${renderTex('0{,}5\\%')} error:</p>
                   <div class="math-formula-box" style="margin: 0.5rem 0; padding: 0.55rem 0.75rem; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 6px;">
                     <div style="font-size: 0.72rem; font-weight: 700; color: #059669; margin-bottom: 0.2rem;">Characteristic Days Vector (Klein, 1977):</div>
                     ${renderTex('n_m \\in \\{17, 47, 75, 105, 135, 162, 198, 228, 258, 288, 318, 344\\}', true)}
+                    <div style="font-size: 0.72rem; font-weight: 700; color: #0284c7; margin: 0.35rem 0 0.2rem 0;">Solar Declination (Cooper, 1969) & Sunset Hour Angle:</div>
+                    ${renderTex('\\delta = 23{,}45^\\circ \\cdot \\sin\\left[ \\frac{360^\\circ}{365}\\,(284 + n_m) \\right], \\quad \\cos\\omega_s = -\\tan\\phi\\tan\\delta \\implies S_0 = \\frac{2\\,\\omega_s}{15^\\circ}', true)}
                   </div>`
-                : `<p style="margin: 0 0 0.5rem 0;">Simular las 8.760 horas del año día a día resulta computacionalmente pesado en ingeniería solar. S. A. Klein (1977) demostró que calcular la geometría solar sobre un día medio característico (${renderTex('n_m')}) en cada mes reproduce la irradiación extraterrestre acumulada mensual (${renderTex('\\overline{G}_{0d}')}) con un error inferior al 0,5%:</p>
+                : `<p style="margin: 0 0 0.5rem 0;">Simular las 8.760 horas del año día a día resulta computacionalmente pesado en ingeniería solar. S. A. Klein (1977) demostró que calcular la geometría solar sobre un día medio característico (${renderTex('n_m')}) en cada mes reproduce la irradiación extraterrestre acumulada mensual (${renderTex('\\overline{G}_{0d}')}) con un error inferior al ${renderTex('0{,}5\\%')}:</p>
                   <div class="math-formula-box" style="margin: 0.5rem 0; padding: 0.55rem 0.75rem; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 6px;">
                     <div style="font-size: 0.72rem; font-weight: 700; color: #059669; margin-bottom: 0.2rem;">Vector de Días Medios Característicos (Klein, 1977):</div>
                     ${renderTex('n_m \\in \\{17, 47, 75, 105, 135, 162, 198, 228, 258, 288, 318, 344\\}', true)}
+                    <div style="font-size: 0.72rem; font-weight: 700; color: #0284c7; margin: 0.35rem 0 0.2rem 0;">Declinación Solar de Cooper (1969) y Ángulo Horario de Puesta:</div>
+                    ${renderTex('\\delta = 23{,}45^\\circ \\cdot \\sin\\left[ \\frac{360^\\circ}{365}\\,(284 + n_m) \\right], \\quad \\cos\\omega_s = -\\tan\\phi\\tan\\delta \\implies S_0 = \\frac{2\\,\\omega_s}{15^\\circ}', true)}
                   </div>`,
             },
             {
               heading: isEn
-                ? `3. Liu-Jordan Radiative Decomposition & WMO-No. 8 Validation`
-                : `3. Descomposición Radiativa de Liu-Jordan y Calibración según Norma OMM Nº 8`,
+                ? `3. Liu-Jordan Radiative Decomposition (${renderTex('B_{dm}(0)')}, ${renderTex('D_{dm}(0)')}) & WMO-No. 8 Calibration`
+                : `3. Descomposición Radiativa de Liu-Jordan (${renderTex('B_{dm}(0)')}, ${renderTex('D_{dm}(0)')}) y Calibración según Norma OMM Nº 8`,
               content: isEn
-                ? `<p style="margin: 0 0 0.5rem 0;">OrientSol separates horizontal global radiation into direct beam (${renderTex('B_{dm}(0)')}) and diffuse (${renderTex('D_{dm}(0)')}) components, transposes them to slope ${renderTex('\\beta')}, and benchmarks against European Commission PVGIS satellite data under World Meteorological Organization (WMO) standards:</p>
+                ? `<p style="margin: 0 0 0.5rem 0;">OrientSol separates horizontal global radiation into direct beam (${renderTex('B_{dm}(0)')}) and diffuse (${renderTex('D_{dm}(0)')}) components, transposes them to slope ${renderTex('\\beta')}, and benchmarks against European Commission PVGIS satellite records under World Meteorological Organization (WMO) standards:</p>
                   <div class="math-formula-box" style="margin: 0.5rem 0; padding: 0.6rem 0.8rem; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 6px;">
-                    <div style="font-size: 0.73rem; font-weight: 700; color: #0284c7; margin-bottom: 0.2rem;">Liu-Jordan Decomposition:</div>
-                    ${renderTex('K_t = \\frac{G_{dm}(0)}{G_{0d}}, \\quad K_d = 1{,}0 - 1{,}13\\,K_t \\implies D_{dm} = K_d \\cdot G_{dm}(0), \\quad B_{dm} = G_{dm}(0) - D_{dm}', true)}
-                    <div style="font-size: 0.73rem; font-weight: 700; color: #059669; margin: 0.4rem 0 0.2rem 0;">WMO-No. 8 Relative Percentage Deviation Audit:</div>
-                    ${renderTex('\\text{Dev}(\\%) = \\frac{|G_{dm}^{\\text{OS}}(\\beta_{opt}) - G_{dm}^{\\text{PVGIS}}(\\beta_{opt})|}{G_{dm}^{\\text{PVGIS}}(\\beta_{opt})} \\times 100', true)}
+                    <div style="font-size: 0.73rem; font-weight: 700; color: #0284c7; margin-bottom: 0.2rem;">Liu-Jordan Radiative Decomposition:</div>
+                    ${renderTex('K_t = \\frac{G_{dm}(0)}{G_{0d}}, \\quad K_d = 1{,}0 - 1{,}13\\,K_t \\implies D_{dm}(0) = K_d \\cdot G_{dm}(0), \\quad B_{dm}(0) = G_{dm}(0) - D_{dm}(0)', true)}
+                    <div style="font-size: 0.73rem; font-weight: 700; color: #059669; margin: 0.4rem 0 0.2rem 0;">Isotropic Transposition to Tilted Surface (${renderTex('\\beta')}):</div>
+                    ${renderTex('G_{dm}(\\beta) = B_{dm}(0)\\,R_b + D_{dm}(0)\\left( \\frac{1 + \\cos\\beta}{2} \\right) + G_{dm}(0)\\,\\rho_g\\left( \\frac{1 - \\cos\\beta}{2} \\right)', true)}
+                    <div style="font-size: 0.73rem; font-weight: 700; color: #0284c7; margin: 0.4rem 0 0.2rem 0;">WMO-No. 8 Relative Percentage Deviation Audit:</div>
+                    ${renderTex('\\text{Dev}(\\%) = \\frac{|G_{dm}^{\\text{OS}}(\\beta_{\\text{opt}}) - G_{dm}^{\\text{PVGIS}}(\\beta_{\\text{opt}})|}{G_{dm}^{\\text{PVGIS}}(\\beta_{\\text{opt}})} \\times 100', true)}
                   </div>`
-                : `<p style="margin: 0 0 0.5rem 0;">OrientSol descompone la radiación horizontal en directa (${renderTex('B_{dm}(0)')}) y difusa (${renderTex('D_{dm}(0)}')}), las transpone a la inclinación ${renderTex('\\beta')} y las audita frente a los registros satelitales de PVGIS bajo los criterios de la Organización Meteorológica Mundial (OMM):</p>
+                : `<p style="margin: 0 0 0.5rem 0;">OrientSol descompone la radiación horizontal en directa (${renderTex('B_{dm}(0)')}) y difusa (${renderTex('D_{dm}(0)')}), las transpone a la inclinación ${renderTex('\\beta')} y las audita frente a los registros satelitales de PVGIS bajo los criterios de la Organización Meteorológica Mundial (OMM):</p>
                   <div class="math-formula-box" style="margin: 0.5rem 0; padding: 0.6rem 0.8rem; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 6px;">
-                    <div style="font-size: 0.73rem; font-weight: 700; color: #0284c7; margin-bottom: 0.2rem;">Descomposición de Liu-Jordan:</div>
-                    ${renderTex('K_t = \\frac{G_{dm}(0)}{G_{0d}}, \\quad K_d = 1{,}0 - 1{,}13\\,K_t \\implies D_{dm} = K_d \\cdot G_{dm}(0), \\quad B_{dm} = G_{dm}(0) - D_{dm}', true)}
-                    <div style="font-size: 0.73rem; font-weight: 700; color: #059669; margin: 0.4rem 0 0.2rem 0;">Auditoría de Desviación Porcentual Relativa OMM Nº 8:</div>
-                    ${renderTex('\\text{Desv}(\\%) = \\frac{|G_{dm}^{\\text{OS}}(\\beta_{opt}) - G_{dm}^{\\text{PVGIS}}(\\beta_{opt})|}{G_{dm}^{\\text{PVGIS}}(\\beta_{opt})} \\times 100', true)}
+                    <div style="font-size: 0.73rem; font-weight: 700; color: #0284c7; margin-bottom: 0.2rem;">Descomposición Radiativa de Liu-Jordan:</div>
+                    ${renderTex('K_t = \\frac{G_{dm}(0)}{G_{0d}}, \\quad K_d = 1{,}0 - 1{,}13\\,K_t \\implies D_{dm}(0) = K_d \\cdot G_{dm}(0), \\quad B_{dm}(0) = G_{dm}(0) - D_{dm}(0)', true)}
+                    <div style="font-size: 0.73rem; font-weight: 700; color: #059669; margin: 0.4rem 0 0.2rem 0;">Transposición Isotrópica a Superficie Inclinada (${renderTex('\\beta')}):</div>
+                    ${renderTex('G_{dm}(\\beta) = B_{dm}(0)\\,R_b + D_{dm}(0)\\left( \\frac{1 + \\cos\\beta}{2} \\right) + G_{dm}(0)\\,\\rho_g\\left( \\frac{1 - \\cos\\beta}{2} \\right)', true)}
+                    <div style="font-size: 0.73rem; font-weight: 700; color: #0284c7; margin: 0.4rem 0 0.2rem 0;">Auditoría de Desviación Porcentual Relativa OMM Nº 8:</div>
+                    ${renderTex('\\text{Desv}(\\%) = \\frac{|G_{dm}^{\\text{OS}}(\\beta_{\\text{opt}}) - G_{dm}^{\\text{PVGIS}}(\\beta_{\\text{opt}})|}{G_{dm}^{\\text{PVGIS}}(\\beta_{\\text{opt}})} \\times 100', true)}
                   </div>`,
             },
             {
               heading: isEn
-                ? `4. Tracking Topologies & Osterwald Cell Thermal Derating`
-                : `4. Topologías de Seguimiento Solar y Pérdidas Térmicas de Osterwald`,
+                ? `4. Solar Tracking Topologies & Kinematic Envelopes (${renderTex('\\beta')}, ${renderTex('\\gamma_c')})`
+                : `4. Topologías de Seguimiento Solar y Cinemática de Captación (${renderTex('\\beta')}, ${renderTex('\\gamma_c')})`,
               content: isEn
-                ? `<p style="margin: 0 0 0.5rem 0;">Capturing solar energy with tracking collectors increases annual yield significantly (up to +45% with 2-axis tracking). Meanwhile, photovoltaic cell operating temperature (${renderTex('T_c')}) reduces conversion efficiency according to the Osterwald thermal model:</p>
+                ? `<p style="margin: 0 0 0.5rem 0;">OrientSol evaluates 6 distinct mechanical topologies across all 12 months to quantify physical capture gains relative to a horizontal reference (${renderTex('\\beta = 0^\\circ')}):</p>
                   <div class="math-formula-box" style="margin: 0.5rem 0; padding: 0.6rem 0.8rem; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 6px;">
-                    <div style="font-size: 0.73rem; font-weight: 700; color: #2563eb; margin-bottom: 0.2rem;">Osterwald Cell Temperature & Thermal Losses:</div>
-                    ${renderTex('T_c = T_{\\text{amb}} + \\left( \\frac{\\text{TONC} - 20^\\circ\\text{C}}{800\\text{ W/m}^2} \\right) \\cdot G_{\\text{eff}}', true)}
-                    ${renderTex('P_{\\text{mp}} = P_{\\text{stc}} \\cdot \\frac{G_{\\text{eff}}}{1000} \\cdot \\left[ 1 + \\gamma \\,(T_c - 25^\\circ\\text{C}) \\right], \\quad \\gamma \\approx -0{,}40\\%/^\\circ\\text{C}', true)}
+                    <div style="font-size: 0.73rem; font-weight: 700; color: #0284c7; margin-bottom: 0.2rem;">Tracking Topologies Evaluated:</div>
+                    <ul style="margin: 0.2rem 0 0.4rem 0; padding-left: 1.15rem; line-height: 1.55;">
+                      <li><strong>1. Horizontal Surface:</strong> ${renderTex('\\beta = 0^\\circ')} (Zero mechanical cost, reference baseline).</li>
+                      <li><strong>2. Annual Fixed Tilt:</strong> ${renderTex('\\beta = \\beta_{\\text{opt}}, \\; \\gamma_c = 0^\\circ')} (${renderTex('+10\\%')} to ${renderTex('+25\\%')} gain vs. horizontal).</li>
+                      <li><strong>3. 4-Season Tilt:</strong> ${renderTex('\\beta \\in \\{\\beta_{\\text{win}}, \\beta_{\\text{spr}}, \\beta_{\\text{sum}}, \\beta_{\\text{aut}}\\}')} (${renderTex('+3\\%')} to ${renderTex('+6\\%')} extra gain vs. fixed).</li>
+                      <li><strong>4. 1-Axis Polar Tracker:</strong> Rotation axis tilted at latitude (${renderTex('\\beta = \\phi')}) tracking hour angle ${renderTex('\\omega')}.</li>
+                      <li><strong>5. 1-Axis Azimuthal Tracker:</strong> Constant optimum tilt (${renderTex('\\beta = \\beta_{\\text{opt}}')}) rotating in azimuth (${renderTex('\\gamma_c = \\psi_s')}).</li>
+                      <li><strong>6. Dual-Axis Tracker (2-Axes):</strong> Normal incidence perpendicular alignment (${renderTex('\\theta = 0^\\circ')}) at all hours:</li>
+                    </ul>
+                    ${renderTex('\\beta_{2\\text{-axes}} = 90^\\circ - \\alpha_s, \\quad \\gamma_c = \\psi_s \\implies \\cos\\theta = 1 \\quad (\\text{Up to } +45\\% \\text{ vs. horiz})', true)}
                   </div>`
-                : `<p style="margin: 0 0 0.5rem 0;">El seguimiento solar incrementa la captación anual de energía (hasta un +45% a dos ejes). Paralelamente, la temperatura real de operación de la célula fotovoltaica (${renderTex('T_c')}) reduce la potencia entregada según el modelo térmico de Osterwald:</p>
+                : `<p style="margin: 0 0 0.5rem 0;">OrientSol evalúa 6 topologías mecánicas a lo largo de los 12 meses para cuantificar rigurosamente las ganancias de captación frente a la superficie horizontal de referencia (${renderTex('\\beta = 0^\\circ')}):</p>
                   <div class="math-formula-box" style="margin: 0.5rem 0; padding: 0.6rem 0.8rem; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 6px;">
-                    <div style="font-size: 0.73rem; font-weight: 700; color: #2563eb; margin-bottom: 0.2rem;">Temperatura de Célula y Derating Térmico de Osterwald:</div>
-                    ${renderTex('T_c = T_{\\text{amb}} + \\left( \\frac{\\text{TONC} - 20^\\circ\\text{C}}{800\\text{ W/m}^2} \\right) \\cdot G_{\\text{eff}}', true)}
-                    ${renderTex('P_{\\text{mp}} = P_{\\text{stc}} \\cdot \\frac{G_{\\text{eff}}}{1000} \\cdot \\left[ 1 + \\gamma \\,(T_c - 25^\\circ\\text{C}) \\right], \\quad \\gamma \\approx -0{,}40\\%/^\\circ\\text{C}', true)}
+                    <div style="font-size: 0.73rem; font-weight: 700; color: #0284c7; margin-bottom: 0.2rem;">Topologías Mecánicas de Captación Analizadas:</div>
+                    <ul style="margin: 0.2rem 0 0.4rem 0; padding-left: 1.15rem; line-height: 1.55;">
+                      <li><strong>1. Plano Horizontal:</strong> ${renderTex('\\beta = 0^\\circ')} (Sin coste mecánico, línea base de referencia).</li>
+                      <li><strong>2. Inclinación Fija Anual:</strong> ${renderTex('\\beta = \\beta_{\\text{opt}}, \\; \\gamma_c = 0^\\circ')} (${renderTex('+10\\%')} a ${renderTex('+25\\%')} de ganancia sobre horizontal).</li>
+                      <li><strong>3. Ajuste Estacional (4 Inclinaciones):</strong> ${renderTex('\\beta \\in \\{\\beta_{\\text{inv}}, \\beta_{\\text{prim}}, \\beta_{\\text{ver}}, \\beta_{\\text{oto}}\\}')} (${renderTex('+3\\%')} a ${renderTex('+6\\%')} adicional sobre fijo).</li>
+                      <li><strong>4. Seguidor 1-Eje Polar:</strong> Eje orientado Norte-Sur e inclinado a la latitud (${renderTex('\\beta = \\phi')}), siguiendo el ángulo horario ${renderTex('\\omega')}.</li>
+                      <li><strong>5. Seguidor 1-Eje Azimutal:</strong> Inclinación fija óptima (${renderTex('\\beta = \\beta_{\\text{opt}}')}) con rotación continua en azimut (${renderTex('\\gamma_c = \\psi_s')}).</li>
+                      <li><strong>6. Seguidor a 2 Ejes:</strong> Orientación ortogonal perfecta (${renderTex('\\theta = 0^\\circ')}) en cada instante diurno:</li>
+                    </ul>
+                    ${renderTex('\\beta_{2\\text{-ejes}} = 90^\\circ - \\alpha_s, \\quad \\gamma_c = \\psi_s \\implies \\cos\\theta = 1 \\quad (\\text{Hasta } +45\\% \\text{ sobre horizontal})', true)}
                   </div>`,
+            },
+            {
+              heading: isEn
+                ? `5. Photovoltaic Energy Balance & Osterwald Thermal Derating (${renderTex('T_c')}, ${renderTex('\\text{NOCT}')})`
+                : `5. Balance de Energía Fotovoltaica y Modelo Térmico de Osterwald (${renderTex('T_c')}, ${renderTex('\\text{TONC}')})`,
+              content: isEn
+                ? `<p style="margin: 0 0 0.5rem 0;">While simplified models assume fixed module temperature (${renderTex('25^\\circ\\text{C}')} at STC) with constant Performance Ratio, real silicon operating cell temperature (${renderTex('T_c')}) experiences severe thermal derating under strong solar irradiance according to the Osterwald thermal model:</p>
+                  <div class="math-formula-box" style="margin: 0.5rem 0; padding: 0.6rem 0.8rem; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 6px;">
+                    <div style="font-size: 0.73rem; font-weight: 700; color: #2563eb; margin-bottom: 0.2rem;">Operating Cell Temperature (NOCT / TONC Model):</div>
+                    ${renderTex('T_c = T_{\\text{amb}} + \\left( \\frac{\\text{TONC} - 20^\\circ\\text{C}}{800\\text{ W/m}^2} \\right) \\cdot G_{\\text{eff}}', true)}
+                    <div style="font-size: 0.73rem; font-weight: 700; color: #2563eb; margin: 0.35rem 0 0.2rem 0;">Osterwald Thermal Power & Efficiency Equation:</div>
+                    ${renderTex('P_{\\text{mp}} = P_{\\text{STC}} \\cdot \\left( \\frac{G_{\\text{eff}}}{1000\\text{ W/m}^2} \\right) \\cdot \\left[ 1 + \\gamma \\,(T_c - 25^\\circ\\text{C}) \\right], \\quad \\gamma \\approx -0{,}40\\%/^\\circ\\text{C}', true)}
+                    <div style="font-size: 0.73rem; font-weight: 700; color: #059669; margin: 0.35rem 0 0.2rem 0;">Net Thermal Derating vs. Constant STC Baseline:</div>
+                    ${renderTex('\\text{Thermal Loss } (\\%) = \\frac{E_{\\text{Osterwald}} - E_{\\text{Simplified}}}{E_{\\text{Simplified}}} \\times 100 = \\gamma \\,(T_c - 25^\\circ\\text{C}) \\times 100', true)}
+                  </div>
+                  <p style="margin: 0.35rem 0 0 0; line-height: 1.5;">When ${renderTex('T_c < 25^\\circ\\text{C}')} (cold winter months), thermal losses are positive (${renderTex('+2\\%')} to ${renderTex('+3\\%')} efficiency boost). When ${renderTex('T_c > 50^\\circ\\text{C}')} (hot summer months), thermal derate reduces energy output by ${renderTex('-10\\%')} to ${renderTex('-13\\%')}.</p>`
+                : `<p style="margin: 0 0 0.5rem 0;">Mientras que el modelo simplificado asume una temperatura de célula constante a STC (${renderTex('25^\\circ\\text{C}')}) con un PR fijo, en la realidad la temperatura de operación de la célula de silicio (${renderTex('T_c')}) se calienta por la irradiación incidente, provocando pérdidas térmicas según el modelo de Osterwald:</p>
+                  <div class="math-formula-box" style="margin: 0.5rem 0; padding: 0.6rem 0.8rem; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 6px;">
+                    <div style="font-size: 0.73rem; font-weight: 700; color: #2563eb; margin-bottom: 0.2rem;">Temperatura Real de Célula en Operación (Modelo TONC / NOCT):</div>
+                    ${renderTex('T_c = T_{\\text{amb}} + \\left( \\frac{\\text{TONC} - 20^\\circ\\text{C}}{800\\text{ W/m}^2} \\right) \\cdot G_{\\text{eff}}', true)}
+                    <div style="font-size: 0.73rem; font-weight: 700; color: #2563eb; margin: 0.35rem 0 0.2rem 0;">Ecuación de Potencia Fotovoltaica Térmica de Osterwald:</div>
+                    ${renderTex('P_{\\text{mp}} = P_{\\text{STC}} \\cdot \\left( \\frac{G_{\\text{eff}}}{1000\\text{ W/m}^2} \\right) \\cdot \\left[ 1 + \\gamma \\,(T_c - 25^\\circ\\text{C}) \\right], \\quad \\gamma \\approx -0{,}40\\%/^\\circ\\text{C}', true)}
+                    <div style="font-size: 0.73rem; font-weight: 700; color: #059669; margin: 0.35rem 0 0.2rem 0;">Balance de Pérdidas Térmicas Netas vs. Modelo Simplificado STC:</div>
+                    ${renderTex('\\text{Pérdida Térmica } (\\%) = \\frac{E_{\\text{Osterwald}} - E_{\\text{Simplificada}}}{E_{\\text{Simplificada}}} \\times 100 = \\gamma \\,(T_c - 25^\\circ\\text{C}) \\times 100', true)}
+                  </div>
+                  <p style="margin: 0.35rem 0 0 0; line-height: 1.5;">Cuando ${renderTex('T_c < 25^\\circ\\text{C}')} (meses fríos de invierno), las pérdidas térmicas son positivas (${renderTex('+2\\%')} a ${renderTex('+3\\%')} de ganancia por frío). Cuando ${renderTex('T_c > 50^\\circ\\text{C}')} (meses de verano), el calor reduce la producción entre ${renderTex('-10\\%')} y ${renderTex('-13\\%')}.</p>`,
             },
           ],
         };
