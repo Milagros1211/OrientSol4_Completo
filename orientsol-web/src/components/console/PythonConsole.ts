@@ -726,15 +726,22 @@ export function renderPythonConsole(): HTMLElement {
             <span class="badge-status-valid">✓ ${isEn ? 'Algorithm Verified' : 'Algoritmo Verificado'}</span>
           </div>
 
-          <div class="verif-table-wrap">
-            <table class="verif-data-table">
+          <div class="verif-table-wrap" style="overflow-x: hidden !important; width: 100% !important; max-width: 100% !important; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);">
+            <table class="verif-data-table" style="width: 100% !important; max-width: 100% !important; table-layout: fixed !important; border-collapse: collapse; font-size: 0.78rem; margin: 0;">
+              <colgroup>
+                <col style="width: 25%;">
+                <col style="width: 35%;">
+                <col style="width: 15%;">
+                <col style="width: 12%;">
+                <col style="width: 13%;">
+              </colgroup>
               <thead>
                 <tr>
-                  <th>${isEn ? 'Parameter' : 'Parámetro Solar'}</th>
-                  <th>${isEn ? 'Equation' : 'Ecuación'}</th>
-                  <th style="text-align: right;">${isEn ? 'Calculated Value' : 'Valor Calculado'}</th>
-                  <th>${isEn ? 'Units' : 'Unidad'}</th>
-                  <th style="text-align: center;">${isEn ? 'Status' : 'Estado'}</th>
+                  <th style="padding: 0.5rem 0.4rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.25;">${isEn ? 'Parameter' : 'Parámetro Solar'}</th>
+                  <th style="padding: 0.5rem 0.4rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.25;">${isEn ? 'Equation' : 'Ecuación'}</th>
+                  <th style="text-align: right; padding: 0.5rem 0.4rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.25;">${isEn ? 'Calculated Value' : 'Valor Calculado'}</th>
+                  <th style="padding: 0.5rem 0.4rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.25;">${isEn ? 'Units' : 'Unidad'}</th>
+                  <th style="text-align: center; padding: 0.5rem 0.4rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.25;">${isEn ? 'Status' : 'Estado'}</th>
                 </tr>
               </thead>
               <tbody>
@@ -866,72 +873,80 @@ export function renderPythonConsole(): HTMLElement {
             </div>
           ` : ''}
 
-          <div class="verif-table-wrap">
+          <div class="verif-table-wrap no-scroll" style="overflow-x: hidden !important; width: 100% !important; max-width: 100% !important; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);">
             ${hourlyViewMode === 'paired' ? `
               <!-- PAIRED SYMMETRY TABLE: Morning vs Afternoon side-by-side -->
-              <table class="verif-data-table">
+              <table class="verif-data-table table-no-scroll" style="width: 100% !important; max-width: 100% !important; table-layout: fixed !important; border-collapse: collapse; font-size: 0.74rem; margin: 0;">
+                <colgroup>
+                  <col style="width: 9%;">
+                  <col style="width: 12%;">
+                  <col style="width: 12%;">
+                  <col style="width: 11%;">
+                  <col style="width: 14%;">
+                  <col style="width: 20%;">
+                  <col style="width: 12%;">
+                  <col style="width: 10%;">
+                </colgroup>
                 <thead>
                   <tr>
-                    <th>${isEn ? 'Interval' : 'Intervalo'}</th>
-                    <th style="color: #0284c7;">${isEn ? 'Morning (East)' : 'Hora Mañana (Este)'}</th>
-                    <th style="color: #ea580c;">${isEn ? 'Afternoon (West)' : 'Hora Tarde (Oeste)'}</th>
-                    <th style="text-align: right;">${isEn ? 'Hour Angle (±ω)' : 'Ángulo Horario (±ω)'}</th>
-                    <th style="text-align: right; color: #0284c7;">${isEn ? 'Solar Alt (Identical)' : 'Altura Solar (Alt, α)'}</th>
-                    <th style="text-align: right;">${isEn ? 'Azimuth Morning / Afternoon' : 'Azimut Mañana / Tarde (Ori, ψ)'}</th>
-                    <th style="text-align: right; color: #059669;">${isEn ? '2-Axis Tilt (Identical)' : 'Inclinación 2-Ejes (Inc, β)'}</th>
-                    <th style="text-align: center;">${isEn ? 'Status' : 'Simetría'}</th>
+                    <th style="padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Interval' : 'Intervalo'}</th>
+                    <th style="color: #0284c7; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Morning (East)' : 'Hora Mañana (Este)'}</th>
+                    <th style="color: #ea580c; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Afternoon (West)' : 'Hora Tarde (Oeste)'}</th>
+                    <th style="text-align: right; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Hour Angle (±ω)' : 'Ángulo Horario (±ω)'}</th>
+                    <th style="text-align: right; color: #0284c7; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Solar Alt (Identical)' : 'Altura Solar (Alt, α)'}</th>
+                    <th style="text-align: right; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Azimuth Morning / Afternoon' : 'Azimut Mañana / Tarde (Ori, ψ)'}</th>
+                    <th style="text-align: right; color: #059669; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? '2-Axis Tilt (Identical)' : 'Inclinación 2-Ejes (Inc, β)'}</th>
+                    <th style="text-align: center; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Status' : 'Simetría'}</th>
                   </tr>
                 </thead>
                 <tbody>
                   ${pairedRows.map((row: any, i: number) => `
                     <tr style="${i === selectedIntervalIdx ? 'background: rgba(16, 185, 129, 0.12); font-weight: 700;' : ''}">
-                      <td><strong>Int. ${row.interval}</strong></td>
-                      <td style="color: #0284c7; font-weight: 600;">${row.morningHourStr}</td>
-                      <td style="color: #ea580c; font-weight: 600;">${row.afternoonHourStr}</td>
-                      <td class="td-num">±${row.wMagnitudeDeg}°</td>
-                      <td class="td-num" style="color: #0284c7; font-weight: 700;">${row.altDeg}</td>
-                      <td class="td-num">${row.azimMorningDeg} / ${row.azimAfternoonDeg}</td>
-                      <td class="td-num" style="color: #059669; font-weight: 700;">${row.tilt2AxisDeg}</td>
-                      <td style="text-align: center;"><span class="badge-status-valid">✓ Simétrico</span></td>
+                      <td style="padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;"><strong>Int. ${row.interval}</strong></td>
+                      <td style="color: #0284c7; font-weight: 600; padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;">${row.morningHourStr}</td>
+                      <td style="color: #ea580c; font-weight: 600; padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;">${row.afternoonHourStr}</td>
+                      <td class="td-num" style="padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;">±${row.wMagnitudeDeg}°</td>
+                      <td class="td-num" style="color: #0284c7; font-weight: 700; padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;">${row.altDeg}</td>
+                      <td class="td-num" style="padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; font-size: 0.71rem;">${row.azimMorningDeg} / ${row.azimAfternoonDeg}</td>
+                      <td class="td-num" style="color: #059669; font-weight: 700; padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;">${row.tilt2AxisDeg}</td>
+                      <td style="text-align: center; padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;"><span class="badge-status-valid" style="font-size: 0.68rem; padding: 0.15rem 0.35rem;">✓ Simétrico</span></td>
                     </tr>
                   `).join('')}
                 </tbody>
-                <tfoot>
-                  <tr class="table-media-row verif-media-row">
-                    <td><strong>${isEn ? 'MEAN' : 'MEDIA'}</strong></td>
-                    <td colspan="2" style="text-align: center;">${pairedRows.length} ${isEn ? 'symmetric hour pairs' : 'pares horarios simétricos'}</td>
-                    <td class="td-num">-</td>
-                    <td class="td-num" style="color: #0284c7;"><strong>${formatAngle((pairedRows.reduce((acc: number, r: any) => acc + (r.numAltDeg || 0), 0) / (pairedRows.length || 1)), 2)}</strong></td>
-                    <td class="td-num">-</td>
-                    <td class="td-num" style="color: #059669;"><strong>${formatAngle((pairedRows.reduce((acc: number, r: any) => acc + (r.numTiltDeg || 0), 0) / (pairedRows.length || 1)), 1)}</strong></td>
-                    <td style="text-align: center;"><span class="badge-status-valid">✓ 100% OK</span></td>
-                  </tr>
-                </tfoot>
               </table>
             ` : `
               <!-- CHRONOLOGICAL TIMELINE TABLE: From Sunrise to Sunset -->
-              <table class="verif-data-table">
+              <table class="verif-data-table table-no-scroll" style="width: 100% !important; max-width: 100% !important; table-layout: fixed !important; border-collapse: collapse; font-size: 0.74rem; margin: 0;">
+                <colgroup>
+                  <col style="width: 14%;">
+                  <col style="width: 12%;">
+                  <col style="width: 13%;">
+                  <col style="width: 17%;">
+                  <col style="width: 17%;">
+                  <col style="width: 15%;">
+                  <col style="width: 12%;">
+                </colgroup>
                 <thead>
                   <tr>
-                    <th>${isEn ? 'Phase' : 'Fase Solar'}</th>
-                    <th>${isEn ? 'Solar Time' : 'Hora Solar'}</th>
-                    <th style="text-align: right;">${isEn ? 'Hour Angle (ω)' : 'Ángulo Horario (ω)'}</th>
-                    <th style="text-align: right;">${isEn ? 'Solar Altitude (Alt, α)' : 'Altura Solar (Alt, α)'}</th>
-                    <th style="text-align: right;">${isEn ? 'Solar Azimuth (Ori, ψ)' : 'Azimut Solar (Ori, ψ)'}</th>
-                    <th style="text-align: right;">${isEn ? '2-Axis Tilt (Inc, β)' : 'Inclinación 2-Ejes (Inc, β)'}</th>
-                    <th style="text-align: center;">${isEn ? 'Status' : 'Estado'}</th>
+                    <th style="padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Phase' : 'Fase Solar'}</th>
+                    <th style="padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Solar Time' : 'Hora Solar'}</th>
+                    <th style="text-align: right; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Hour Angle (ω)' : 'Ángulo Horario (ω)'}</th>
+                    <th style="text-align: right; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Solar Altitude (Alt, α)' : 'Altura Solar (Alt, α)'}</th>
+                    <th style="text-align: right; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Solar Azimuth (Ori, ψ)' : 'Azimut Solar (Ori, ψ)'}</th>
+                    <th style="text-align: right; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? '2-Axis Tilt (Inc, β)' : 'Inclinación 2-Ejes (Inc, β)'}</th>
+                    <th style="text-align: center; padding: 0.5rem 0.35rem; white-space: normal !important; word-wrap: break-word !important; line-height: 1.2; vertical-align: middle;">${isEn ? 'Status' : 'Estado'}</th>
                   </tr>
                 </thead>
                 <tbody>
                   ${chronologicalRows.map((row: any) => `
                     <tr style="${row.isNoon ? 'background: rgba(2, 132, 199, 0.15); font-weight: 800; border-top: 2px solid #0284c7; border-bottom: 2px solid #0284c7;' : ''}">
-                      <td><span class="badge ${row.isNoon ? 'badge-primary' : row.phase.includes('Mañana') || row.phase.includes('Morning') ? 'badge-info' : 'badge-warning'}" style="font-size: 0.72rem;">${row.phaseBadge}</span></td>
-                      <td style="font-family: var(--font-mono); font-weight: 700;">${row.hourStr}</td>
-                      <td class="td-num">${row.wDeg}</td>
-                      <td class="td-num" style="color: #0284c7; font-weight: 700;">${row.altDeg}</td>
-                      <td class="td-num">${row.azimDeg}</td>
-                      <td class="td-num" style="color: #059669; font-weight: 700;">${row.tilt2AxisDeg}</td>
-                      <td style="text-align: center;"><span class="badge-status-valid">${row.isNoon ? (isEn ? '★ Central Axis' : '★ Eje Central') : (isEn ? '✓ Validated' : '✓ Validado')}</span></td>
+                      <td style="padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;"><span class="badge ${row.isNoon ? 'badge-primary' : row.phase.includes('Mañana') || row.phase.includes('Morning') ? 'badge-info' : 'badge-warning'}" style="font-size: 0.68rem; padding: 0.15rem 0.35rem;">${row.phaseBadge}</span></td>
+                      <td style="font-family: var(--font-mono); font-weight: 700; padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;">${row.hourStr}</td>
+                      <td class="td-num" style="padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;">${row.wDeg}</td>
+                      <td class="td-num" style="color: #0284c7; font-weight: 700; padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;">${row.altDeg}</td>
+                      <td class="td-num" style="padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;">${row.azimDeg}</td>
+                      <td class="td-num" style="color: #059669; font-weight: 700; padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;">${row.tilt2AxisDeg}</td>
+                      <td style="text-align: center; padding: 0.45rem 0.35rem; white-space: normal !important; word-wrap: break-word !important;"><span class="badge-status-valid" style="font-size: 0.68rem; padding: 0.15rem 0.35rem;">${row.isNoon ? (isEn ? '★ Central Axis' : '★ Eje Central') : (isEn ? '✓ Validated' : '✓ Validado')}</span></td>
                     </tr>
                   `).join('')}
                 </tbody>

@@ -1553,11 +1553,29 @@ body.theme-dark #btn-save-api-to-supabase:disabled {
   border-radius: var(--radius-sm);
 }
 
+.verif-table-wrap.no-scroll {
+  overflow-x: hidden !important;
+}
+
 .verif-data-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.85rem;
   text-align: left;
+}
+
+.verif-data-table.table-no-scroll {
+  width: 100% !important;
+  max-width: 100% !important;
+  table-layout: fixed !important;
+}
+
+.verif-data-table.table-no-scroll th,
+.verif-data-table.table-no-scroll td {
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  box-sizing: border-box !important;
 }
 
 .verif-data-table th {
