@@ -5,11 +5,11 @@ import { platformSecureStorage, platformSecureStorageAdapter } from '@/services/
 const STORAGE_KEY_URL = 'orientsol_supabase_url';
 const STORAGE_KEY_KEY = 'orientsol_supabase_anon_key';
 
-// Credenciales verificadas por defecto para la tabla comunitaria pública datos_mensuales (Anon / Publishable Key).
-// Se pueden sobreescribir mediante variables de entorno (VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY)
-// o mediante configuración segura local en tiempo de ejecución.
-const DEFAULT_SUPABASE_URL = 'https://dqdkjkcmdsolpobxfbfi.supabase.co';
-const DEFAULT_SUPABASE_ANON_KEY = 'sb_publishable_DPjfm6Y8yEQgK91sFovHIQ_x1PGFTyS';
+// Sin claves ni credenciales hardcodeadas en el código fuente.
+// Se obtienen exclusivamente de las variables de entorno inyectadas en tiempo de build
+// mediante GitHub Secrets (VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY).
+const DEFAULT_SUPABASE_URL = '';
+const DEFAULT_SUPABASE_ANON_KEY = '';
 
 let clientInstance: SupabaseClient | null = null;
 
@@ -166,40 +166,6 @@ export async function testSupabaseConnection(): Promise<{ ok: boolean; message: 
       message: `Fallo de red o conexión: ${err.message || String(err)}`,
     };
   }
-}
-
-/**
- * Saves custom Supabase credentials to storage and reinitializes client.
- */
-export function setSupabaseCredentials(url: string, key: string): void {
-  try {
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem(STORAGE_KEY_URL, url.trim());
-      localStorage.setItem(STORAGE_KEY_KEY, key.trim());
-    }
-    platformSecureStorage.setItem(STORAGE_KEY_URL, url.trim()).catch(() => {});
-    platformSecureStorage.setItem(STORAGE_KEY_KEY, key.trim()).catch(() => {});
-  } catch {}
-
-  clientInstance = null;
-}
-
-/**
- * Clears custom credentials from storage and restores defaults.
- */
-export function clearSupabaseCredentials(): void {
-  try {
-    if (typeof localStorage !== 'undefined') {
-      localStorage.removeItem(STORAGE_KEY_URL);
-      localStorage.removeItem(STORAGE_KEY_KEY);
-      localStorage.removeItem(`orientsol_sec_${STORAGE_KEY_URL}`);
-      localStorage.removeItem(`orientsol_sec_${STORAGE_KEY_KEY}`);
-    }
-    platformSecureStorage.removeItem(STORAGE_KEY_URL).catch(() => {});
-    platformSecureStorage.removeItem(STORAGE_KEY_KEY).catch(() => {});
-  } catch {}
-
-  clientInstance = null;
 }
 
 const STORAGE_KEY_BACKEND_URL = 'orientsol_backend_api_url';

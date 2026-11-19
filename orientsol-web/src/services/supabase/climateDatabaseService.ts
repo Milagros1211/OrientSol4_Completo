@@ -392,11 +392,32 @@ export class ClimateDatabaseService {
         });
       }
 
+      // Active connectivity probe against Supabase to prevent false offline states on Windows/Web
+      if (this.isConfigured()) {
+        testSupabaseConnection()
+          .then((res) => {
+            if (res.ok) {
+              this.setOnline(true);
+            }
+          })
+          .catch(() => {});
+      }
+
       // Periodic sanity check every 5 seconds to detect live drops
       setInterval(() => {
         const currentNav = typeof navigator !== 'undefined' ? navigator.onLine : true;
         if (currentNav !== this._isOnline) {
-          this.setOnline(currentNav);
+          if (!currentNav && this.isConfigured()) {
+            testSupabaseConnection()
+              .then((res) => {
+                this.setOnline(res.ok);
+              })
+              .catch(() => {
+                this.setOnline(false);
+              });
+          } else {
+            this.setOnline(currentNav);
+          }
         }
       }, 5000);
     }
@@ -531,6 +552,7 @@ export class ClimateDatabaseService {
             const grouped = new Map<string, any[]>();
             for (const row of data) {
               const name = (row.nombre_emplazamiento || row.name || row.nombre || 'Emplazamiento').trim();
+              if (name.startsWith('Test_City_Unique_') || name.startsWith('Test_Connection_Check')) continue;
               const key = `${name.toLowerCase()}_${row.latitud ?? row.latitude ?? 0}_${row.longitud ?? row.longitude ?? 0}`;
               if (!grouped.has(key)) {
                 grouped.set(key, []);
@@ -539,6 +561,7 @@ export class ClimateDatabaseService {
             }
 
             for (const [, rows] of grouped.entries()) {
+              if (rows.length < 12) continue;
               const first = rows[0];
               const locName = (first.nombre_emplazamiento || first.name || first.nombre || 'Emplazamiento').trim();
               const lat = Number(first.latitud ?? first.latitude ?? 0);

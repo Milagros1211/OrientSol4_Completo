@@ -3,12 +3,6 @@ import {
   formatLocationWithCountry,
   type SyncSummary,
 } from '@/services/supabase/climateDatabaseService';
-import {
-  testSupabaseConnection,
-  getEffectiveSupabaseConfig,
-  setSupabaseCredentials,
-  clearSupabaseCredentials,
-} from '@/services/supabase/supabaseClient';
 import { escapeHtml, formatSafeUserErrorMessage } from '@/utils/security';
 import { i18n } from '@/i18n';
 import { formatNum } from '@/utils/formatters';
@@ -74,50 +68,14 @@ export function openSupabaseSyncModal(): void {
           </div>
         </div>
 
-        <!-- 2. System Status & Live Connection Verification Card -->
+        <!-- 2. System Status Card (External Integration Notice) -->
         <div class="modal-section-card">
-          <div class="section-card-header-flex" style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:0.75rem;">
-            <div>
-              <h4 class="section-card-title">${isEn ? 'Supabase Cloud Verification' : 'Verificación de Conexión Supabase'}</h4>
-              <p class="section-card-desc" style="margin-bottom: 0.35rem;">
-                ${isEn
-                  ? 'Server target: '
-                  : 'Servidor conectado: '}<code>${escapeHtml(getEffectiveSupabaseConfig().url || 'No configurado')}</code> | ${isEn ? 'Table: ' : 'Tabla: '}<code>datos_mensuales</code>
-              </p>
-            </div>
-            <button id="btn-test-connection" type="button" class="btn btn-secondary btn-sm" style="display:flex; align-items:center; gap:0.4rem;">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
-              </svg>
-              <span>${isEn ? 'Test Connection Live' : 'Comprobar Conexión'}</span>
-            </button>
-          </div>
-          <div id="test-connection-result" class="sync-results-box hidden" style="margin-top:0.75rem;"></div>
-
-          <!-- Optional Custom Credentials Accordion -->
-          <details id="custom-creds-details" style="margin-top: 0.85rem; border-top: 1px dashed var(--border-color); padding-top: 0.65rem;">
-            <summary style="cursor: pointer; font-size: 0.82rem; color: var(--text-muted); user-select: none;">
-              ⚙️ ${isEn ? 'Custom Supabase Credentials (Advanced / Self-Hosted)' : 'Credenciales Personalizadas de Supabase (Avanzado)'}
-            </summary>
-            <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.65rem;">
-              <div>
-                <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 0.2rem;">Supabase URL</label>
-                <input type="text" id="custom-supabase-url" class="form-control" style="width: 100%; font-size: 0.82rem;" value="${escapeHtml(getEffectiveSupabaseConfig().url)}" placeholder="https://xxxx.supabase.co" />
-              </div>
-              <div>
-                <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 0.2rem;">Supabase Anon / Publishable Key</label>
-                <input type="password" id="custom-supabase-key" class="form-control" style="width: 100%; font-size: 0.82rem;" value="${escapeHtml(getEffectiveSupabaseConfig().key)}" placeholder="sb_publishable_..." />
-              </div>
-              <div style="display: flex; gap: 0.5rem; margin-top: 0.3rem;">
-                <button type="button" id="btn-save-credentials" class="btn btn-solar btn-sm">
-                  ${isEn ? 'Save & Connect' : 'Guardar y Conectar'}
-                </button>
-                <button type="button" id="btn-reset-credentials" class="btn btn-ghost btn-sm">
-                  ${isEn ? 'Restore Official Default' : 'Restaurar Predeterminado'}
-                </button>
-              </div>
-            </div>
-          </details>
+          <h4 class="section-card-title">${isEn ? 'External Supabase Integration' : 'Integración Externa de Supabase'}</h4>
+          <p class="section-card-desc" style="margin-bottom: 0;">
+            ${isEn
+              ? 'Supabase credentials are automatically managed outside the page (via GitHub Secrets and environment variables). No credentials need to be typed or configured inside this page.'
+              : 'Las credenciales de Supabase se gestionan de forma automática fuera de la página (mediante GitHub Secrets y variables de entorno). No es necesario ingresar ninguna clave dentro de la página.'}
+          </p>
         </div>
 
         <!-- 3. Offline Sync Queue Section -->
@@ -177,81 +135,6 @@ export function openSupabaseSyncModal(): void {
   modal.querySelector('#btn-modal-close-footer')?.addEventListener('click', closeModal);
   modal.addEventListener('click', (e) => {
     if (e.target === modal) closeModal();
-  });
-
-  // Live connection test handler
-  const testConnBtn = modal.querySelector<HTMLButtonElement>('#btn-test-connection');
-  const testConnResult = modal.querySelector<HTMLElement>('#test-connection-result');
-  const cloudBadge = modal.querySelector<HTMLElement>('#supabase-cloud-badge');
-
-  const runTestConnection = async () => {
-    if (testConnBtn) {
-      testConnBtn.disabled = true;
-      testConnBtn.innerHTML = `<span>${isEn ? 'Testing...' : 'Comprobando...'}</span>`;
-    }
-    if (testConnResult) {
-      testConnResult.classList.remove('hidden');
-      testConnResult.innerHTML = `<em>${isEn ? 'Checking connection to Supabase...' : 'Comprobando conexión con Supabase...'}</em>`;
-    }
-
-    try {
-      const res = await testSupabaseConnection();
-      if (testConnResult) {
-        testConnResult.innerHTML = res.ok
-          ? `<div style="color: #10b981; font-weight: 500;">✓ ${escapeHtml(res.message)}</div>`
-          : `<div style="color: #ef4444; font-weight: 500;">✗ ${escapeHtml(res.message)}</div>`;
-      }
-      if (cloudBadge) {
-        cloudBadge.className = `badge ${res.ok ? 'badge-success' : 'badge-neutral'}`;
-        cloudBadge.textContent = res.ok ? (isEn ? 'Connected' : 'Conectado') : (isEn ? 'Disconnected' : 'Desconectado');
-      }
-      climateDatabaseService.notify();
-    } catch (e: any) {
-      if (testConnResult) {
-        testConnResult.innerHTML = `<div style="color: #ef4444; font-weight: 500;">✗ ${escapeHtml(e?.message || String(e))}</div>`;
-      }
-    } finally {
-      if (testConnBtn) {
-        testConnBtn.disabled = false;
-        testConnBtn.innerHTML = `
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
-          </svg>
-          <span>${isEn ? 'Test Connection Live' : 'Comprobar Conexión'}</span>
-        `;
-      }
-    }
-  };
-
-  testConnBtn?.addEventListener('click', runTestConnection);
-
-  // Save custom credentials handler
-  modal.querySelector('#btn-save-credentials')?.addEventListener('click', async () => {
-    const urlInput = modal.querySelector<HTMLInputElement>('#custom-supabase-url');
-    const keyInput = modal.querySelector<HTMLInputElement>('#custom-supabase-key');
-    const url = (urlInput?.value || '').trim();
-    const key = (keyInput?.value || '').trim();
-
-    if (!url || !key) {
-      alert(isEn ? 'Please provide both URL and Anon Key' : 'Por favor introduce tanto la URL como la clave Anon');
-      return;
-    }
-
-    setSupabaseCredentials(url, key);
-    climateDatabaseService.notify();
-    await runTestConnection();
-  });
-
-  // Reset default credentials handler
-  modal.querySelector('#btn-reset-credentials')?.addEventListener('click', async () => {
-    clearSupabaseCredentials();
-    const cfg = getEffectiveSupabaseConfig();
-    const urlInput = modal.querySelector<HTMLInputElement>('#custom-supabase-url');
-    const keyInput = modal.querySelector<HTMLInputElement>('#custom-supabase-key');
-    if (urlInput) urlInput.value = cfg.url;
-    if (keyInput) keyInput.value = cfg.key;
-    climateDatabaseService.notify();
-    await runTestConnection();
   });
 
   // Queue actions
