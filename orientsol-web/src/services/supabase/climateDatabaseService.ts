@@ -809,10 +809,10 @@ export class ClimateDatabaseService {
           });
         }
 
-        // Usar upsert con ignoreDuplicates: true para evitar colisiones de concurrencia o errores 23505
+        // Inserción comunitaria estándar (requiere sólo privilegios SELECT e INSERT otorgados al rol anon)
         const { error } = await supabase
           .from('datos_mensuales')
-          .upsert(monthlyRows, { onConflict: 'nombre_emplazamiento,mes', ignoreDuplicates: true });
+          .insert(monthlyRows);
 
         if (!error) {
           const savedRecord: ClimateDataRecord = {
@@ -1059,9 +1059,10 @@ export class ClimateDatabaseService {
             });
           }
 
+          // Inserción comunitaria estándar (requiere sólo privilegios SELECT e INSERT otorgados al rol anon)
           const { error } = await supabase
             .from('datos_mensuales')
-            .upsert(monthlyRows, { onConflict: 'nombre_emplazamiento,mes', ignoreDuplicates: true });
+            .insert(monthlyRows);
 
           if (!error) {
             summary.inserted++;

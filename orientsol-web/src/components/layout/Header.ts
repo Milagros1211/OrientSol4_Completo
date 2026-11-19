@@ -104,7 +104,7 @@ export function renderHeader(): HTMLElement {
     }
     const label = isConn
       ? (isEn ? 'Supabase: Connected' : 'Supabase: Conectado')
-      : (isEn ? 'Offline: Disconnected' : 'Offline: Desconectado');
+      : (isEn ? 'Supabase: Disconnected' : 'Supabase: Desconectado');
     textEl.innerHTML = `${label}${count > 0 ? ` <span class="pill-badge-counter">${count}</span>` : ''}`;
     if (dotEl) {
       dotEl.className = `status-dot ${isConn ? 'status-dot-active' : ''}`;
