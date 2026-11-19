@@ -1,0 +1,737 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>404 - Coordenadas Fuera de Órbita | OrientSol 4.0</title>
+    <meta name="description" content="Página no encontrada en OrientSol 4.0 - Software de Simulación y Optimización Solar Fotovoltaica (Universidad de Jaén)." />
+    <meta name="theme-color" content="#071318" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+      :root {
+        --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        --font-heading: 'Outfit', var(--font-sans);
+        --font-mono: 'JetBrains Mono', monospace;
+
+        --bg-space: #071318;
+        --bg-space-dark: #03080b;
+        --bg-card: rgba(15, 36, 45, 0.75);
+        --bg-card-hover: rgba(20, 46, 57, 0.85);
+        --border-glass: rgba(56, 189, 248, 0.2);
+        --border-highlight: rgba(245, 158, 11, 0.4);
+
+        --solar-gold: #fbbf24;
+        --solar-amber: #f59e0b;
+        --solar-orange: #ea580c;
+        --accent-cyan: #38bdf8;
+        --accent-emerald: #10b981;
+        --accent-rose: #f43f5e;
+
+        --text-main: #f8fafc;
+        --text-muted: #cbd5e1;
+        --text-dim: #64748b;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: var(--font-sans);
+        background: radial-gradient(circle at 50% 20%, #112d38 0%, var(--bg-space) 60%, var(--bg-space-dark) 100%);
+        color: var(--text-main);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        overflow-x: hidden;
+        position: relative;
+      }
+
+      /* Animated space stars background */
+      .stars-canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 0;
+        opacity: 0.7;
+      }
+
+      /* Ambient glowing nebula */
+      .ambient-glow {
+        position: absolute;
+        width: 600px;
+        height: 600px;
+        border-radius: 50%;
+        filter: blur(140px);
+        pointer-events: none;
+        z-index: 0;
+        opacity: 0.35;
+        animation: pulseGlow 8s ease-in-out infinite alternate;
+      }
+      .glow-amber {
+        top: -100px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: radial-gradient(circle, var(--solar-amber) 0%, transparent 70%);
+      }
+      .glow-cyan {
+        bottom: 10%;
+        right: 10%;
+        background: radial-gradient(circle, var(--accent-cyan) 0%, transparent 70%);
+        width: 400px;
+        height: 400px;
+      }
+
+      @keyframes pulseGlow {
+        0% { transform: translateX(-50%) scale(0.9); opacity: 0.25; }
+        100% { transform: translateX(-50%) scale(1.15); opacity: 0.45; }
+      }
+
+      /* Header Bar */
+      header {
+        position: relative;
+        z-index: 10;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.25rem 2rem;
+        background: rgba(7, 19, 24, 0.6);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        text-decoration: none;
+        color: inherit;
+      }
+
+      .brand-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, var(--solar-amber), var(--solar-orange));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 16px rgba(245, 158, 11, 0.4);
+      }
+
+      .brand-title {
+        font-family: var(--font-heading);
+        font-size: 1.25rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        background: linear-gradient(120deg, #fff 40%, var(--solar-gold) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .lang-btn {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        color: var(--text-main);
+        padding: 0.4rem 0.85rem;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        transition: all 0.2s ease;
+      }
+      .lang-btn:hover {
+        background: rgba(255, 255, 255, 0.12);
+        border-color: var(--accent-cyan);
+        transform: translateY(-1px);
+      }
+
+      /* Main Content Container */
+      main {
+        position: relative;
+        z-index: 10;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 2.5rem 1.5rem;
+        text-align: center;
+        max-width: 860px;
+        margin: 0 auto;
+        width: 100%;
+      }
+
+      /* Solar Eclipse & Orbital Visualizer */
+      .solar-visualizer {
+        position: relative;
+        width: 220px;
+        height: 220px;
+        margin: 0 auto 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .orbital-ring {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        border: 1px dashed rgba(56, 189, 248, 0.35);
+        animation: spinOrbit 24s linear infinite;
+      }
+
+      .orbital-ring-outer {
+        position: absolute;
+        width: 130%;
+        height: 130%;
+        border-radius: 50%;
+        border: 1px solid rgba(245, 158, 11, 0.15);
+        animation: spinOrbit 40s linear infinite reverse;
+      }
+
+      .orbiting-panel {
+        position: absolute;
+        top: -12px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 24px;
+        height: 24px;
+        background: #0f172a;
+        border: 1.5px solid var(--accent-cyan);
+        border-radius: 4px;
+        box-shadow: 0 0 12px var(--accent-cyan);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      @keyframes spinOrbit {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+
+      /* Sun with Eclipse Corona */
+      .sun-core {
+        width: 110px;
+        height: 110px;
+        border-radius: 50%;
+        background: radial-gradient(circle, #0b1a21 58%, var(--solar-amber) 85%, var(--solar-gold) 100%);
+        box-shadow:
+          0 0 40px rgba(245, 158, 11, 0.65),
+          0 0 80px rgba(234, 88, 12, 0.4),
+          inset 0 0 25px rgba(0, 0, 0, 0.8);
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: coronaPulse 4s ease-in-out infinite alternate;
+      }
+
+      @keyframes coronaPulse {
+        0% {
+          box-shadow: 0 0 30px rgba(245, 158, 11, 0.5), 0 0 60px rgba(234, 88, 12, 0.3), inset 0 0 25px rgba(0, 0, 0, 0.8);
+        }
+        100% {
+          box-shadow: 0 0 55px rgba(245, 158, 11, 0.85), 0 0 100px rgba(234, 88, 12, 0.55), inset 0 0 20px rgba(0, 0, 0, 0.7);
+        }
+      }
+
+      .sun-inner-icon {
+        color: var(--solar-gold);
+        opacity: 0.9;
+      }
+
+      /* 404 Headline */
+      .error-code {
+        font-family: var(--font-heading);
+        font-size: clamp(4rem, 10vw, 7.5rem);
+        font-weight: 900;
+        line-height: 1;
+        letter-spacing: -0.04em;
+        background: linear-gradient(135deg, #ffffff 10%, var(--solar-gold) 50%, var(--solar-orange) 95%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.5rem;
+        filter: drop-shadow(0 4px 20px rgba(245, 158, 11, 0.3));
+      }
+
+      .error-title {
+        font-family: var(--font-heading);
+        font-size: clamp(1.4rem, 3.5vw, 2.2rem);
+        font-weight: 700;
+        color: var(--text-main);
+        margin-bottom: 0.75rem;
+        letter-spacing: -0.02em;
+      }
+
+      .error-desc {
+        font-size: clamp(0.95rem, 2vw, 1.15rem);
+        color: var(--text-muted);
+        line-height: 1.6;
+        max-width: 620px;
+        margin: 0 auto 1.75rem;
+      }
+
+      /* Solar Telemetry Card (Glassmorphism) */
+      .telemetry-card {
+        background: var(--bg-card);
+        backdrop-filter: blur(16px);
+        border: 1px solid var(--border-glass);
+        border-radius: 16px;
+        padding: 1.25rem 1.75rem;
+        max-width: 640px;
+        width: 100%;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        text-align: left;
+      }
+
+      .telemetry-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        padding-bottom: 0.6rem;
+        margin-bottom: 0.8rem;
+        font-size: 0.82rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--solar-amber);
+        font-weight: 700;
+      }
+
+      .telemetry-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 0.85rem;
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+      }
+
+      .telemetry-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+      }
+
+      .telemetry-label {
+        color: var(--text-dim);
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .telemetry-value {
+        color: var(--text-main);
+        font-weight: 600;
+        word-break: break-all;
+      }
+      .telemetry-value.warn {
+        color: var(--solar-gold);
+      }
+      .telemetry-value.err {
+        color: var(--accent-rose);
+      }
+
+      /* Action Buttons */
+      .actions-group {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.85rem 1.6rem;
+        border-radius: 12px;
+        font-family: var(--font-heading);
+        font-size: 0.98rem;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        border: none;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, var(--solar-amber) 0%, var(--solar-orange) 100%);
+        color: #ffffff;
+        box-shadow: 0 4px 18px rgba(245, 158, 11, 0.35);
+      }
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 26px rgba(245, 158, 11, 0.55);
+        color: #ffffff;
+      }
+
+      .btn-secondary {
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--text-main);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(8px);
+      }
+      .btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.12);
+        border-color: var(--accent-cyan);
+        transform: translateY(-2px);
+        color: var(--text-main);
+      }
+
+      /* Footer */
+      footer {
+        position: relative;
+        z-index: 10;
+        padding: 1.5rem 2rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(7, 19, 24, 0.7);
+        backdrop-filter: blur(12px);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+        font-size: 0.82rem;
+        color: var(--text-dim);
+      }
+
+      footer a {
+        color: var(--accent-cyan);
+        text-decoration: none;
+        transition: color 0.2s ease;
+      }
+      footer a:hover {
+        color: var(--solar-gold);
+        text-decoration: underline;
+      }
+
+      @media (max-width: 640px) {
+        header { padding: 1rem; }
+        main { padding: 2rem 1rem; }
+        .telemetry-card { padding: 1rem; }
+        .actions-group { flex-direction: column; width: 100%; }
+        .btn { width: 100%; justify-content: center; }
+        footer { flex-direction: column; text-align: center; }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Background Space Effects -->
+    <canvas id="starsCanvas" class="stars-canvas"></canvas>
+    <div class="ambient-glow glow-amber"></div>
+    <div class="ambient-glow glow-cyan"></div>
+
+    <!-- Navigation Header -->
+    <header>
+      <a href="./" id="brand-link" class="brand" title="Ir al Simulador Principal">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+        </div>
+        <span class="brand-title">OrientSol 4.0</span>
+      </a>
+
+      <button id="langToggleBtn" class="lang-btn" type="button" aria-label="Cambiar idioma">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="2" y1="12" x2="22" y2="12"></line>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+        </svg>
+        <span id="langText">English</span>
+      </button>
+    </header>
+
+    <!-- Main 404 Section -->
+    <main>
+      <!-- Solar Visualizer Graphic -->
+      <div class="solar-visualizer" aria-hidden="true">
+        <div class="orbital-ring-outer"></div>
+        <div class="orbital-ring">
+          <div class="orbiting-panel" title="Superficie Receptora Solar">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--solar-gold);">
+              <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+              <line x1="3" y1="9" x2="21" y2="9"></line>
+              <line x1="3" y1="15" x2="21" y2="15"></line>
+              <line x1="9" y1="3" x2="9" y2="21"></line>
+              <line x1="15" y1="3" x2="15" y2="21"></line>
+            </svg>
+          </div>
+        </div>
+        <div class="sun-core">
+          <svg class="sun-inner-icon" viewBox="0 0 24 24" width="46" height="46" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+            <circle cx="12" cy="12" r="4"></circle>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Error Text -->
+      <div class="error-code">404</div>
+      <h1 class="error-title" id="txtTitle">Coordenadas Fuera de Órbita</h1>
+      <p class="error-desc" id="txtDesc">
+        La trayectoria solicitada no intersecta con ninguna superficie o módulo receptor conocido en OrientSol. El ángulo cenital ha caído por debajo del horizonte.
+      </p>
+
+      <!-- Diagnostic Solar Telemetry Card -->
+      <div class="telemetry-card">
+        <div class="telemetry-header">
+          <span id="txtTelemetryHeader">Telemetría de Navegación Solar</span>
+          <span class="telemetry-value err" id="txtStatusBadge">COORD_NOT_FOUND</span>
+        </div>
+        <div class="telemetry-grid">
+          <div class="telemetry-item">
+            <span class="telemetry-label" id="lblPath">Ruta Solicitada</span>
+            <span class="telemetry-value warn" id="valPath">/desconocido</span>
+          </div>
+          <div class="telemetry-item">
+            <span class="telemetry-label" id="lblIncidence">Ángulo de Incidencia (θ)</span>
+            <span class="telemetry-value">θ &gt; 90° (Sombra Total)</span>
+          </div>
+          <div class="telemetry-item">
+            <span class="telemetry-label" id="lblRadiation">Radiación Directa B_d(β)</span>
+            <span class="telemetry-value err">0.00 kWh/m²·día</span>
+          </div>
+          <div class="telemetry-item">
+            <span class="telemetry-label" id="lblElevation">Altura Solar (α)</span>
+            <span class="telemetry-value err">α &lt; 0° (Noche Astronómica)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="actions-group">
+        <button id="btnHome" class="btn btn-primary" type="button">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
+          <span id="btnHomeText">Regresar al Simulador Solar</span>
+        </button>
+
+        <button id="btnAbout" class="btn btn-secondary" type="button">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          <span id="btnAboutText">Acerca del Proyecto TFM</span>
+        </button>
+
+        <a id="btnGithub" class="btn btn-secondary" href="https://github.com/Milagros1211/OrientSol4_Completo" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+          </svg>
+          <span id="btnGithubText">Repositorio GitHub</span>
+        </a>
+      </div>
+    </main>
+
+    <!-- Footer Bar -->
+    <footer>
+      <div>
+        <span>OrientSol 4.0</span> • 
+        <span>Trabajo Fin de Máster en Energías Renovables</span> • 
+        <span>Universidad de Jaén (UJA)</span>
+      </div>
+      <div>
+        <span>Autora: Karina Milagros Baldeón Zárate</span>
+      </div>
+    </footer>
+
+    <!-- Interactive Logic (Standalone, Safe, Zero-Dependency) -->
+    <script>
+      (function() {
+        // 1. Calculate base application URL intelligently
+        function getAppRootUrl() {
+          const path = window.location.pathname;
+          // Check if hosted under /OrientSol4_Completo/
+          const match = path.match(/(\/[^/]*OrientSol[^/]*\/)/i);
+          if (match && match[1]) {
+            return window.location.origin + match[1];
+          }
+          // Default relative fallback
+          return './';
+        }
+
+        const appRoot = getAppRootUrl();
+
+        // 2. Safely display the requested invalid pathname (OWASP Anti-XSS Sanitization)
+        const valPathEl = document.getElementById('valPath');
+        if (valPathEl) {
+          const safePath = window.location.pathname || '/unknown';
+          valPathEl.textContent = safePath.length > 50 ? safePath.substring(0, 47) + '...' : safePath;
+        }
+
+        // 3. Setup Navigation Actions
+        const btnHome = document.getElementById('btnHome');
+        const brandLink = document.getElementById('brand-link');
+        if (btnHome) {
+          btnHome.addEventListener('click', function() {
+            window.location.href = appRoot;
+          });
+        }
+        if (brandLink) {
+          brandLink.setAttribute('href', appRoot);
+        }
+
+        const btnAbout = document.getElementById('btnAbout');
+        if (btnAbout) {
+          btnAbout.addEventListener('click', function() {
+            window.location.href = appRoot + (appRoot.endsWith('/') ? '' : '/') + '?tab=about';
+          });
+        }
+
+        // 4. Bilingual Internationalization (ES / EN)
+        const i18nData = {
+          es: {
+            langBtn: 'English',
+            title: 'Coordenadas Fuera de Órbita',
+            desc: 'La trayectoria solicitada no intersecta con ninguna superficie o módulo receptor conocido en OrientSol. El ángulo cenital ha caído por debajo del horizonte.',
+            telemetryHeader: 'Telemetría de Navegación Solar',
+            statusBadge: 'COORD_NO_ENCONTRADA',
+            lblPath: 'Ruta Solicitada',
+            lblIncidence: 'Ángulo de Incidencia (θ)',
+            lblRadiation: 'Radiación Directa B_d(β)',
+            lblElevation: 'Altura Solar (α)',
+            valIncidence: 'θ > 90° (Sombra Total)',
+            valRadiation: '0.00 kWh/m²·día',
+            valElevation: 'α < 0° (Noche Astronómica)',
+            btnHome: 'Regresar al Simulador Solar',
+            btnAbout: 'Acerca del Proyecto TFM',
+            btnGithub: 'Repositorio GitHub'
+          },
+          en: {
+            langBtn: 'Español',
+            title: 'Coordinates Out of Orbit',
+            desc: 'The requested trajectory does not intersect with any known solar receiver surface in OrientSol. The solar zenith angle has fallen below the horizon.',
+            telemetryHeader: 'Solar Navigation Telemetry',
+            statusBadge: 'COORD_NOT_FOUND',
+            lblPath: 'Requested Path',
+            lblIncidence: 'Incidence Angle (θ)',
+            lblRadiation: 'Direct Radiation B_d(β)',
+            lblElevation: 'Solar Altitude (α)',
+            valIncidence: 'θ > 90° (Total Shadow)',
+            valRadiation: '0.00 kWh/m²·day',
+            valElevation: 'α < 0° (Astronomical Night)',
+            btnHome: 'Return to Solar Simulator',
+            btnAbout: 'About TFM Project',
+            btnGithub: 'GitHub Repository'
+          }
+        };
+
+        let currentLang = 'es';
+        // Auto-detect browser preference
+        if (navigator.language && navigator.language.toLowerCase().startsWith('en')) {
+          currentLang = 'en';
+        }
+
+        function updateTexts(lang) {
+          const dict = i18nData[lang];
+          document.getElementById('langText').textContent = dict.langBtn;
+          document.getElementById('txtTitle').textContent = dict.title;
+          document.getElementById('txtDesc').textContent = dict.desc;
+          document.getElementById('txtTelemetryHeader').textContent = dict.telemetryHeader;
+          document.getElementById('txtStatusBadge').textContent = dict.statusBadge;
+          document.getElementById('lblPath').textContent = dict.lblPath;
+          document.getElementById('lblIncidence').textContent = dict.lblIncidence;
+          document.getElementById('lblRadiation').textContent = dict.lblRadiation;
+          document.getElementById('lblElevation').textContent = dict.lblElevation;
+          document.getElementById('btnHomeText').textContent = dict.btnHome;
+          document.getElementById('btnAboutText').textContent = dict.btnAbout;
+          document.getElementById('btnGithubText').textContent = dict.btnGithub;
+        }
+
+        updateTexts(currentLang);
+
+        const langToggleBtn = document.getElementById('langToggleBtn');
+        if (langToggleBtn) {
+          langToggleBtn.addEventListener('click', function() {
+            currentLang = currentLang === 'es' ? 'en' : 'es';
+            updateTexts(currentLang);
+          });
+        }
+
+        // 5. Dynamic Starfield Background
+        const canvas = document.getElementById('starsCanvas');
+        if (canvas) {
+          const ctx = canvas.getContext('2d');
+          let width = canvas.width = window.innerWidth;
+          let height = canvas.height = window.innerHeight;
+
+          window.addEventListener('resize', function() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            initStars();
+          });
+
+          const stars = [];
+          function initStars() {
+            stars.length = 0;
+            const starCount = Math.floor((width * height) / 3200);
+            for (let i = 0; i < starCount; i++) {
+              stars.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                radius: Math.random() * 1.4 + 0.3,
+                alpha: Math.random() * 0.8 + 0.2,
+                pulseSpeed: Math.random() * 0.02 + 0.005,
+                increasing: Math.random() > 0.5
+              });
+            }
+          }
+
+          function render() {
+            ctx.clearRect(0, 0, width, height);
+            for (let i = 0; i < stars.length; i++) {
+              const s = stars[i];
+              if (s.increasing) {
+                s.alpha += s.pulseSpeed;
+                if (s.alpha >= 1) s.increasing = false;
+              } else {
+                s.alpha -= s.pulseSpeed;
+                if (s.alpha <= 0.15) s.increasing = true;
+              }
+
+              ctx.beginPath();
+              ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+              ctx.fillStyle = 'rgba(255, 255, 255, ' + s.alpha.toFixed(2) + ')';
+              ctx.fill();
+            }
+            requestAnimationFrame(render);
+          }
+
+          initStars();
+          render();
+        }
+      })();
+    </script>
+  </body>
+</html>
