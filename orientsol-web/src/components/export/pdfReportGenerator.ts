@@ -518,11 +518,12 @@ export async function generateOrientSolPDFReport(
     lossMatrix?: number[][];
   };
   const lossMapRes = res.captureLossMap;
+  const fixedOriPdf = 0.0;
   const monthlyMapsList: MiniLossMap[] =
     lossMapRes?.monthlyMaps && lossMapRes.monthlyMaps.length === 12
       ? lossMapRes.monthlyMaps.map((m, i) => {
           const bDeg = Number(m.optimalPoint.betaDeg);
-          const aDeg = Math.abs(bDeg) < 0.01 ? 0 : Number(m.optimalPoint.alphaDeg);
+          const aDeg = Math.abs(bDeg) < 0.01 ? fixedOriPdf : Number(m.optimalPoint.alphaDeg);
           return {
             label: mFull[i],
             sub: isEn ? 'Monthly map' : 'Mapa mensual',
@@ -549,7 +550,7 @@ export async function generateOrientSolPDFReport(
       ];
       return lossMapRes.seasonalMaps.map((s, i) => {
         const bDeg = seasonalTilts[i] ?? Number(s.optimalPoint.betaDeg);
-        const aDeg = Math.abs(bDeg) < 0.01 ? 0 : Number(s.optimalPoint.alphaDeg);
+        const aDeg = Math.abs(bDeg) < 0.01 ? fixedOriPdf : Number(s.optimalPoint.alphaDeg);
         return {
           label: isEn ? s.seasonNameEn || namesEn[i] : s.seasonName || namesEs[i],
           sub: isEn ? s.monthsIncludedEn || monthsEn[i] : s.monthsIncluded || monthsEs[i],
@@ -3238,14 +3239,14 @@ export async function generateOrientSolPDFReport(
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(6.5);
   doc.setTextColor(15, 23, 42);
-  doc.text(`* ${isEn ? 'OPTIMUM: Tilt' : 'OPTIMO: Inc'} = ${optAngle}°, ${isEn ? 'Azimuth' : 'Ori'} = 0° (0% ${isEn ? 'loss' : 'perdida'})`, optXMap + 3, optYMap - 2.5);
+  doc.text(`* ${isEn ? 'OPTIMUM: Tilt' : 'OPTIMO: Inc'} = ${optAngle}°, ${isEn ? 'Azimuth' : 'Ori'} = ${fixedOriPdf}° (0% ${isEn ? 'loss' : 'perdida'})`, optXMap + 3, optYMap - 2.5);
 
   // Axis Labels
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(6);
   doc.setTextColor(100, 116, 139);
   doc.text(isEn ? '-90° (East)' : '-90° (Este)', 24, mapBoxY + mapH - 2);
-  doc.text(isEn ? '0° (South)' : '0° (Sur)', optXMap - 4, mapBoxY + mapH - 2);
+  doc.text(res.latitude < 0 ? (isEn ? '0° (North)' : '0° (Norte)') : (isEn ? '0° (South)' : '0° (Sur)'), optXMap - 5, mapBoxY + mapH - 2);
   doc.text(isEn ? '+90° (West)' : '+90° (Oeste)', 166, mapBoxY + mapH - 2);
 
   doc.text(isEn ? '90° (Vertical)' : '90° (Vertical)', 23, mapBoxY + 6);
@@ -3355,7 +3356,7 @@ export async function generateOrientSolPDFReport(
     doc.text('90°', x + 2, hy + 2);
     doc.text('0°', x + 3, hy + hh);
     doc.text('-90° E', hx, hy + hh + 3);
-    doc.text('0° S', hx + hw / 2, hy + hh + 3, { align: 'center' });
+    doc.text(res.latitude < 0 ? '0° N' : '0° S', hx + hw / 2, hy + hh + 3, { align: 'center' });
     doc.text(`+90° ${isEn ? 'W' : 'O'}`, hx + hw, hy + hh + 3, { align: 'right' });
 
     // CTE compliance summary

@@ -171,12 +171,18 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
 
     const currentBetas = lossMap.betasDeg;
     const currentAlphas = lossMap.alphasDeg;
+    const isSouthernHemisphere = res.latitude < 0;
     let currentLossMatrix = lossMap.lossPercentageMatrix;
     let currentRadMatrix = lossMap.radiationMatrixKwhM2Day;
     let currentOptPoint = lossMap.optimalPoint;
     let currentCteZones = lossMap.cteZones;
 
-    const fixedOptimalOri = res.latitude >= 0 ? 0.0 : 180.0;
+    const fixedOptimalOri = 0.0;
+    const cardinalCenterLabel = isSouthernHemisphere
+      ? (isEn ? 'North' : 'Norte')
+      : (isEn ? 'South' : 'Sur');
+    const formatOriWithCardinal = (alphaVal: number) =>
+      `${formatNum(Number(alphaVal), 1)}° (${Math.abs(Number(alphaVal)) < 0.1 ? cardinalCenterLabel : Number(alphaVal) < 0 ? (isEn ? 'East' : 'Este') : (isEn ? 'West' : 'Oeste')})`;
     const seasonalTilts = res.seasonal
       ? [
           res.seasonal.winterTiltDeg,
@@ -331,15 +337,15 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
 
     const optBadgeText = mode === 'annual'
       ? (isEn
-          ? `Optimal: Inc = ${formatNum(Number(currentOptPoint.betaDeg), 1)}°, Ori = ${formatNum(Number(currentOptPoint.alphaDeg), 1)}° | ${formatNum(currentOptPoint.maxDailyRadiationKwh, 2)} kWh/m²/day`
-          : `Óptimo Anual: Inc = ${formatNum(Number(currentOptPoint.betaDeg), 1)}°, Ori = ${formatNum(Number(currentOptPoint.alphaDeg), 1)}° | ${formatNum(currentOptPoint.maxDailyRadiationKwh, 2)} kWh/m²/día`)
+          ? `Optimal: Inc = ${formatNum(Number(currentOptPoint.betaDeg), 1)}°, Ori = ${formatOriWithCardinal(currentOptPoint.alphaDeg)} | ${formatNum(currentOptPoint.maxDailyRadiationKwh, 2)} kWh/m²/day`
+          : `Óptimo Anual: Inc = ${formatNum(Number(currentOptPoint.betaDeg), 1)}°, Ori = ${formatOriWithCardinal(currentOptPoint.alphaDeg)} | ${formatNum(currentOptPoint.maxDailyRadiationKwh, 2)} kWh/m²/día`)
       : mode === 'monthly'
       ? (isEn
-          ? `Month Optimum (${monthNames[selectedMonthIdx]}): Inc = ${formatNum(Number(currentOptPoint.betaDeg), 1)}°, Ori = ${formatNum(Number(currentOptPoint.alphaDeg), 1)}° | ${formatNum(currentOptPoint.maxDailyRadiationKwh, 2)} kWh/m²/day`
-          : `Óptimo del mes (${monthNames[selectedMonthIdx]}): Inc = ${formatNum(Number(currentOptPoint.betaDeg), 1)}°, Ori = ${formatNum(Number(currentOptPoint.alphaDeg), 1)}° | ${formatNum(currentOptPoint.maxDailyRadiationKwh, 2)} kWh/m²/día`)
+          ? `Month Optimum (${monthNames[selectedMonthIdx]}): Inc = ${formatNum(Number(currentOptPoint.betaDeg), 1)}°, Ori = ${formatOriWithCardinal(currentOptPoint.alphaDeg)} | ${formatNum(currentOptPoint.maxDailyRadiationKwh, 2)} kWh/m²/day`
+          : `Óptimo del mes (${monthNames[selectedMonthIdx]}): Inc = ${formatNum(Number(currentOptPoint.betaDeg), 1)}°, Ori = ${formatOriWithCardinal(currentOptPoint.alphaDeg)} | ${formatNum(currentOptPoint.maxDailyRadiationKwh, 2)} kWh/m²/día`)
       : (isEn
-          ? `Season Optimum (${activeSeasonName}): Inc = ${formatNum(Number(currentOptPoint.betaDeg), 1)}°, Ori = ${formatNum(Number(currentOptPoint.alphaDeg), 1)}° | ${formatNum(currentOptPoint.maxDailyRadiationKwh, 2)} kWh/m²/day`
-          : `Óptimo Estacional (${activeSeasonName}): Inc = ${formatNum(Number(currentOptPoint.betaDeg), 1)}°, Ori = ${formatNum(Number(currentOptPoint.alphaDeg), 1)}° | ${formatNum(currentOptPoint.maxDailyRadiationKwh, 2)} kWh/m²/día`);
+          ? `Season Optimum (${activeSeasonName}): Inc = ${formatNum(Number(currentOptPoint.betaDeg), 1)}°, Ori = ${formatOriWithCardinal(currentOptPoint.alphaDeg)} | ${formatNum(currentOptPoint.maxDailyRadiationKwh, 2)} kWh/m²/day`
+          : `Óptimo Estacional (${activeSeasonName}): Inc = ${formatNum(Number(currentOptPoint.betaDeg), 1)}°, Ori = ${formatOriWithCardinal(currentOptPoint.alphaDeg)} | ${formatNum(currentOptPoint.maxDailyRadiationKwh, 2)} kWh/m²/día`);
 
     let selectorHtml = '';
     if (mode === 'monthly') {
@@ -523,7 +529,9 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
           <div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
               <label for="loss-slider-alpha" style="font-size: 0.8rem; font-weight: 700; color: var(--text-main);">
-                ${isEn ? 'Azimuth angle α (-90° to +90°):' : 'Orientación / Azimut α (-90° a +90°):'}
+                ${isEn
+                  ? 'Azimuth angle α (-90° to +90°):'
+                  : 'Orientación / Azimut α (-90° a +90°):'}
               </label>
               <div style="display: flex; align-items: center; gap: 0.35rem;">
                 <input type="number" id="loss-input-alpha" min="-90" max="90" step="1" value="${evaluatedAlpha}"
@@ -533,11 +541,11 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
             </div>
             <input type="range" id="loss-slider-alpha" min="-90" max="90" step="1" value="${evaluatedAlpha}" style="width: 100%; cursor: pointer;" />
             <div style="display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-dim); margin-top: 0.15rem;">
-              <span>-90° (Este)</span>
-              <span>-45°</span>
-              <span>0° (Sur)</span>
-              <span>+45°</span>
-              <span>+90° (Oeste)</span>
+              <span>-90° (${isEn ? 'East' : 'Este'})</span>
+              <span>-45° (${isSouthernHemisphere ? 'NE' : 'SE'})</span>
+              <span>0° (${cardinalCenterLabel})</span>
+              <span>+45° (${isSouthernHemisphere ? (isEn ? 'NW' : 'NO') : (isEn ? 'SW' : 'SO')})</span>
+              <span>+90° (${isEn ? 'West' : 'Oeste'})</span>
             </div>
           </div>
         </div>
@@ -548,22 +556,22 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
             ${isEn ? 'Presets:' : 'Atajos rápidos:'}
           </span>
           <button type="button" class="btn btn-xs loss-preset-btn" id="loss-preset-opt" style="font-size: 0.72rem; padding: 0.2rem 0.55rem; background: rgba(2, 132, 199, 0.15); color: var(--accent-cyan, #0284c7); border: 1px solid rgba(2, 132, 199, 0.3); border-radius: 4px; font-weight: 600; cursor: pointer;">
-            ★ ${isEn ? 'Optimal' : 'Óptimo'} (β=${Math.round(currentOptPoint.betaDeg)}°, α=${Math.round(currentOptPoint.alphaDeg)}°)
+            ★ ${isEn ? 'Optimal' : 'Óptimo'} (β=${Math.round(currentOptPoint.betaDeg)}°, α=0° ${cardinalCenterLabel})
           </button>
           <button type="button" class="btn btn-xs loss-preset-btn" id="loss-preset-horiz" style="font-size: 0.72rem; padding: 0.2rem 0.55rem; background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-subtle); border-radius: 4px; font-weight: 600; cursor: pointer;">
             Horizontal (β=0°, α=0°)
           </button>
           <button type="button" class="btn btn-xs loss-preset-btn" id="loss-preset-roof" style="font-size: 0.72rem; padding: 0.2rem 0.55rem; background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-subtle); border-radius: 4px; font-weight: 600; cursor: pointer;">
-            Tejado típico (β=30°, α=0°)
+            ${isEn ? 'Typical roof' : 'Tejado típico'} (β=30°, α=0°)
           </button>
           <button type="button" class="btn btn-xs loss-preset-btn" id="loss-preset-south-vert" style="font-size: 0.72rem; padding: 0.2rem 0.55rem; background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-subtle); border-radius: 4px; font-weight: 600; cursor: pointer;">
-            Fachada Sur (β=90°, α=0°)
+            ${isSouthernHemisphere ? (isEn ? 'North Facade' : 'Fachada Norte') : (isEn ? 'South Facade' : 'Fachada Sur')} (β=90°, α=0°)
           </button>
           <button type="button" class="btn btn-xs loss-preset-btn" id="loss-preset-east" style="font-size: 0.72rem; padding: 0.2rem 0.55rem; background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-subtle); border-radius: 4px; font-weight: 600; cursor: pointer;">
-            Este (β=45°, α=-90°)
+            ${isEn ? 'East' : 'Este'} (β=45°, α=-90°)
           </button>
           <button type="button" class="btn btn-xs loss-preset-btn" id="loss-preset-west" style="font-size: 0.72rem; padding: 0.2rem 0.55rem; background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-subtle); border-radius: 4px; font-weight: 600; cursor: pointer;">
-            Oeste (β=45°, α=+90°)
+            ${isEn ? 'West' : 'Oeste'} (β=45°, α=+90°)
           </button>
         </div>
       </div>
@@ -679,9 +687,15 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    const isSouthHem = res.latitude < 0;
+    const minAlphaGrid = -90;
+    const maxAlphaGrid = 90;
+    const spanAlphaGrid = 180;
+    const centerAlphaGrid = 0;
+
     // Cache pre-computed 181x91 offscreen texture (1° resolution)
     const offscreenCanvas = document.createElement('canvas');
-    offscreenCanvas.width = 181; // alphas from -90 to +90 (181 values)
+    offscreenCanvas.width = 181; // 181 values across spanAlphaGrid
     offscreenCanvas.height = 91; // betas from 0 to 90 (91 values)
     const offCtx = offscreenCanvas.getContext('2d');
 
@@ -693,7 +707,7 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
       for (let r = 0; r < 91; r++) {
         const b = 90 - r; // 90 down to 0
         for (let c = 0; c < 181; c++) {
-          const a = -90 + c; // -90 to +90
+          const a = minAlphaGrid + (c / 180) * spanAlphaGrid;
           const { loss } = interpolateLossAndRadiation(betas, alphas, lossMatrix, radMatrix, b, a);
           const [red, green, blue] = getLossRgb(loss);
           const idx = (r * 181 + c) * 4;
@@ -728,15 +742,15 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
 
     // Coordinate conversion
     function coordsToXY(beta: number, alpha: number, plotW: number, plotH: number) {
-      const x = padLeft + ((alpha - (-90)) / 180) * plotW;
+      const x = padLeft + ((alpha - minAlphaGrid) / spanAlphaGrid) * plotW;
       const y = padTop + ((90 - beta) / 90) * plotH;
       return { x, y };
     }
 
     function xyToCoords(x: number, y: number, plotW: number, plotH: number) {
-      const a = -90 + ((x - padLeft) / plotW) * 180;
+      const a = minAlphaGrid + ((x - padLeft) / plotW) * spanAlphaGrid;
       const b = 90 - ((y - padTop) / plotH) * 90;
-      const clampedA = Math.max(-90, Math.min(90, Math.round(a)));
+      const clampedA = Math.max(minAlphaGrid, Math.min(maxAlphaGrid, Math.round(a)));
       const clampedB = Math.max(0, Math.min(90, Math.round(b)));
       return { beta: clampedB, alpha: clampedA };
     }
@@ -784,12 +798,12 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
         ctx!.lineTo(x, padTop + plotH);
         ctx!.stroke();
 
-        // Alpha labels on X-axis
+        // Alpha labels on X-axis (-90° East to +90° West, centered at 0° North in SH / 0° South in NH)
         ctx!.fillStyle = a === 0 ? (isDark ? '#38bdf8' : '#0284c7') : textColor;
         let label = `${a > 0 ? '+' : ''}${a}°`;
         if (a === -90) label = '-90° (E)';
-        if (a === 0) label = '0° (Sur)';
-        if (a === 90) label = '+90° (O)';
+        if (a === 0) label = isSouthHem ? (isEn ? '0° (North)' : '0° (Norte)') : (isEn ? '0° (South)' : '0° (Sur)');
+        if (a === 90) label = isEn ? '+90° (W)' : '+90° (O)';
         ctx!.fillText(label, x, padTop + plotH + 7);
       }
 
@@ -822,7 +836,9 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
       ctx!.font = 'bold 11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
       ctx!.textAlign = 'center';
       ctx!.fillText(
-        isEn ? 'Azimuth / Orientation α (degrees)' : 'Orientación / Azimut α (grados respecto al Sur)',
+        isSouthHem
+          ? (isEn ? 'Azimuth / Orientation α (degrees from Equator-facing North)' : 'Orientación / Azimut α (grados respecto al Norte ecuatorial)')
+          : (isEn ? 'Azimuth / Orientation α (degrees from South)' : 'Orientación / Azimut α (grados respecto al Sur)'),
         padLeft + plotW / 2,
         padTop + plotH + 28
       );
@@ -861,9 +877,10 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
       ctx!.fill();
 
       // Optimal Point badge
+      const optCardinalTag = isSouthHem ? (isEn ? 'North' : 'Norte') : (isEn ? 'South' : 'Sur');
       const optLabel = isEn
-        ? `★ OPTIMAL: β=${formatNum(Number(optPoint.betaDeg), 1)}°, α=${formatNum(Number(optPoint.alphaDeg), 1)}°`
-        : `★ ÓPTIMO: β=${formatNum(Number(optPoint.betaDeg), 1)}°, α=${formatNum(Number(optPoint.alphaDeg), 1)}°`;
+        ? `★ OPTIMAL: β=${formatNum(Number(optPoint.betaDeg), 1)}°, α=${formatNum(Number(optPoint.alphaDeg), 1)}° (${optCardinalTag})`
+        : `★ ÓPTIMO: β=${formatNum(Number(optPoint.betaDeg), 1)}°, α=${formatNum(Number(optPoint.alphaDeg), 1)}° (${optCardinalTag})`;
       ctx!.font = 'bold 10px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
       const textMetrics = ctx!.measureText(optLabel);
       const bW = textMetrics.width + 12;
@@ -984,7 +1001,9 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
       }
 
       // Orientation textual description
-      let oriText = isEn ? 'True South (0°)' : 'Sur estricto (0°)';
+      let oriText = isSouthHem
+        ? (isEn ? 'True North (0° Equator / 180° Azimuth)' : 'Norte estricto (0° Ecuatorial / 180° Azimut)')
+        : (isEn ? 'True South (0°)' : 'Sur estricto (0°)');
       if (evaluatedAlpha < 0) {
         oriText = isEn ? `${Math.abs(evaluatedAlpha)}° East (Mornings)` : `${Math.abs(evaluatedAlpha)}° al Este (Mañanas)`;
       } else if (evaluatedAlpha > 0) {
@@ -1002,6 +1021,22 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
       let whenTitle = '';
       let whenSolarPhysics = '';
       const lat = res.latitude ?? 37.0;
+      const isTropicalSite = Math.abs(lat) < 23.45;
+      const tropicalExplanationBanner = isTropicalSite ? `
+        <div style="margin-top: 0.75rem; padding: 0.75rem 0.95rem; border-radius: var(--radius-sm); border-left: 4px solid #f59e0b; background: rgba(245, 158, 11, 0.08); border-top: 1px solid rgba(245, 158, 11, 0.25); border-right: 1px solid rgba(245, 158, 11, 0.25); border-bottom: 1px solid rgba(245, 158, 11, 0.25); font-size: 0.77rem; line-height: 1.48; color: var(--text-main);">
+          <div style="font-weight: 800; color: #d97706; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.4rem;">
+            <span>☀️</span>
+            <span>${isEn
+              ? `Intertropical / Low-Latitude Solar Behavior (φ = ${formatNum(lat, 2)}° ${isSouthHem ? 'South' : 'North'}):`
+              : `Comportamiento Solar Intertropical / Baja Latitud (φ = ${formatNum(lat, 2)}° ${isSouthHem ? 'Sur' : 'Norte'}):`}</span>
+          </div>
+          <div>
+            ${isEn
+              ? `At this latitude (|φ| < 23.45°), the Sun passes near the zenith during much of the year, so optimal tilt is low (<strong>β<sub>opt</sub> = ${formatNum(Number(optPoint.betaDeg), 1)}°</strong> at <strong>α = 0,0° [${isSouthHem ? 'Equator-facing North' : 'Equator-facing South'}]</strong>). In the [-90° East, +90° West] map, the star <strong>★</strong> is centered at 0° and low tilts (β ≤ 15°) form a wide green plateau (loss ≤ 10%) across all azimuths.`
+              : `En emplazamientos intertropicales como este (|φ| < 23,45°), el Sol transita muy alto cerca del cenit gran parte del año, por lo que la inclinación óptima es reducida (<strong>β<sub>ópt</sub> = ${formatNum(Number(optPoint.betaDeg), 1)}°</strong> en el eje central <strong>α = 0,0° [${isSouthHem ? 'Norte ecuatorial' : 'Sur ecuatorial'}]</strong>). En el mapa [-90° Este, +90° Oeste], el punto óptimo <strong>★</strong> se ubica lógicamente en el centro (0°) y las inclinaciones bajas (β ≤ 15°) forman una amplia zona verde (pérdida ≤ 10%).`}
+          </div>
+        </div>
+      ` : '';
 
       if (mode === 'seasonal') {
         const seasonInfo = isEn ? [
@@ -1087,6 +1122,7 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
         };
 
         whenTitle = `${seasonInfo.name} (${seasonInfo.months})`;
+        const azDev = evaluatedAlpha - centerAlphaGrid;
         whenSolarPhysics = isEn ? `
           <div style="font-size: 0.76rem; color: var(--text-muted); line-height: 1.45; margin-top: 0.4rem;">
             <div>• <strong>Astronomical period:</strong> ${seasonInfo.months}. Includes ${seasonInfo.solstice} with declination ${seasonInfo.declination}.</div>
@@ -1102,12 +1138,13 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
                   : ''
               }
               ${
-                Math.abs(evaluatedAlpha) > 10
-                  ? ` Azimuth deviation of ${evaluatedAlpha > 0 ? '+' : ''}${evaluatedAlpha}° penalizes collection around solar noon, favoring ${evaluatedAlpha < 0 ? 'mornings' : 'afternoons'}.`
+                Math.abs(azDev) > 10
+                  ? ` Azimuth deviation of ${azDev > 0 ? '+' : ''}${azDev}° from ${isSouthHem ? 'North (0°)' : 'South (0°)'} penalizes collection around solar noon, favoring ${azDev < 0 ? 'mornings (East)' : 'afternoons (West)'}.`
                   : ''
               }
             </div>
           </div>
+          ${tropicalExplanationBanner}
         ` : `
           <div style="font-size: 0.76rem; color: var(--text-muted); line-height: 1.45; margin-top: 0.4rem;">
             <div>• <strong>Periodo astronómico:</strong> ${seasonInfo.months}. Incluye el ${seasonInfo.solstice} con declinación ${seasonInfo.declination}.</div>
@@ -1123,12 +1160,13 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
                   : ''
               }
               ${
-                Math.abs(evaluatedAlpha) > 10
-                  ? ` El desvío azimutal de ${evaluatedAlpha > 0 ? '+' : ''}${evaluatedAlpha}° penaliza la captación en el mediodía solar, favoreciendo las ${evaluatedAlpha < 0 ? 'mañanas' : 'tardes'}.`
+                Math.abs(azDev) > 10
+                  ? ` El desvío azimutal de ${azDev > 0 ? '+' : ''}${azDev}° respecto al ${isSouthHem ? 'Norte (0°)' : 'Sur (0°)'} penaliza la captación en el mediodía solar, favoreciendo las ${azDev < 0 ? 'mañanas (Este)' : 'tardes (Oeste)'}.`
                   : ''
               }
             </div>
           </div>
+          ${tropicalExplanationBanner}
         `;
       } else if (mode === 'monthly') {
         const mNamesList = isEn ? MONTH_NAMES_EN : MONTH_NAMES_ES;
@@ -1140,12 +1178,14 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
             <div>• <strong>Angular performance:</strong> Optimal tilt for this month is <strong>Inc = ${formatNum(Number(optPoint.betaDeg), 1)}°, Ori = ${formatNum(Number(optPoint.alphaDeg), 1)}°</strong> (Maximum radiation: ${formatNum(optPoint.maxDailyRadiationKwh, 2)} kWh/m²/day).</div>
             <div>• <strong>Effect at selected point:</strong> With β=${evaluatedBeta}° and α=${evaluatedAlpha}°, daily collection is <strong>${formatNum(radiation, 2)} kWh/m²/day</strong>, representing a loss of <strong>${formatPercent(loss, 1)}</strong> vs monthly optimum.</div>
           </div>
+          ${tropicalExplanationBanner}
         ` : `
           <div style="font-size: 0.76rem; color: var(--text-muted); line-height: 1.45; margin-top: 0.4rem;">
             <div>• <strong>Periodo evaluado:</strong> Mes completo de ${mName}, evaluado mediante el día característico de Klein y el modelo de irradiación Liu-Jordan & Klein.</div>
             <div>• <strong>Rendimiento angular:</strong> El ángulo óptimo para este mes es <strong>Inc = ${formatNum(Number(optPoint.betaDeg), 1)}°, Ori = ${formatNum(Number(optPoint.alphaDeg), 1)}°</strong> (Radiación máxima: ${formatNum(optPoint.maxDailyRadiationKwh, 2)} kWh/m²/día).</div>
             <div>• <strong>Efecto en el punto seleccionado:</strong> Con β=${evaluatedBeta}° y α=${evaluatedAlpha}°, se capta <strong>${formatNum(radiation, 2)} kWh/m²/día</strong>, lo que representa una pérdida de <strong>${formatPercent(loss, 1)}</strong> frente al óptimo mensual.</div>
           </div>
+          ${tropicalExplanationBanner}
         `;
       } else {
         whenTitle = isEn ? 'Annual Global Balance (365 Days)' : 'Balance Global Anual (365 días)';
@@ -1155,12 +1195,14 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
             <div>• <strong>Global annual optimum:</strong> Located at <strong>Inc = ${formatNum(Number(optPoint.betaDeg), 1)}°, Ori = ${formatNum(Number(optPoint.alphaDeg), 1)}°</strong> (${formatNum(optPoint.maxDailyRadiationKwh, 2)} kWh/m²/day annual mean).</div>
             <div>• <strong>Effect at selected point:</strong> A fixed installation with β=${evaluatedBeta}° and α=${evaluatedAlpha}° produces annually ~${formatInt(Math.round(radiation * 365))} kWh/m²/year vs ${formatInt(Math.round(optPoint.maxDailyRadiationKwh * 365))} kWh/m²/year of the optimum (cumulative annual loss of <strong>${formatPercent(loss, 1)}</strong>).</div>
           </div>
+          ${tropicalExplanationBanner}
         ` : `
           <div style="font-size: 0.76rem; color: var(--text-muted); line-height: 1.45; margin-top: 0.4rem;">
             <div>• <strong>Periodo evaluado:</strong> Integración anual completa (365 días) combinando solsticios y equinoccios con la distribución de radiación horizontal de la localidad.</div>
             <div>• <strong>Óptimo anual global:</strong> Situado en <strong>Inc = ${formatNum(Number(optPoint.betaDeg), 1)}°, Ori = ${formatNum(Number(optPoint.alphaDeg), 1)}°</strong> (${formatNum(optPoint.maxDailyRadiationKwh, 2)} kWh/m²/día de media anual).</div>
             <div>• <strong>Efecto en el punto seleccionado:</strong> Una instalación fija con β=${evaluatedBeta}° y α=${evaluatedAlpha}° produce anualmente ~${formatInt(Math.round(radiation * 365))} kWh/m²/año frente a los ${formatInt(Math.round(optPoint.maxDailyRadiationKwh * 365))} kWh/m²/año del óptimo (pérdida anual acumulada del <strong>${formatPercent(loss, 1)}</strong>).</div>
           </div>
+          ${tropicalExplanationBanner}
         `;
       }
 
@@ -1236,7 +1278,7 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
 
     function setEvaluatedPoint(beta: number, alpha: number) {
       evaluatedBeta = Math.max(0, Math.min(90, Math.round(beta)));
-      evaluatedAlpha = Math.max(-90, Math.min(90, Math.round(alpha)));
+      evaluatedAlpha = Math.max(minAlphaGrid, Math.min(maxAlphaGrid, Math.round(alpha)));
       hasUserSelectedPoint = true;
 
       // Update inputs and sliders

@@ -426,6 +426,8 @@ loss_map = generate_capture_loss_map(
     annual_opt_tilt_deg=float(opt_beta),
     monthly_opt_tilts_deg=[float(v) for v in monthly_opt["optimal_tilts_deg"]],
     seasonal_optima=seasonal_opt_dict,
+    annual_opt_max_rad_kwh=float(mean_opt),
+    monthly_opt_max_rad_kwh=[float(v) for v in monthly_opt["monthly_daily_kwh"]],
 )
 
 # 10. Comparative Surface Optimization Engine

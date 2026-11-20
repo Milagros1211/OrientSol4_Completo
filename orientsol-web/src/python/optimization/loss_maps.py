@@ -20,14 +20,19 @@ from core.hour_angles import angulos, angulos2
 DAYS_PER_MONTH = np.array([31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31], dtype=np.int32)
 
 
-def _find_optimal_beta_alpha(rad_mat: np.ndarray, betas: np.ndarray, alphas: np.ndarray) -> Tuple[float, float, float]:
+def _find_optimal_beta_alpha(
+    rad_mat: np.ndarray,
+    betas: np.ndarray,
+    alphas: np.ndarray,
+    preferred_alpha: float = 0.0,
+) -> Tuple[float, float, float]:
     """
     Finds maximum radiation in rad_mat and the corresponding optimal tilt (beta)
-    and orientation (alpha).
+    and orientation (alpha) in [-90°, +90°].
     - If optimal beta is 0° (horizontal plane), orientation alpha has no physical/geometric
-      effect, so alpha is strictly set to 0.0° (South) by international solar convention.
+      effect, so alpha is set to 0.0° (center of map).
     - If multiple orientations tie for the maximum (within 1e-4 kWh/m²/day), chooses the
-      candidate closest to alpha = 0° (South), breaking further ties by lowest beta.
+      candidate closest to 0.0° (center of map), breaking further ties by lowest beta.
     """
     max_val = float(np.max(rad_mat))
     max_mask = np.isclose(rad_mat, max_val, atol=1e-4)
@@ -40,7 +45,7 @@ def _find_optimal_beta_alpha(rad_mat: np.ndarray, betas: np.ndarray, alphas: np.
             a = 0.0
         return b, a, max_val
 
-    best = min(candidates, key=lambda idx: (abs(float(alphas[idx[1]])), float(betas[idx[0]])))
+    best = min(candidates, key=lambda idx: (abs(float(alphas[idx[1]]) - preferred_alpha), float(betas[idx[0]])))
     opt_b = float(betas[best[0]])
     opt_a = float(alphas[best[1]])
     if abs(opt_b) < 0.01:
@@ -63,11 +68,14 @@ def generate_capture_loss_map(
     annual_opt_tilt_deg: Optional[float] = None,
     monthly_opt_tilts_deg: Optional[List[float]] = None,
     seasonal_optima: Optional[Dict[str, Dict[str, float]]] = None,
+    annual_opt_max_rad_kwh: Optional[float] = None,
+    monthly_opt_max_rad_kwh: Optional[List[float]] = None,
 ) -> Dict[str, Union[np.ndarray, List[float], float, int, Dict]]:
     """
     Computes 2D grid of annual solar irradiation and capture losses as a function of:
     - Tilt angle beta in [0..90] degrees
-    - Azimuth angle alpha in [alpha_min..alpha_max] degrees (0 = South, -90 = East, +90 = West).
+    - Azimuth deviation angle alpha in [-90..+90] degrees from the equator-facing optimum
+      (-90° = East, 0° = Equator-facing optimum [South in NH / North in SH], +90° = West).
 
     Returns
     -------
@@ -75,6 +83,9 @@ def generate_capture_loss_map(
         beta_grid, alpha_grid, radiation_matrix, loss_pct_matrix, cte_zones, and optimum point.
     """
     lat_rad = float(deg2rad(lat_deg))
+    is_south_hem = lat_deg < 0
+    if alpha_range_deg is None:
+        alpha_range_deg = (-90, 90)
     g0 = np.asarray(gdm0, dtype=np.float64)
     b0 = np.asarray(val_bdm0, dtype=np.float64)
     d0 = np.asarray(val_ddm0, dtype=np.float64)
@@ -110,7 +121,10 @@ def generate_capture_loss_map(
         albedo_factor = albedo * ((1.0 - cos_beta) / 2.0)
 
         for i_a, alpha_deg in enumerate(alphas):
-            alpha_rad = np.radians(alpha_deg)
+            # In the Southern Hemisphere, alpha_deg in [-90°, +90°] represents azimuth deviation
+            # from the equator-facing North (180°), keeping -90° = East and +90° = West.
+            phys_alpha_deg = (180.0 - alpha_deg) if is_south_hem else alpha_deg
+            alpha_rad = np.radians(phys_alpha_deg)
             sin_alpha = np.sin(alpha_rad)
             cos_alpha = np.cos(alpha_rad)
 
@@ -180,17 +194,21 @@ def generate_capture_loss_map(
             for m in range(12):
                 radiation_monthly[m, i_b, i_a] = g_daily_month[m]
 
-    # Reference maximum (South-facing optimal tilt)
-    opt_beta_deg, opt_alpha_deg, max_radiation = _find_optimal_beta_alpha(radiation_annual_daily, betas, alphas)
+    # Reference maximum (Equator-facing optimal tilt at center of [-90, +90] map: alpha = 0.0°)
+    opt_beta_deg, opt_alpha_deg, max_radiation = _find_optimal_beta_alpha(
+        radiation_annual_daily, betas, alphas, preferred_alpha=0.0
+    )
     if annual_opt_tilt_deg is not None:
         opt_beta_deg = float(annual_opt_tilt_deg)
-        opt_alpha_deg = 0.0 if lat_deg >= 0 else 180.0
+        opt_alpha_deg = 0.0
+    if annual_opt_max_rad_kwh is not None:
+        max_radiation = max(float(max_radiation), float(annual_opt_max_rad_kwh))
 
     # Capture loss percentage matrix relative to the maximum:
     # Loss (%) = (1 - G / G_max) * 100
     loss_pct_matrix = np.where(
         max_radiation > 0,
-        ((max_radiation - radiation_annual_daily) / max_radiation) * 100.0,
+        np.maximum(0.0, ((max_radiation - radiation_annual_daily) / max_radiation) * 100.0),
         0.0
     )
 
@@ -210,10 +228,14 @@ def generate_capture_loss_map(
     monthly_maps = []
     for m in range(12):
         m_rad = radiation_monthly[m]
-        opt_beta_m, opt_alpha_m, max_rad_m = _find_optimal_beta_alpha(m_rad, betas, alphas)
+        opt_beta_m, opt_alpha_m, max_rad_m = _find_optimal_beta_alpha(
+            m_rad, betas, alphas, preferred_alpha=0.0
+        )
         if monthly_opt_tilts_deg is not None and m < len(monthly_opt_tilts_deg):
             opt_beta_m = float(monthly_opt_tilts_deg[m])
-            opt_alpha_m = 0.0 if lat_deg >= 0 else 180.0
+            opt_alpha_m = 0.0
+        if monthly_opt_max_rad_kwh is not None and m < len(monthly_opt_max_rad_kwh):
+            max_rad_m = max(float(max_rad_m), float(monthly_opt_max_rad_kwh[m]))
 
         loss_pct_m = np.where(
             max_rad_m > 0,
@@ -281,11 +303,13 @@ def generate_capture_loss_map(
     for s_idx, s_def in enumerate(SEASON_DEFS):
         s_months = s_def["months"]
         s_rad = np.mean(radiation_monthly[s_months, :, :], axis=0)
-        opt_beta_s, opt_alpha_s, max_rad_s = _find_optimal_beta_alpha(s_rad, betas, alphas)
+        opt_beta_s, opt_alpha_s, max_rad_s = _find_optimal_beta_alpha(
+            s_rad, betas, alphas, preferred_alpha=0.0
+        )
         if seasonal_optima is not None and s_def["key"] in seasonal_optima:
             s_opt_data = seasonal_optima[s_def["key"]]
             opt_beta_s = float(s_opt_data.get("opt_angle_deg", opt_beta_s))
-            opt_alpha_s = 0.0 if lat_deg >= 0 else 180.0
+            opt_alpha_s = 0.0
             if "mean_daily_kwh" in s_opt_data:
                 max_rad_s = max(float(max_rad_s), float(s_opt_data["mean_daily_kwh"]))
 
