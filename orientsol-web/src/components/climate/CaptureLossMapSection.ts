@@ -28,6 +28,8 @@ export interface CaptureLossMapSectionProps {
 /**
  * Bilinear interpolation for loss % and incident daily radiation
  * on a discrete grid of betas (19 rows) and alphas (25 cols).
+ * If roundValues is false, returns exact continuous floating-point loss
+ * for ultra-smooth high-DPI contour rendering without staircase artifacts.
  */
 function interpolateLossAndRadiation(
   betas: number[],
@@ -35,7 +37,8 @@ function interpolateLossAndRadiation(
   lossMatrix: number[][],
   radMatrix: number[][],
   targetBeta: number,
-  targetAlpha: number
+  targetAlpha: number,
+  roundValues: boolean = true
 ): { loss: number; radiation: number } {
   const minB = betas[0];
   const maxB = betas[betas.length - 1];
@@ -90,6 +93,13 @@ function interpolateLossAndRadiation(
     (1 - tb) * ta * r01 +
     tb * (1 - ta) * r10 +
     tb * ta * r11;
+
+  if (!roundValues) {
+    return {
+      loss: Math.max(0, interpLoss),
+      radiation: Math.max(0, interpRad),
+    };
+  }
 
   return {
     loss: Math.max(0, Math.round(interpLoss * 10) / 10),
@@ -719,55 +729,65 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
     const spanAlphaGrid = 180;
     const centerAlphaGrid = 0;
 
-    // Cache pre-computed 181x91 offscreen texture (1° resolution) with 1% isoline contour shading
+    // Cache pre-computed high-definition 721x361 offscreen texture (0.25° resolution)
+    // with crisp, well-defined 1% isoline bands and clean anti-aliased contour lines
+    const texW = 721; // 0.25° steps across 180° azimuth
+    const texH = 361; // 0.25° steps across 90° tilt
     const offscreenCanvas = document.createElement('canvas');
-    offscreenCanvas.width = 181; // 181 values across spanAlphaGrid
-    offscreenCanvas.height = 91; // betas from 0 to 90 (91 values)
+    offscreenCanvas.width = texW;
+    offscreenCanvas.height = texH;
     const offCtx = offscreenCanvas.getContext('2d');
 
     if (offCtx) {
-      const imgData = offCtx.createImageData(181, 91);
+      const imgData = offCtx.createImageData(texW, texH);
       const data = imgData.data;
 
-      // Pre-compute 1° loss grid and integer 1% isoline bands (without numbers, purely shaded contours)
-      const bandGrid: number[][] = Array.from({ length: 91 }, () => new Array(181).fill(0));
-      const lossGrid: number[][] = Array.from({ length: 91 }, () => new Array(181).fill(0));
+      // Pre-compute continuous 0.25° loss grid and integer 1% isoline bands
+      const bandGrid: Int16Array = new Int16Array(texW * texH);
+      const lossGrid: Float32Array = new Float32Array(texW * texH);
 
-      for (let r = 0; r < 91; r++) {
-        const b = 90 - r; // 90 down to 0
-        for (let c = 0; c < 181; c++) {
-          const a = minAlphaGrid + (c / 180) * spanAlphaGrid;
-          const { loss } = interpolateLossAndRadiation(betas, alphas, lossMatrix, radMatrix, b, a);
-          lossGrid[r][c] = loss;
-          bandGrid[r][c] = Math.floor(Math.max(0, loss));
+      for (let r = 0; r < texH; r++) {
+        const b = 90 - (r / (texH - 1)) * 90; // 90 down to 0
+        const rowOffset = r * texW;
+        for (let c = 0; c < texW; c++) {
+          const a = minAlphaGrid + (c / (texW - 1)) * spanAlphaGrid;
+          const { loss } = interpolateLossAndRadiation(betas, alphas, lossMatrix, radMatrix, b, a, false);
+          lossGrid[rowOffset + c] = loss;
+          bandGrid[rowOffset + c] = Math.floor(Math.max(0, loss));
         }
       }
 
-      // Fill pixel array: row 0 is beta=90 (top), row 90 is beta=0 (bottom)
-      for (let r = 0; r < 91; r++) {
-        for (let c = 0; c < 181; c++) {
-          const loss = lossGrid[r][c];
+      // Fill pixel array with clean stepped bands and continuous 4-neighbor contour lines
+      for (let r = 0; r < texH; r++) {
+        const rowOffset = r * texW;
+        for (let c = 0; c < texW; c++) {
+          const cellIdx = rowOffset + c;
+          const loss = lossGrid[cellIdx];
           let [red, green, blue] = getLossRgb(loss);
 
-          // Subtle isoline contour boundary shading when crossing any 1% loss threshold
-          const curBand = bandGrid[r][c];
-          const upBand = r > 0 ? bandGrid[r - 1][c] : curBand;
-          const leftBand = c > 0 ? bandGrid[r][c - 1] : curBand;
-          if (curBand !== upBand || curBand !== leftBand) {
-            // Major CTE boundaries (10%, 20%, 40%) get slightly deeper contour emphasis than 1% steps
-            const maxB = Math.max(curBand, upBand, leftBand);
-            const isMajorCte = maxB === 10 || maxB === 20 || maxB === 40;
-            const shadeFactor = isMajorCte ? 0.72 : 0.86;
+          // Crisp 1-pixel contour line wherever an isoline (every 1% loss) is crossed
+          const curBand = bandGrid[cellIdx];
+          const upBand = r > 0 ? bandGrid[cellIdx - texW] : curBand;
+          const downBand = r < texH - 1 ? bandGrid[cellIdx + texW] : curBand;
+          const leftBand = c > 0 ? bandGrid[cellIdx - 1] : curBand;
+          const rightBand = c < texW - 1 ? bandGrid[cellIdx + 1] : curBand;
+
+          // Draw contour on the higher-loss side of the boundary for a clean 1px stroke
+          const minNeighborBand = Math.min(upBand, downBand, leftBand, rightBand);
+          if (curBand > minNeighborBand) {
+            const isMajorCte = curBand === 10 || curBand === 20 || curBand === 40;
+            const is5PctStep = curBand % 5 === 0;
+            const shadeFactor = isMajorCte ? 0.52 : is5PctStep ? 0.66 : 0.78;
             red = Math.round(red * shadeFactor);
             green = Math.round(green * shadeFactor);
             blue = Math.round(blue * shadeFactor);
           }
 
-          const idx = (r * 181 + c) * 4;
+          const idx = cellIdx * 4;
           data[idx] = red;
           data[idx + 1] = green;
           data[idx + 2] = blue;
-          data[idx + 3] = 235; // opacity
+          data[idx + 3] = 242; // high clarity opacity
         }
       }
       offCtx.putImageData(imgData, 0, 0);
