@@ -1,8 +1,8 @@
 {
   "name": "orientsol-suite",
   "private": true,
-  "version": "4.2.2",
-  "description": "OrientSol 3 - Plataforma Web y Desktop de Simulación Solar y Fotovoltaica",
+  "version": "4.2.3",
+  "description": "OrientSol 4.0 - Plataforma Web y Desktop de Simulación Solar y Fotovoltaica",
   "scripts": {
     "dev": "npm run --prefix orientsol-web dev",
     "build": "npm run --prefix orientsol-web build",
@@ -11,6 +11,11 @@
     "app:dev": "npm run --prefix orientsol-web app:dev",
     "electron:start": "npm run --prefix orientsol-web electron:start",
     "electron:test": "npm run --prefix orientsol-web electron:test",
+    "build:win": "npm run --prefix orientsol-web build:win",
+    "build:mac": "npm run --prefix orientsol-web build:mac",
+    "build:linux": "npm run --prefix orientsol-web build:linux",
+    "build:apk": "npm run --prefix orientsol-web build:apk",
+    "build:offline": "npm run --prefix orientsol-web build:offline",
     "deploy": "npm run --prefix orientsol-web deploy"
   }
 }
