@@ -98,44 +98,54 @@ function interpolateLossAndRadiation(
 }
 
 /**
- * Returns RGB tuple based on CTE DB-HE4 loss thresholds:
- * - 0% to 10%: Deep emerald to bright green (Límite General)
- * - 10% to 20%: Amber/Yellow (Superposición)
- * - 20% to 40%: Warm Orange (Integración Arquitectónica)
- * - > 40%: Deep Crimson/Wine (No conforme)
+ * Returns RGB tuple based on CTE DB-HE4 loss thresholds with stepped 1% isoline bands:
+ * - 0% to 10%: Deep emerald to bright green (Límite General, 1% isoline steps)
+ * - 10% to 20%: Amber/Yellow (Superposición, 1% isoline steps)
+ * - 20% to 40%: Warm Orange (Integración Arquitectónica, 2% isoline steps)
+ * - > 40%: Deep Crimson/Wine (No conforme, 2.5% isoline steps)
  */
 function getLossRgb(loss: number): [number, number, number] {
+  // Quantize into 1% isoline bands so points with similar loss share a distinct contour band
+  const band1Pct = Math.floor(Math.max(0, loss));
+
   if (loss <= 10.0) {
-    const t = Math.max(0, Math.min(1, loss / 10.0));
-    // [5, 150, 105] to [16, 185, 129]
+    // 10 distinct 1% isoline bands inside the green CTE zone (0-1%, 1-2%, ..., 9-10%)
+    const b = Math.min(9, band1Pct);
+    const t = b / 9.0;
+    // Core optimum (0-1%) is rich deep emerald [4, 110, 78], progressing by 1% steps to bright mint-green [45, 212, 155]
     return [
-      Math.round(5 + t * 11),
-      Math.round(150 + t * 35),
-      Math.round(105 + t * 24),
+      Math.round(4 + t * 41),
+      Math.round(110 + t * 102),
+      Math.round(78 + t * 77),
     ];
   } else if (loss <= 20.0) {
-    const t = Math.max(0, Math.min(1, (loss - 10.0) / 10.0));
-    // [180, 150, 15] to [245, 158, 11]
+    // 10 distinct 1% isoline bands inside the yellow CTE zone (10-11%, ..., 19-20%)
+    const b = Math.min(9, Math.max(0, band1Pct - 10));
+    const t = b / 9.0;
+    // [190, 155, 12] to [250, 176, 15]
     return [
-      Math.round(180 + t * 65),
-      Math.round(150 + t * 8),
-      Math.round(15 - t * 4),
+      Math.round(190 + t * 60),
+      Math.round(155 + t * 21),
+      Math.round(12 + t * 3),
     ];
   } else if (loss <= 40.0) {
-    const t = Math.max(0, Math.min(1, (loss - 20.0) / 20.0));
-    // [245, 158, 11] to [220, 38, 38]
+    // 1% isoline steps across the orange zone (20% to 40%)
+    const b = Math.min(19, Math.max(0, band1Pct - 20));
+    const t = b / 19.0;
+    // [245, 145, 11] to [220, 48, 32]
     return [
       Math.round(245 - t * 25),
-      Math.round(158 - t * 120),
-      Math.round(11 + t * 27),
+      Math.round(145 - t * 97),
+      Math.round(11 + t * 21),
     ];
   } else {
-    const t = Math.max(0, Math.min(1, (loss - 40.0) / 30.0));
-    // [220, 38, 38] to [127, 29, 29]
+    const b = Math.min(30, Math.max(0, band1Pct - 40));
+    const t = b / 30.0;
+    // [210, 35, 35] to [120, 22, 22]
     return [
-      Math.round(220 - t * 93),
-      Math.round(38 - t * 9),
-      Math.round(38 - t * 9),
+      Math.round(210 - t * 90),
+      Math.round(35 - t * 13),
+      Math.round(35 - t * 13),
     ];
   }
 }
@@ -601,24 +611,40 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
               </tr>
             </thead>
             <tbody>
-              ${currentBetas
-                .map((b, i_b) => {
-                  const cells = currentAlphas
-                    .map((a, i_a) => {
-                      const loss = currentLossMatrix[i_b][i_a];
-                      const rad = currentRadMatrix[i_b][i_a];
-                      const cls = getCteClass(loss);
-                      const isOptimalCell = Math.abs(b - currentOptPoint.betaDeg) < 0.01 && Math.abs(a - currentOptPoint.alphaDeg) < 0.01;
-                      const optStyle = isOptimalCell
-                        ? 'border: 2px solid var(--accent-cyan, #0284c7) !important; box-shadow: inset 0 0 8px rgba(2, 132, 199, 0.4); font-weight: 800; transform: scale(1.08);'
-                        : '';
-                      const starText = isOptimalCell ? ' ★' : '';
-                      return `<td class="${cls}" style="${optStyle}" title="β=${b}°, α=${a}°: ${isEn ? 'Loss' : 'Pérdida'} ${formatPercent(loss, 1)} (${formatNum(rad, 2)} ${isEn ? 'kWh/m²/day' : 'kWh/m²/d'})">${formatPercent(loss, 1)}${starText}</td>`;
-                    })
-                    .join('');
-                  return `<tr><td class="row-header-beta">${b}°</td>${cells}</tr>`;
-                })
-                .join('')}
+              ${(() => {
+                // Closest discrete cell to the canonical optimum (e.g. β=27° -> 25° row, α=0° -> 0° col)
+                const closestDiscreteBeta = currentBetas.reduce(
+                  (prev, curr) => (Math.abs(curr - currentOptPoint.betaDeg) < Math.abs(prev - currentOptPoint.betaDeg) ? curr : prev),
+                  currentBetas[0] ?? 0
+                );
+                const closestDiscreteAlpha = currentAlphas.reduce(
+                  (prev, curr) => (Math.abs(curr - currentOptPoint.alphaDeg) < Math.abs(prev - currentOptPoint.alphaDeg) ? curr : prev),
+                  currentAlphas[0] ?? 0
+                );
+                return currentBetas
+                  .map((b, i_b) => {
+                    const cells = currentAlphas
+                      .map((a, i_a) => {
+                        const loss = currentLossMatrix[i_b][i_a];
+                        const rad = currentRadMatrix[i_b][i_a];
+                        const cls = getCteClass(loss);
+                        const isExactOptimalCell = Math.abs(b - currentOptPoint.betaDeg) < 0.01 && Math.abs(a - currentOptPoint.alphaDeg) < 0.01;
+                        const isClosestOptimalCell = Math.abs(b - closestDiscreteBeta) < 0.01 && Math.abs(a - closestDiscreteAlpha) < 0.01;
+                        const isOptimalCell = isExactOptimalCell || isClosestOptimalCell;
+                        const optStyle = isOptimalCell
+                          ? 'border: 2px solid var(--accent-cyan, #0284c7) !important; box-shadow: inset 0 0 8px rgba(2, 132, 199, 0.4); font-weight: 800; transform: scale(1.08);'
+                          : '';
+                        const starText = isOptimalCell ? ' ★' : '';
+                        const optNote = isClosestOptimalCell && !isExactOptimalCell
+                          ? ` [${isEn ? `Closest cell to exact optimum β=${currentOptPoint.betaDeg}°` : `Celda más próxima al óptimo exacto β=${currentOptPoint.betaDeg}°`}]`
+                          : '';
+                        return `<td class="${cls}" style="${optStyle}" title="β=${b}°, α=${a}°: ${isEn ? 'Loss' : 'Pérdida'} ${formatPercent(loss, 1)} (${formatNum(rad, 2)} ${isEn ? 'kWh/m²/day' : 'kWh/m²/d'})${optNote}">${formatPercent(loss, 1)}${starText}</td>`;
+                      })
+                      .join('');
+                    return `<tr><td class="row-header-beta">${b}°</td>${cells}</tr>`;
+                  })
+                  .join('');
+              })()}
             </tbody>
           </table>
         </div>
@@ -693,7 +719,7 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
     const spanAlphaGrid = 180;
     const centerAlphaGrid = 0;
 
-    // Cache pre-computed 181x91 offscreen texture (1° resolution)
+    // Cache pre-computed 181x91 offscreen texture (1° resolution) with 1% isoline contour shading
     const offscreenCanvas = document.createElement('canvas');
     offscreenCanvas.width = 181; // 181 values across spanAlphaGrid
     offscreenCanvas.height = 91; // betas from 0 to 90 (91 values)
@@ -703,18 +729,45 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
       const imgData = offCtx.createImageData(181, 91);
       const data = imgData.data;
 
-      // Fill pixel array: row 0 is beta=90 (top), row 90 is beta=0 (bottom)
+      // Pre-compute 1° loss grid and integer 1% isoline bands (without numbers, purely shaded contours)
+      const bandGrid: number[][] = Array.from({ length: 91 }, () => new Array(181).fill(0));
+      const lossGrid: number[][] = Array.from({ length: 91 }, () => new Array(181).fill(0));
+
       for (let r = 0; r < 91; r++) {
         const b = 90 - r; // 90 down to 0
         for (let c = 0; c < 181; c++) {
           const a = minAlphaGrid + (c / 180) * spanAlphaGrid;
           const { loss } = interpolateLossAndRadiation(betas, alphas, lossMatrix, radMatrix, b, a);
-          const [red, green, blue] = getLossRgb(loss);
+          lossGrid[r][c] = loss;
+          bandGrid[r][c] = Math.floor(Math.max(0, loss));
+        }
+      }
+
+      // Fill pixel array: row 0 is beta=90 (top), row 90 is beta=0 (bottom)
+      for (let r = 0; r < 91; r++) {
+        for (let c = 0; c < 181; c++) {
+          const loss = lossGrid[r][c];
+          let [red, green, blue] = getLossRgb(loss);
+
+          // Subtle isoline contour boundary shading when crossing any 1% loss threshold
+          const curBand = bandGrid[r][c];
+          const upBand = r > 0 ? bandGrid[r - 1][c] : curBand;
+          const leftBand = c > 0 ? bandGrid[r][c - 1] : curBand;
+          if (curBand !== upBand || curBand !== leftBand) {
+            // Major CTE boundaries (10%, 20%, 40%) get slightly deeper contour emphasis than 1% steps
+            const maxB = Math.max(curBand, upBand, leftBand);
+            const isMajorCte = maxB === 10 || maxB === 20 || maxB === 40;
+            const shadeFactor = isMajorCte ? 0.72 : 0.86;
+            red = Math.round(red * shadeFactor);
+            green = Math.round(green * shadeFactor);
+            blue = Math.round(blue * shadeFactor);
+          }
+
           const idx = (r * 181 + c) * 4;
           data[idx] = red;
           data[idx + 1] = green;
           data[idx + 2] = blue;
-          data[idx + 3] = 230; // opacity
+          data[idx + 3] = 235; // opacity
         }
       }
       offCtx.putImageData(imgData, 0, 0);
@@ -903,9 +956,14 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
 
       // Highlight Current Evaluated Point (Interactive Crosshair Reticle)
       const selXY = coordsToXY(evaluatedBeta, evaluatedAlpha, plotW, plotH);
-      const { loss: evaluatedLoss, radiation: evaluatedRad } = interpolateLossAndRadiation(
+      const isAtCanonicalOpt =
+        Math.abs(evaluatedBeta - Math.round(optPoint.betaDeg)) < 0.5 &&
+        Math.abs(evaluatedAlpha - Math.round(optPoint.alphaDeg)) < 0.5;
+      const interpRes = interpolateLossAndRadiation(
         betas, alphas, lossMatrix, radMatrix, evaluatedBeta, evaluatedAlpha
       );
+      const evaluatedLoss = isAtCanonicalOpt ? 0.0 : interpRes.loss;
+      const evaluatedRad = isAtCanonicalOpt ? optPoint.maxDailyRadiationKwh : interpRes.radiation;
 
       // Crosshair lines
       ctx!.setLineDash([4, 4]);
@@ -942,7 +1000,7 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
       ctx!.arc(selXY.x, selXY.y, 3, 0, Math.PI * 2);
       ctx!.fill();
 
-      // Floating reticle badge with exact values
+      // Floating reticle badge with exact values (offset smoothly if near optimal badge to prevent overlap)
       const reticleLabel = `β = ${evaluatedBeta}°, α = ${evaluatedAlpha > 0 ? '+' : ''}${evaluatedAlpha}° | ${isEn ? 'Loss' : 'Pérdida'}: ${formatPercent(evaluatedLoss, 1)} (${formatNum(evaluatedRad, 2)} ${isEn ? 'kWh/m²/day' : 'kWh/m²/d'})`;
       ctx!.font = 'bold 11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
       const reticleMetrics = ctx!.measureText(reticleLabel);
@@ -953,6 +1011,17 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
 
       if (rX + rW > padLeft + plotW) rX = selXY.x - rW - 14;
       if (rY < padTop + 4) rY = selXY.y + 12;
+
+      // Avoid colliding with the optimal badge [bX, bY, bW, bH]
+      const overlapsOptX = rX < bX + bW + 4 && rX + rW > bX - 4;
+      const overlapsOptY = rY < bY + bH + 4 && rY + rH > bY - 4;
+      if (overlapsOptX && overlapsOptY) {
+        if (selXY.y + 14 + rH <= padTop + plotH - 2) {
+          rY = Math.max(selXY.y + 12, bY + bH + 6);
+        } else {
+          rY = Math.max(padTop + 4, bY - rH - 6);
+        }
+      }
 
       ctx!.fillStyle = 'rgba(15, 23, 42, 0.94)';
       ctx!.strokeStyle = '#ffffff';
@@ -971,9 +1040,14 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
     }
 
     function updateInspectorHUD() {
-      const { loss, radiation } = interpolateLossAndRadiation(
+      const isAtCanonicalOpt =
+        Math.abs(evaluatedBeta - Math.round(optPoint.betaDeg)) < 0.5 &&
+        Math.abs(evaluatedAlpha - Math.round(optPoint.alphaDeg)) < 0.5;
+      const interpRes = interpolateLossAndRadiation(
         betas, alphas, lossMatrix, radMatrix, evaluatedBeta, evaluatedAlpha
       );
+      const loss = isAtCanonicalOpt ? 0.0 : interpRes.loss;
+      const radiation = isAtCanonicalOpt ? optPoint.maxDailyRadiationKwh : interpRes.radiation;
 
       // CTE Compliance Status
       let cteBadge = '';

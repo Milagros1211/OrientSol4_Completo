@@ -149,8 +149,16 @@ def generate_capture_loss_map(
                 sin_delta = np.sin(delta)
                 cos_delta = np.cos(delta)
 
+                # For beta = 0° (horizontal surface), daily radiation is exactly g0[m]
+                # (matches transposition.py horizontal baseline without 15° discrete bin loss)
+                if beta_deg < 0.001:
+                    g_daily_month[m] = float(g0[m])
+                    continue
+
                 # Direct cosine of incidence angle on inclined surface with azimuth alpha:
-                # Symmetrical terms A(omega) - even functions where cos(-omega) = cos(omega):
+                #Note: for equator-facing alpha = 0° (phys_alpha = 0° in NH, 180° in SH),
+                # cos_theta_pm == cos_theta_am == sin_delta*sin(lat -/+ beta) + cos_delta*cos(lat -/+ beta)*cos(omega)
+                # matching transposition.py bh_beta() identically.
                 term1 = sin_delta * sin_phi * cos_beta
                 term2 = -sin_delta * cos_phi * sin_beta * cos_alpha
                 term3 = cos_delta * cos_phi * cos_beta * np.cos(omegas)
@@ -166,11 +174,11 @@ def generate_capture_loss_map(
 
                 # Sun zenith cosine on horizontal surface (symmetric for morning & afternoon)
                 cos_theta_z = sin_phi * sin_delta + cos_phi * cos_delta * np.cos(omegas)
-                safe_cos_tz = np.where(cos_theta_z > 0.01, cos_theta_z, 0.01)
+                safe_cos_tz = np.where(cos_theta_z > 1e-6, cos_theta_z, 1e-6)
 
-                # Beam transposition ratio Rb:
-                rb_pm = np.where((cos_theta_z > 0.01) & (cos_theta_pm > 0), cos_theta_pm / safe_cos_tz, 0.0)
-                rb_am = np.where((cos_theta_z > 0.01) & (cos_theta_am > 0), cos_theta_am / safe_cos_tz, 0.0)
+                # Beam transposition ratio Rb (matching transposition.py 1e-6 threshold):
+                rb_pm = np.where((cos_theta_z > 1e-6) & (cos_theta_pm > 0.0), cos_theta_pm / safe_cos_tz, 0.0)
+                rb_am = np.where((cos_theta_z > 1e-6) & (cos_theta_am > 0.0), cos_theta_am / safe_cos_tz, 0.0)
 
                 # Hourly beam, diffuse, and ground reflected components
                 bh_hourly = bh_matriz[m, :n_pts]
@@ -195,20 +203,24 @@ def generate_capture_loss_map(
                 radiation_monthly[m, i_b, i_a] = g_daily_month[m]
 
     # Reference maximum (Equator-facing optimal tilt at center of [-90, +90] map: alpha = 0.0°)
-    opt_beta_deg, opt_alpha_deg, max_radiation = _find_optimal_beta_alpha(
+    # Note: we normalize loss_pct_matrix against the actual grid maximum so that the discrete
+    # cell closest to the canonical optimum always reaches 0.0% loss, while keeping max_radiation
+    # from the 1° analytical study for reporting consistency.
+    opt_beta_deg, opt_alpha_deg, grid_max_radiation = _find_optimal_beta_alpha(
         radiation_annual_daily, betas, alphas, preferred_alpha=0.0
     )
+    max_radiation = grid_max_radiation
     if annual_opt_tilt_deg is not None:
         opt_beta_deg = float(annual_opt_tilt_deg)
         opt_alpha_deg = 0.0
     if annual_opt_max_rad_kwh is not None:
         max_radiation = max(float(max_radiation), float(annual_opt_max_rad_kwh))
 
-    # Capture loss percentage matrix relative to the maximum:
-    # Loss (%) = (1 - G / G_max) * 100
+    # Capture loss percentage matrix relative to the grid maximum:
+    # Loss (%) = (1 - G / G_grid_max) * 100
     loss_pct_matrix = np.where(
-        max_radiation > 0,
-        np.maximum(0.0, ((max_radiation - radiation_annual_daily) / max_radiation) * 100.0),
+        grid_max_radiation > 0,
+        np.maximum(0.0, ((grid_max_radiation - radiation_annual_daily) / grid_max_radiation) * 100.0),
         0.0
     )
 
@@ -228,9 +240,10 @@ def generate_capture_loss_map(
     monthly_maps = []
     for m in range(12):
         m_rad = radiation_monthly[m]
-        opt_beta_m, opt_alpha_m, max_rad_m = _find_optimal_beta_alpha(
+        opt_beta_m, opt_alpha_m, grid_max_rad_m = _find_optimal_beta_alpha(
             m_rad, betas, alphas, preferred_alpha=0.0
         )
+        max_rad_m = grid_max_rad_m
         if monthly_opt_tilts_deg is not None and m < len(monthly_opt_tilts_deg):
             opt_beta_m = float(monthly_opt_tilts_deg[m])
             opt_alpha_m = 0.0
@@ -238,8 +251,8 @@ def generate_capture_loss_map(
             max_rad_m = max(float(max_rad_m), float(monthly_opt_max_rad_kwh[m]))
 
         loss_pct_m = np.where(
-            max_rad_m > 0,
-            np.maximum(0.0, ((max_rad_m - m_rad) / max_rad_m) * 100.0),
+            grid_max_rad_m > 0,
+            np.maximum(0.0, ((grid_max_rad_m - m_rad) / grid_max_rad_m) * 100.0),
             0.0
         )
         gen_pct_m = round(float(np.sum(loss_pct_m <= 10.0) / total_cells * 100.0), 1)
@@ -303,9 +316,10 @@ def generate_capture_loss_map(
     for s_idx, s_def in enumerate(SEASON_DEFS):
         s_months = s_def["months"]
         s_rad = np.mean(radiation_monthly[s_months, :, :], axis=0)
-        opt_beta_s, opt_alpha_s, max_rad_s = _find_optimal_beta_alpha(
+        opt_beta_s, opt_alpha_s, grid_max_rad_s = _find_optimal_beta_alpha(
             s_rad, betas, alphas, preferred_alpha=0.0
         )
+        max_rad_s = grid_max_rad_s
         if seasonal_optima is not None and s_def["key"] in seasonal_optima:
             s_opt_data = seasonal_optima[s_def["key"]]
             opt_beta_s = float(s_opt_data.get("opt_angle_deg", opt_beta_s))
@@ -314,8 +328,8 @@ def generate_capture_loss_map(
                 max_rad_s = max(float(max_rad_s), float(s_opt_data["mean_daily_kwh"]))
 
         loss_pct_s = np.where(
-            max_rad_s > 0,
-            np.maximum(0.0, ((max_rad_s - s_rad) / max_rad_s) * 100.0),
+            grid_max_rad_s > 0,
+            np.maximum(0.0, ((grid_max_rad_s - s_rad) / grid_max_rad_s) * 100.0),
             0.0
         )
         gen_pct_s = round(float(np.sum(loss_pct_s <= 10.0) / total_cells * 100.0), 1)
