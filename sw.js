@@ -1,4 +1,4 @@
-const CACHE_NAME = 'orientsol-cache-v6';
+const CACHE_NAME = 'orientsol-cache-v7';
 
 const ASSETS_TO_CACHE = [
   './manifest.webmanifest',
