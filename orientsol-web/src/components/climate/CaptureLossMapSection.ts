@@ -729,70 +729,6 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
     const spanAlphaGrid = 180;
     const centerAlphaGrid = 0;
 
-    // Cache pre-computed high-definition 721x361 offscreen texture (0.25° resolution)
-    // with crisp, well-defined 1% isoline bands and clean anti-aliased contour lines
-    const texW = 721; // 0.25° steps across 180° azimuth
-    const texH = 361; // 0.25° steps across 90° tilt
-    const offscreenCanvas = document.createElement('canvas');
-    offscreenCanvas.width = texW;
-    offscreenCanvas.height = texH;
-    const offCtx = offscreenCanvas.getContext('2d');
-
-    if (offCtx) {
-      const imgData = offCtx.createImageData(texW, texH);
-      const data = imgData.data;
-
-      // Pre-compute continuous 0.25° loss grid and integer 1% isoline bands
-      const bandGrid: Int16Array = new Int16Array(texW * texH);
-      const lossGrid: Float32Array = new Float32Array(texW * texH);
-
-      for (let r = 0; r < texH; r++) {
-        const b = 90 - (r / (texH - 1)) * 90; // 90 down to 0
-        const rowOffset = r * texW;
-        for (let c = 0; c < texW; c++) {
-          const a = minAlphaGrid + (c / (texW - 1)) * spanAlphaGrid;
-          const { loss } = interpolateLossAndRadiation(betas, alphas, lossMatrix, radMatrix, b, a, false);
-          lossGrid[rowOffset + c] = loss;
-          bandGrid[rowOffset + c] = Math.floor(Math.max(0, loss));
-        }
-      }
-
-      // Fill pixel array with clean stepped bands and continuous 4-neighbor contour lines
-      for (let r = 0; r < texH; r++) {
-        const rowOffset = r * texW;
-        for (let c = 0; c < texW; c++) {
-          const cellIdx = rowOffset + c;
-          const loss = lossGrid[cellIdx];
-          let [red, green, blue] = getLossRgb(loss);
-
-          // Crisp 1-pixel contour line wherever an isoline (every 1% loss) is crossed
-          const curBand = bandGrid[cellIdx];
-          const upBand = r > 0 ? bandGrid[cellIdx - texW] : curBand;
-          const downBand = r < texH - 1 ? bandGrid[cellIdx + texW] : curBand;
-          const leftBand = c > 0 ? bandGrid[cellIdx - 1] : curBand;
-          const rightBand = c < texW - 1 ? bandGrid[cellIdx + 1] : curBand;
-
-          // Draw contour on the higher-loss side of the boundary for a clean 1px stroke
-          const minNeighborBand = Math.min(upBand, downBand, leftBand, rightBand);
-          if (curBand > minNeighborBand) {
-            const isMajorCte = curBand === 10 || curBand === 20 || curBand === 40;
-            const is5PctStep = curBand % 5 === 0;
-            const shadeFactor = isMajorCte ? 0.52 : is5PctStep ? 0.66 : 0.78;
-            red = Math.round(red * shadeFactor);
-            green = Math.round(green * shadeFactor);
-            blue = Math.round(blue * shadeFactor);
-          }
-
-          const idx = cellIdx * 4;
-          data[idx] = red;
-          data[idx + 1] = green;
-          data[idx + 2] = blue;
-          data[idx + 3] = 242; // high clarity opacity
-        }
-      }
-      offCtx.putImageData(imgData, 0, 0);
-    }
-
     // Geometry margins for canvas plotting
     const padLeft = 60;
     const padRight = 30;
@@ -800,6 +736,93 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
     const padBottom = 48;
 
     let isDragging = false;
+
+    // Offscreen pixel-exact cache rendered at the exact physical DPR resolution of the plot area
+    // so that drawImage performs a 1:1 copy without any bilinear scaling blur.
+    const offscreenCanvas = document.createElement('canvas');
+    let cachedTexW = 0;
+    let cachedTexH = 0;
+
+    function ensureSharpPlotTexture(physW: number, physH: number) {
+      const targetW = Math.max(180, Math.round(physW));
+      const targetH = Math.max(90, Math.round(physH));
+      if (cachedTexW === targetW && cachedTexH === targetH) return;
+
+      cachedTexW = targetW;
+      cachedTexH = targetH;
+      offscreenCanvas.width = targetW;
+      offscreenCanvas.height = targetH;
+      const offCtx = offscreenCanvas.getContext('2d');
+      if (!offCtx) return;
+
+      const imgData = offCtx.createImageData(targetW, targetH);
+      const data = imgData.data;
+
+      // 1. Evaluate continuous loss at every exact physical pixel of the plot
+      const lossGrid = new Float32Array(targetW * targetH);
+      const bandGrid = new Int16Array(targetW * targetH);
+      const invW = 1 / Math.max(1, targetW - 1);
+      const invH = 1 / Math.max(1, targetH - 1);
+
+      for (let r = 0; r < targetH; r++) {
+        const b = 90 - r * invH * 90;
+        const rowOffset = r * targetW;
+        for (let c = 0; c < targetW; c++) {
+          const a = minAlphaGrid + c * invW * spanAlphaGrid;
+          const { loss } = interpolateLossAndRadiation(betas, alphas, lossMatrix, radMatrix, b, a, false);
+          lossGrid[rowOffset + c] = loss;
+          bandGrid[rowOffset + c] = Math.floor(Math.max(0, loss));
+        }
+      }
+
+      // 2. Render crisp, flat-shaded 1% isoline bands and sub-pixel anti-aliased contour lines
+      for (let r = 0; r < targetH; r++) {
+        const rowOffset = r * targetW;
+        for (let c = 0; c < targetW; c++) {
+          const cellIdx = rowOffset + c;
+          const loss = lossGrid[cellIdx];
+          let [red, green, blue] = getLossRgb(loss);
+
+          // Compute local screen-space gradient magnitude |∇loss| (loss % per physical pixel)
+          const lLeft = c > 0 ? lossGrid[cellIdx - 1] : loss;
+          const lRight = c < targetW - 1 ? lossGrid[cellIdx + 1] : loss;
+          const lUp = r > 0 ? lossGrid[cellIdx - targetW] : loss;
+          const lDown = r < targetH - 1 ? lossGrid[cellIdx + targetW] : loss;
+          const gx = (lRight - lLeft) * (c > 0 && c < targetW - 1 ? 0.5 : 1.0);
+          const gy = (lDown - lUp) * (r > 0 && r < targetH - 1 ? 0.5 : 1.0);
+          const gradMag = Math.hypot(gx, gy);
+
+          if (gradMag > 1e-5) {
+            // Distance in loss-% units to the nearest integer 1% isoline level
+            const nearestLevel = Math.max(1, Math.round(loss));
+            const distLoss = Math.abs(loss - nearestLevel);
+            // Distance in physical pixels to that 1% isoline curve
+            const distPx = distLoss / gradMag;
+
+            const isMajorCte = nearestLevel === 10 || nearestLevel === 20 || nearestLevel === 40;
+            const is5Pct = nearestLevel % 5 === 0;
+            const halfWidthPx = isMajorCte ? 1.35 : is5Pct ? 1.0 : 0.78;
+
+            if (distPx < halfWidthPx) {
+              // Smooth anti-aliased coverage across the 1px contour stroke
+              const edgeCoverage = Math.max(0, Math.min(1, (halfWidthPx - distPx) / Math.min(0.65, halfWidthPx)));
+              const darkenStrength = isMajorCte ? 0.62 : is5Pct ? 0.45 : 0.32;
+              const factor = 1.0 - edgeCoverage * darkenStrength;
+              red = Math.round(red * factor);
+              green = Math.round(green * factor);
+              blue = Math.round(blue * factor);
+            }
+          }
+
+          const idx = cellIdx * 4;
+          data[idx] = red;
+          data[idx + 1] = green;
+          data[idx + 2] = blue;
+          data[idx + 3] = 255; // 100% opaque so background never washes out band contrast
+        }
+      }
+      offCtx.putImageData(imgData, 0, 0);
+    }
 
     function getPlotDimensions() {
       const rect = canvas!.getBoundingClientRect();
@@ -851,8 +874,11 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
       ctx!.fillStyle = bgColor;
       ctx!.fillRect(0, 0, cssW, cssH);
 
-      // Draw interpolated heat map from offscreen texture
-      ctx!.imageSmoothingEnabled = true;
+      // Build/reuse exact physical-pixel texture (plotW * dpr x plotH * dpr) and blit 1:1 without scaling blur
+      const physPlotW = Math.round(plotW * dpr);
+      const physPlotH = Math.round(plotH * dpr);
+      ensureSharpPlotTexture(physPlotW, physPlotH);
+      ctx!.imageSmoothingEnabled = false;
       ctx!.drawImage(offscreenCanvas, padLeft, padTop, plotW, plotH);
 
       // Draw grid lines and ticks
