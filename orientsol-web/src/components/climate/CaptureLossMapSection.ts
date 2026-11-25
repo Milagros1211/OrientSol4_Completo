@@ -108,13 +108,43 @@ function interpolateLossAndRadiation(
 }
 
 /**
- * Returns RGB tuple based on CTE DB-HE4 loss thresholds with stepped 1% isoline bands:
- * - 0% to 10%: Deep emerald to bright green (Límite General, 1% isoline steps)
- * - 10% to 20%: Amber/Yellow (Superposición, 1% isoline steps)
- * - 20% to 40%: Warm Orange (Integración Arquitectónica, 2% isoline steps)
- * - > 40%: Deep Crimson/Wine (No conforme, 2.5% isoline steps)
+ * Returns RGB tuple based on CTE DB-HE4 loss thresholds.
+ * - When steppedIsolines is true: quantizes into distinct 1% isoline bands.
+ * - When steppedIsolines is false: renders a smooth continuous gradient across each CTE zone.
  */
-function getLossRgb(loss: number): [number, number, number] {
+function getLossRgb(loss: number, steppedIsolines: boolean = true): [number, number, number] {
+  if (!steppedIsolines) {
+    if (loss <= 10.0) {
+      const t = Math.max(0, Math.min(1, loss / 10.0));
+      return [
+        Math.round(5 + t * 11),
+        Math.round(150 + t * 35),
+        Math.round(105 + t * 24),
+      ];
+    } else if (loss <= 20.0) {
+      const t = Math.max(0, Math.min(1, (loss - 10.0) / 10.0));
+      return [
+        Math.round(180 + t * 65),
+        Math.round(150 + t * 8),
+        Math.round(15 - t * 4),
+      ];
+    } else if (loss <= 40.0) {
+      const t = Math.max(0, Math.min(1, (loss - 20.0) / 20.0));
+      return [
+        Math.round(245 - t * 25),
+        Math.round(158 - t * 120),
+        Math.round(11 + t * 27),
+      ];
+    } else {
+      const t = Math.max(0, Math.min(1, (loss - 40.0) / 30.0));
+      return [
+        Math.round(220 - t * 93),
+        Math.round(38 - t * 9),
+        Math.round(38 - t * 9),
+      ];
+    }
+  }
+
   // Quantize into 1% isoline bands so points with similar loss share a distinct contour band
   const band1Pct = Math.floor(Math.max(0, loss));
 
@@ -174,6 +204,7 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
   let evaluatedBeta = 35;
   let evaluatedAlpha = 0;
   let hasUserSelectedPoint = false;
+  let showIsolines = true;
 
   const getCteClass = (loss: number) => {
     if (loss <= 10.0) return 'loss-cell-green';
@@ -509,7 +540,17 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
             </svg>
             ${isEn ? 'Interactive Map (1° Resolution) — Click or drag anywhere to inspect' : 'Mapa Interactivo de Pérdidas (Resolución 1°) — Haz clic o arrastra para evaluar'}
           </div>
-          <div style="font-size: 0.74rem; color: var(--text-dim); display: flex; align-items: center; gap: 0.6rem;">
+          <div style="font-size: 0.74rem; color: var(--text-dim); display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+            <button
+              type="button"
+              id="btn-toggle-isolines"
+              aria-pressed="${showIsolines ? 'true' : 'false'}"
+              title="${isEn ? 'Toggle 1% loss isoline contours ON or OFF' : 'Activar o desactivar el sombreado de isolíneas de pérdidas (1%)'}"
+              style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.22rem 0.65rem; border-radius: 999px; font-size: 0.73rem; font-weight: 700; cursor: pointer; transition: all 0.15s ease; border: 1px solid ${showIsolines ? 'rgba(16, 185, 129, 0.45)' : 'var(--border-subtle)'}; background: ${showIsolines ? 'rgba(16, 185, 129, 0.14)' : 'var(--bg-card)'}; color: ${showIsolines ? '#10b981' : 'var(--text-dim)'};"
+            >
+              <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: ${showIsolines ? '#10b981' : '#94a3b8'}; box-shadow: ${showIsolines ? '0 0 6px rgba(16, 185, 129, 0.6)' : 'none'};"></span>
+              <span>${isEn ? 'Isolines (1%):' : 'Isolíneas (1%):'} <strong id="lbl-toggle-isolines-state">${showIsolines ? 'ON' : 'OFF'}</strong></span>
+            </button>
             <span><strong style="color: var(--accent-cyan, #0284c7);">★</strong> ${isEn ? 'Optimal Point' : 'Punto Óptimo'}</span>
             <span><strong style="color: #38bdf8;">◎</strong> ${isEn ? 'Inspected Point (1°)' : 'Punto Inspeccionado (1°)'}</span>
           </div>
@@ -742,14 +783,16 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
     const offscreenCanvas = document.createElement('canvas');
     let cachedTexW = 0;
     let cachedTexH = 0;
+    let cachedIsolinesState: boolean | null = null;
 
     function ensureSharpPlotTexture(physW: number, physH: number) {
       const targetW = Math.max(180, Math.round(physW));
       const targetH = Math.max(90, Math.round(physH));
-      if (cachedTexW === targetW && cachedTexH === targetH) return;
+      if (cachedTexW === targetW && cachedTexH === targetH && cachedIsolinesState === showIsolines) return;
 
       cachedTexW = targetW;
       cachedTexH = targetH;
+      cachedIsolinesState = showIsolines;
       offscreenCanvas.width = targetW;
       offscreenCanvas.height = targetH;
       const offCtx = offscreenCanvas.getContext('2d');
@@ -760,7 +803,6 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
 
       // 1. Evaluate continuous loss at every exact physical pixel of the plot
       const lossGrid = new Float32Array(targetW * targetH);
-      const bandGrid = new Int16Array(targetW * targetH);
       const invW = 1 / Math.max(1, targetW - 1);
       const invH = 1 / Math.max(1, targetH - 1);
 
@@ -771,46 +813,47 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
           const a = minAlphaGrid + c * invW * spanAlphaGrid;
           const { loss } = interpolateLossAndRadiation(betas, alphas, lossMatrix, radMatrix, b, a, false);
           lossGrid[rowOffset + c] = loss;
-          bandGrid[rowOffset + c] = Math.floor(Math.max(0, loss));
         }
       }
 
-      // 2. Render crisp, flat-shaded 1% isoline bands and sub-pixel anti-aliased contour lines
+      // 2. Render either crisp 1% isoline bands + anti-aliased contour lines (ON) or smooth continuous heatmap (OFF)
       for (let r = 0; r < targetH; r++) {
         const rowOffset = r * targetW;
         for (let c = 0; c < targetW; c++) {
           const cellIdx = rowOffset + c;
           const loss = lossGrid[cellIdx];
-          let [red, green, blue] = getLossRgb(loss);
+          let [red, green, blue] = getLossRgb(loss, showIsolines);
 
-          // Compute local screen-space gradient magnitude |∇loss| (loss % per physical pixel)
-          const lLeft = c > 0 ? lossGrid[cellIdx - 1] : loss;
-          const lRight = c < targetW - 1 ? lossGrid[cellIdx + 1] : loss;
-          const lUp = r > 0 ? lossGrid[cellIdx - targetW] : loss;
-          const lDown = r < targetH - 1 ? lossGrid[cellIdx + targetW] : loss;
-          const gx = (lRight - lLeft) * (c > 0 && c < targetW - 1 ? 0.5 : 1.0);
-          const gy = (lDown - lUp) * (r > 0 && r < targetH - 1 ? 0.5 : 1.0);
-          const gradMag = Math.hypot(gx, gy);
+          if (showIsolines) {
+            // Compute local screen-space gradient magnitude |∇loss| (loss % per physical pixel)
+            const lLeft = c > 0 ? lossGrid[cellIdx - 1] : loss;
+            const lRight = c < targetW - 1 ? lossGrid[cellIdx + 1] : loss;
+            const lUp = r > 0 ? lossGrid[cellIdx - targetW] : loss;
+            const lDown = r < targetH - 1 ? lossGrid[cellIdx + targetW] : loss;
+            const gx = (lRight - lLeft) * (c > 0 && c < targetW - 1 ? 0.5 : 1.0);
+            const gy = (lDown - lUp) * (r > 0 && r < targetH - 1 ? 0.5 : 1.0);
+            const gradMag = Math.hypot(gx, gy);
 
-          if (gradMag > 1e-5) {
-            // Distance in loss-% units to the nearest integer 1% isoline level
-            const nearestLevel = Math.max(1, Math.round(loss));
-            const distLoss = Math.abs(loss - nearestLevel);
-            // Distance in physical pixels to that 1% isoline curve
-            const distPx = distLoss / gradMag;
+            if (gradMag > 1e-5) {
+              // Distance in loss-% units to the nearest integer 1% isoline level
+              const nearestLevel = Math.max(1, Math.round(loss));
+              const distLoss = Math.abs(loss - nearestLevel);
+              // Distance in physical pixels to that 1% isoline curve
+              const distPx = distLoss / gradMag;
 
-            const isMajorCte = nearestLevel === 10 || nearestLevel === 20 || nearestLevel === 40;
-            const is5Pct = nearestLevel % 5 === 0;
-            const halfWidthPx = isMajorCte ? 1.35 : is5Pct ? 1.0 : 0.78;
+              const isMajorCte = nearestLevel === 10 || nearestLevel === 20 || nearestLevel === 40;
+              const is5Pct = nearestLevel % 5 === 0;
+              const halfWidthPx = isMajorCte ? 1.35 : is5Pct ? 1.0 : 0.78;
 
-            if (distPx < halfWidthPx) {
-              // Smooth anti-aliased coverage across the 1px contour stroke
-              const edgeCoverage = Math.max(0, Math.min(1, (halfWidthPx - distPx) / Math.min(0.65, halfWidthPx)));
-              const darkenStrength = isMajorCte ? 0.62 : is5Pct ? 0.45 : 0.32;
-              const factor = 1.0 - edgeCoverage * darkenStrength;
-              red = Math.round(red * factor);
-              green = Math.round(green * factor);
-              blue = Math.round(blue * factor);
+              if (distPx < halfWidthPx) {
+                // Smooth anti-aliased coverage across the 1px contour stroke
+                const edgeCoverage = Math.max(0, Math.min(1, (halfWidthPx - distPx) / Math.min(0.65, halfWidthPx)));
+                const darkenStrength = isMajorCte ? 0.62 : is5Pct ? 0.45 : 0.32;
+                const factor = 1.0 - edgeCoverage * darkenStrength;
+                red = Math.round(red * factor);
+                green = Math.round(green * factor);
+                blue = Math.round(blue * factor);
+              }
             }
           }
 
@@ -1457,6 +1500,26 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
     });
     inputAlpha?.addEventListener('change', () => {
       setEvaluatedPoint(evaluatedBeta, parseInt(inputAlpha.value, 10) || 0);
+    });
+
+    // Toggle 1% isolines ON / OFF
+    const btnToggleIsolines = container.querySelector<HTMLButtonElement>('#btn-toggle-isolines');
+    btnToggleIsolines?.addEventListener('click', () => {
+      showIsolines = !showIsolines;
+      btnToggleIsolines.setAttribute('aria-pressed', showIsolines ? 'true' : 'false');
+      btnToggleIsolines.style.border = `1px solid ${showIsolines ? 'rgba(16, 185, 129, 0.45)' : 'var(--border-subtle)'}`;
+      btnToggleIsolines.style.background = showIsolines ? 'rgba(16, 185, 129, 0.14)' : 'var(--bg-card)';
+      btnToggleIsolines.style.color = showIsolines ? '#10b981' : 'var(--text-dim)';
+      const dot = btnToggleIsolines.querySelector<HTMLSpanElement>('span');
+      if (dot) {
+        dot.style.background = showIsolines ? '#10b981' : '#94a3b8';
+        dot.style.boxShadow = showIsolines ? '0 0 6px rgba(16, 185, 129, 0.6)' : 'none';
+      }
+      const lbl = btnToggleIsolines.querySelector<HTMLElement>('#lbl-toggle-isolines-state');
+      if (lbl) {
+        lbl.textContent = showIsolines ? 'ON' : 'OFF';
+      }
+      renderCanvas();
     });
 
     // Preset button shortcuts
